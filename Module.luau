@@ -2168,7 +2168,12 @@ function VerifyToolTip(ToolTip)
 end
 
 function VerifyTool(Name)
-  return if GetToolByName(Name) then true else false
+    if GetToolByName(Name) then
+        return true
+    else
+        return false
+    end
 end
 
 return Module
+
