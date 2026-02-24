@@ -2167,13 +2167,6 @@ function VerifyToolTip(ToolTip)
   return GetToolTip(ToolTip, Player.Backpack) or Character and GetToolTip(ToolTip, Character)
 end
 
-function VerifyTool(Name)
-    if GetToolByName(Name) then
-        return true
-    else
-        return false
-    end
-end
-
 return Module
+
 
