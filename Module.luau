@@ -1,10 +1,10 @@
-local Settings, Connections = ...
+local Settings = ...
+
+if type(Settings) ~= "table" then
+  return nil
+end
 
 local _ENV = (getgenv or getrenv or getfenv)()
-
-if type(Settings) ~= "table" or type(Connections) ~= "table" then
-	return {}
-end
 
 local VirtualInputManager: VirtualInputManager = game:GetService("VirtualInputManager")
 local CollectionService: CollectionService = game:GetService("CollectionService")
@@ -44,8 +44,8 @@ local Net: ModuleScript = Modules:WaitForChild("Net")
 
 local BLACKLISTED_EXECUTORS: { string } = {"NULL"}
 
-local EXECUTOR_NAME: string = string.upper(if identifyexecutor then identifyexecutor() else "NULL")
-local IS_BLACKLISTED_EXECUTOR: boolean = if table.find(BLACKLISTED_EXECUTORS, EXECUTOR_NAME) then true else false
+local EXECUTOR_NAME = identifyexecutor and string.upper(identifyexecutor()) or "NULL"
+local IS_BLACKLISTED_EXECUTOR = table.find(BLACKLISTED_EXECUTORS, EXECUTOR_NAME) ~= nil
 
 local hookmetamethod = (not IS_BLACKLISTED_EXECUTOR and hookmetamethod) or (function(...) return ... end)
 local hookfunction = (not IS_BLACKLISTED_EXECUTOR and hookfunction) or (function(...) return ... end)
@@ -65,6 +65,15 @@ local HIDDEN_SETTINGS: { [string]: any } = {
 _ENV._Bring_Tag = BRING_TAG
 _ENV._KillAura_Tag = KILLAURA_TAG
 
+local Connections = {} do
+	if _ENV.rz_connections then
+		for _, Connection in ipairs(_ENV.rz_connections) do
+			Connection:Disconnect()
+		end
+	end
+	_ENV.rz_connections = Connections
+end
+
 local function GetEnemyName(string: string): string
 	return (string:find("Lv. ") and string:gsub(" %pLv. %d+%p", "") or string):gsub(" %pBoss%p", "")
 end
@@ -75,7 +84,6 @@ local function CheckPlayerAlly(__Player: Player): boolean
 	elseif __Player:HasTag(`Ally{Player.Name}`) or Player:HasTag(`Ally{__Player.Name}`) then
 		return false
 	end
-	
 	return true
 end
 
@@ -93,13 +101,11 @@ local function FastWait(Seconds, Instance, ...)
 		end
 		return Instance
 	end, ...)
-	
 	return Success and Result or nil
 end
 
 local function CreateNewClear()
 	local COUNT_NEWINDEX = 0
-	
 	return {
 		__newindex = function(self, index, value)
 			if COUNT_NEWINDEX >= HIDDEN_SETTINGS.CLEAR_AFTER then
@@ -110,8 +116,7 @@ local function CreateNewClear()
 				end
 				COUNT_NEWINDEX = 0
 			end
-			
-			COUNT_NEWINDEX += 1
+			COUNT_NEWINDEX = COUNT_NEWINDEX + 1
 			return rawset(self, index, value)
 		end
 	}
@@ -119,47 +124,29 @@ end
 
 function CreateDictionary(array: { string }, value: any?): { [string]: any? }
 	local Dictionary = {}
-	
-	for _, string in ipairs(array) do
-		Dictionary[string] = if type(value) == "table" then {} else value
+	for _, str in ipairs(array) do
+		Dictionary[str] = (type(value) == "table") and {} or value
 	end
-	
 	return Dictionary
 end
 
 local Signal = {} do
 	local Connection = {} do
 		Connection.__index = Connection
-		
 		function Connection:Disconnect(): (nil)
-			if not self.Connected then
-				return nil
-			end
-			
-			local find = table.find(self.Signal, self)
-			
-			if find then
-				table.remove(self.Signal, find)
-			end
-			
+			if not self.Connected then return nil end
+			local idx = table.find(self.Signal, self)
+			if idx then table.remove(self.Signal, idx) end
 			self.Function = nil
 			self.Connected = false
 		end
-		
 		function Connection:Fire(...): (nil)
-			if not self.Function then
-				return nil
-			end
-			
+			if not self.Function then return nil end
 			task.spawn(self.Function, ...)
 		end
-		
 		function Connection.new(): Connection
-			return setmetatable({
-				Connected = true
-			}, Connection)
+			return setmetatable({ Connected = true }, Connection)
 		end
-		
 		setmetatable(Connection, {
 			__index = function(self, index)
 				error(("Attempt to get Connection::%s (not a valid member)"):format(tostring(index)), 2)
@@ -169,40 +156,30 @@ local Signal = {} do
 			end
 		})
 	end
-	
 	Signal.__index = Signal
-	
 	function Signal:Connect(Function): Connection
-		if type(Function) ~= "function" then
-			return nil
-		end
-		
+		if type(Function) ~= "function" then return nil end
 		local NewConnection = Connection.new()
 		NewConnection.Function = Function
 		NewConnection.Signal = self
-		
 		table.insert(self.Connections, NewConnection)
 		return NewConnection
 	end
-	
 	function Signal:Once(Function): (nil)
-		local Connection;
-		Connection = self:Connect(function(...)
+		local Connection; Connection = self:Connect(function(...)
 			Function(...)
 			Connection:Disconnect()
 		end)
 		return Connection
 	end
-	
 	function Signal:Wait(): any?
 		local WaitingCoroutine = coroutine.running()
-		local Connection;Connection = self:Connect(function(...)
+		local Connection; Connection = self:Connect(function(...)
 			Connection:Disconnect()
 			task.spawn(WaitingCoroutine, ...)
 		end)
 		return coroutine.yield()
 	end
-	
 	function Signal:Fire(...): (nil)
 		for _, Connection in ipairs(self.Connections) do
 			if Connection.Connected then
@@ -210,13 +187,9 @@ local Signal = {} do
 			end
 		end
 	end
-	
 	function Signal.new(): Signal
-		return setmetatable({
-			Connections = {}
-		}, Signal)
+		return setmetatable({ Connections = {} }, Signal)
 	end
-	
 	setmetatable(Signal, {
 		__index = function(self, index)
 			error(`Attempt to get Signal::{ tostring(index) } (not a valid member)`, 2)
@@ -232,14 +205,10 @@ local sea2 = {4442272183, 79091703265657}
 local sea3 = {7449423635, 100117331123089}
 
 local function detectSea(placeId)
-    if table.find(sea1, placeId) then
-        return 1
-    elseif table.find(sea2, placeId) then
-        return 2
-    elseif table.find(sea3, placeId) then
-        return 3
-    end
-    return 0
+	if table.find(sea1, placeId) then return 1
+	elseif table.find(sea2, placeId) then return 2
+	elseif table.find(sea3, placeId) then return 3 end
+	return 0
 end
 
 local Module = {} do
@@ -247,18 +216,18 @@ local Module = {} do
 		Closest = nil,
 		Equipped = nil,
 		Humanoids = setmetatable({}, CreateNewClear()),
-		Enemies = {}, -- setmetatable({}, CreateNewClear()),
+		Enemies = {},
 		Progress = {},
 		Bring = {},
 		Tools = {}
 	}
 	
 	Module.GameData = {
-		Sea =  detectSea(game.PlaceId),
+		Sea = detectSea(game.PlaceId),
 		SeasName = { "Main", "Dressrosa", "Zou" },
 		MaxMastery = 600,
 		MaxLevel = game.Workspace:GetAttribute("LEVEL_CAP"),
-        StringVersion = require(ReplicatedStorage.BuildInfo).VERSION
+		StringVersion = require(ReplicatedStorage.BuildInfo).VERSION
 	}
 	
 	Module.Debounce = {
@@ -313,205 +282,44 @@ local Module = {} do
 		}
 		
 		Module.Bosses = {
-			-- Bosses Sea 1
-			["Saber Expert"] = {
-				NoQuest = true,
-				Position = CFrame.new(-1461, 30, -51)
-			},
-			["The Saw"] = {
-				RaidBoss = true,
-				Position = CFrame.new(-690, 15, 1583)
-			},
-			["Greybeard"] = {
-				RaidBoss = true,
-				Position = CFrame.new(-5043, 25, 4262)
-			},
-			["The Gorilla King"] = {
-				IsBoss = true,
-				Level = 20,
-				Position = CFrame.new(-1128, 6, -451),
-				Quest = {"JungleQuest", CFrame.new(-1598, 37, 153)}
-			},
-			["Bobby"] = {
-				IsBoss = true,
-				Level = 55,
-				Position = CFrame.new(-1131, 14, 4080),
-				Quest = {"BuggyQuest1", CFrame.new(-1140, 4, 3829)}
-			},
-			["Yeti"] = {
-				IsBoss = true,
-				Level = 105,
-				Position = CFrame.new(1185, 106, -1518),
-				Quest = {"SnowQuest", CFrame.new(1385, 87, -1298)}
-			},
-			["Vice Admiral"] = {
-				IsBoss = true,
-				Level = 130,
-				Position = CFrame.new(-4807, 21, 4360),
-				Quest = {"MarineQuest2", CFrame.new(-5035, 29, 4326), 2}
-			},
-			["Swan"] = {
-				IsBoss = true,
-				Level = 240,
-				Position = CFrame.new(5230, 4, 749),
-				Quest = {"ImpelQuest", CFrame.new(5191, 4, 692)}
-			},
-			["Chief Warden"] = {
-				IsBoss = true,
-				Level = 230,
-				Position = CFrame.new(5230, 4, 749),
-				Quest = {"ImpelQuest", CFrame.new(5191, 4, 692), 2}
-			},
-			["Warden"] = {
-				IsBoss = true,
-				Level = 220,
-				Position = CFrame.new(5230, 4, 749),
-				Quest = {"ImpelQuest", CFrame.new(5191, 4, 692), 1}
-			},
-			["Magma Admiral"] = {
-				IsBoss = true,
-				Level = 350,
-				Position = CFrame.new(-5694, 18, 8735),
-				Quest = {"MagmaQuest", CFrame.new(-5319, 12, 8515)}
-			},
-			["Fishman Lord"] = {
-				IsBoss = true,
-				Level = 425,
-				Position = CFrame.new(61350, 31, 1095),
-				Quest = {"FishmanQuest", CFrame.new(61122, 18, 1567)}
-			},
-			["Wysper"] = {
-				IsBoss = true,
-				Level = 500,
-				Position = CFrame.new(-7927, 5551, -637),
-				Quest = {"SkyExp1Quest", CFrame.new(-7861, 5545, -381)}
-			},
-			["Thunder God"] = {
-				IsBoss = true,
-				Level = 575,
-				Position = CFrame.new(-7751, 5607, -2315),
-				Quest = {"SkyExp2Quest", CFrame.new(-7903, 5636, -1412)}
-			},
-			["Cyborg"] = {
-				IsBoss = true,
-				Level = 675,
-				Position = CFrame.new(6138, 10, 3939),
-				Quest = {"FountainQuest", CFrame.new(5258, 39, 4052)}
-			},
-			
-			-- Bosses Sea 2
-			["Don Swan"] = {
-				RaidBoss = true,
-				Position = CFrame.new(2289, 15, 808)
-			},
-			["Cursed Captain"] = {
-				RaidBoss = true,
-				Position = CFrame.new(912, 186, 33591)
-			},
-			["Darkbeard"] = {
-				RaidBoss = true,
-				Position = CFrame.new(3695, 13, -3599)
-			},
-			["Diamond"] = {
-				IsBoss = true,
-				Level = 750,
-				Position = CFrame.new(-1569, 199, -31),
-				Quest = {"Area1Quest", CFrame.new(-427, 73, 1835)}
-			},
-			["Jeremy"] = {
-				IsBoss = true,
-				Level = 850,
-				Position = CFrame.new(2316, 449, 787),
-				Quest = {"Area2Quest", CFrame.new(635, 73, 919)}
-			},
-			["Orbitus"] = {
-				IsBoss = true,
-				Level = 925,
-				Position = CFrame.new(-2086, 73, -4208),
-				Quest = {"MarineQuest3", CFrame.new(-2441, 73, -3219)}
-			},
-			["Smoke Admiral"] = {
-				IsBoss = true,
-				Level = 1150,
-				Position = CFrame.new(-5078, 24, -5352),
-				Quest = {"IceSideQuest", CFrame.new(-6229, 82, -4853)}
-			},
-			["Awakened Ice Admiral"] = {
-				IsBoss = true,
-				Level = 1400,
-				Position = CFrame.new(6473, 297, -6944),
-				Quest = {"FrostQuest", CFrame.new(5668, 28, -6484)}
-			},
-			["Tide Keeper"] = {
-				IsBoss = true,
-				Level = 1475,
-				Position = CFrame.new(-3711, 77, -11469),
-				Quest = {"ForgottenQuest", CFrame.new(-3056, 240, -10145)}
-			},
-			
-			-- Bosses Sea 3
-			["Tyrant of the Skies"] = {
-				RaidBoss = true,
-				Position = CFrame.new(-16252, 153, 1394)
-			},
-			["Cake Prince"] = {
-				RaidBoss = true,
-				Position = CFrame.new(-2103, 70, -12165)
-			},
-			["Dough King"] = {
-				RaidBoss = true,
-				Position = CFrame.new(-2103, 70, -12165)
-			},
-			["rip_indra True Form"] = {
-				RaidBoss = true,
-				Position = CFrame.new(-5333, 424, -2673)
-			},
-			["Stone"] = {
-				IsBoss = true,
-				Level = 1550,
-				Position = CFrame.new(-1049, 40, 6791),
-				Quest = {"PiratePortQuest", CFrame.new(-449, 109, 5950)}
-			},
-			["Hydra Leader"] = {
-				IsBoss = true,
-				Level = 1675,
-				Position = CFrame.new(5836, 1019, -83),
-				Quest = {"VenomCrewQuest", CFrame.new(5214, 1004, 761)}
-			},
-			["Kilo Admiral"] = {
-				IsBoss = true,
-				Level = 1750,
-				Position = CFrame.new(2904, 509, -7349),
-				Quest = {"MarineTreeIsland", CFrame.new(2485, 74, -6788)}
-			},
-			["Captain Elephant"] = {
-				IsBoss = true,
-				Level = 1875,
-				Position = CFrame.new(-13393, 319, -8423),
-				Quest = {"DeepForestIsland", CFrame.new(-13233, 332, -7626)}
-			},
-			["Beautiful Pirate"] = {
-				IsBoss = true,
-				Level = 1950,
-				Position = CFrame.new(5370, 22, -89),
-				Quest = {"DeepForestIsland2", CFrame.new(-12682, 391, -9901)}
-			},
-			["Cake Queen"] = {
-				IsBoss = true,
-				Level = 2175,
-				Position = CFrame.new(-710, 382, -11150),
-				Quest = {"IceCreamIslandQuest", CFrame.new(-818, 66, -10964)}
-			},
-			["Longma"] = {
-				NoQuest = true,
-				Position = CFrame.new(-10218, 333, -9444)
-			}
+			["Saber Expert"] = { NoQuest = true, Position = CFrame.new(-1461, 30, -51) },
+			["The Saw"] = { RaidBoss = true, Position = CFrame.new(-690, 15, 1583) },
+			["Greybeard"] = { RaidBoss = true, Position = CFrame.new(-5043, 25, 4262) },
+			["The Gorilla King"] = { IsBoss = true, Level = 20, Position = CFrame.new(-1128, 6, -451), Quest = {"JungleQuest", CFrame.new(-1598, 37, 153)} },
+			["Bobby"] = { IsBoss = true, Level = 55, Position = CFrame.new(-1131, 14, 4080), Quest = {"BuggyQuest1", CFrame.new(-1140, 4, 3829)} },
+			["Yeti"] = { IsBoss = true, Level = 105, Position = CFrame.new(1185, 106, -1518), Quest = {"SnowQuest", CFrame.new(1385, 87, -1298)} },
+			["Vice Admiral"] = { IsBoss = true, Level = 130, Position = CFrame.new(-4807, 21, 4360), Quest = {"MarineQuest2", CFrame.new(-5035, 29, 4326), 2} },
+			["Swan"] = { IsBoss = true, Level = 240, Position = CFrame.new(5230, 4, 749), Quest = {"ImpelQuest", CFrame.new(5191, 4, 692)} },
+			["Chief Warden"] = { IsBoss = true, Level = 230, Position = CFrame.new(5230, 4, 749), Quest = {"ImpelQuest", CFrame.new(5191, 4, 692), 2} },
+			["Warden"] = { IsBoss = true, Level = 220, Position = CFrame.new(5230, 4, 749), Quest = {"ImpelQuest", CFrame.new(5191, 4, 692), 1} },
+			["Magma Admiral"] = { IsBoss = true, Level = 350, Position = CFrame.new(-5694, 18, 8735), Quest = {"MagmaQuest", CFrame.new(-5319, 12, 8515)} },
+			["Fishman Lord"] = { IsBoss = true, Level = 425, Position = CFrame.new(61350, 31, 1095), Quest = {"FishmanQuest", CFrame.new(61122, 18, 1567)} },
+			["Wysper"] = { IsBoss = true, Level = 500, Position = CFrame.new(-7927, 5551, -637), Quest = {"SkyExp1Quest", CFrame.new(-7861, 5545, -381)} },
+			["Thunder God"] = { IsBoss = true, Level = 575, Position = CFrame.new(-7751, 5607, -2315), Quest = {"SkyExp2Quest", CFrame.new(-7903, 5636, -1412)} },
+			["Cyborg"] = { IsBoss = true, Level = 675, Position = CFrame.new(6138, 10, 3939), Quest = {"FountainQuest", CFrame.new(5258, 39, 4052)} },
+			["Don Swan"] = { RaidBoss = true, Position = CFrame.new(2289, 15, 808) },
+			["Cursed Captain"] = { RaidBoss = true, Position = CFrame.new(912, 186, 33591) },
+			["Darkbeard"] = { RaidBoss = true, Position = CFrame.new(3695, 13, -3599) },
+			["Diamond"] = { IsBoss = true, Level = 750, Position = CFrame.new(-1569, 199, -31), Quest = {"Area1Quest", CFrame.new(-427, 73, 1835)} },
+			["Jeremy"] = { IsBoss = true, Level = 850, Position = CFrame.new(2316, 449, 787), Quest = {"Area2Quest", CFrame.new(635, 73, 919)} },
+			["Orbitus"] = { IsBoss = true, Level = 925, Position = CFrame.new(-2086, 73, -4208), Quest = {"MarineQuest3", CFrame.new(-2441, 73, -3219)} },
+			["Smoke Admiral"] = { IsBoss = true, Level = 1150, Position = CFrame.new(-5078, 24, -5352), Quest = {"IceSideQuest", CFrame.new(-6061, 16, -4904)} },
+			["Awakened Ice Admiral"] = { IsBoss = true, Level = 1400, Position = CFrame.new(6473, 297, -6944), Quest = {"FrostQuest", CFrame.new(5668, 28, -6484)} },
+			["Tide Keeper"] = { IsBoss = true, Level = 1475, Position = CFrame.new(-3711, 77, -11469), Quest = {"ForgottenQuest", CFrame.new(-3056, 240, -10145)} },
+			["Tyrant of the Skies"] = { RaidBoss = true, Position = CFrame.new(-16252, 153, 1394) },
+			["Cake Prince"] = { RaidBoss = true, Position = CFrame.new(-2103, 70, -12165) },
+			["Dough King"] = { RaidBoss = true, Position = CFrame.new(-2103, 70, -12165) },
+			["rip_indra True Form"] = { RaidBoss = true, Position = CFrame.new(-5333, 424, -2673) },
+			["Stone"] = { IsBoss = true, Level = 1550, Position = CFrame.new(-1049, 40, 6791), Quest = {"PiratePortQuest", CFrame.new(-449, 109, 5950)} },
+			["Hydra Leader"] = { IsBoss = true, Level = 1675, Position = CFrame.new(5836, 1019, -83), Quest = {"VenomCrewQuest", CFrame.new(5214, 1004, 761)} },
+			["Kilo Admiral"] = { IsBoss = true, Level = 1750, Position = CFrame.new(2904, 509, -7349), Quest = {"MarineTreeIsland", CFrame.new(2485, 74, -6788)} },
+			["Captain Elephant"] = { IsBoss = true, Level = 1875, Position = CFrame.new(-13393, 319, -8423), Quest = {"DeepForestIsland", CFrame.new(-13233, 332, -7626)} },
+			["Beautiful Pirate"] = { IsBoss = true, Level = 1950, Position = CFrame.new(5370, 22, -89), Quest = {"DeepForestIsland2", CFrame.new(-12682, 391, -9901)} },
+			["Cake Queen"] = { IsBoss = true, Level = 2175, Position = CFrame.new(-710, 382, -11150), Quest = {"IceCreamIslandQuest", CFrame.new(-818, 66, -10964)} },
+			["Longma"] = { NoQuest = true, Position = CFrame.new(-10218, 333, -9444) }
 		}
 		
 		Module.Shop = {
-            --[[{"Magic Elf", {{"Buy 2x EXP", {"Candies", "Buy", 1, 1}}, {"Buy Stats Refund", {"Candies", "Buy", 1, 2}}, {"Buy Race Reroll", {"Candies", "Buy", 1, 3}}}},
-            {"Greedy Elf", {{"Buy 200 Fragments", {"Candies", "Buy", 2, 1}}, {"Buy 500 Fragments", {"Candies", "Buy", 2, 2}}}},
-            {"Santa Claws", {{"Buy Elf Hat", {"Candies", "Buy", 3, 1}}, {"Buy Santa Hat", {"Candies", "Buy", 3, 2}}, {"Buy Sleigh", {"Candies", "Buy", 3, 3}}}},]]
 			{"Frags", {{"Race Reroll", {"BlackbeardReward", "Reroll", "2"}}, {"Reset Stats", {"BlackbeardReward", "Refund", "2"}}}},
 			{"Ability Teacher", {
 				{"Buy Geppo", {"BuyHaki", "Geppo"}},
@@ -543,7 +351,7 @@ local Module = {} do
 				{"Buy Black Cape", {"BuyItem", "Black Cape"}},
 				{"Buy Swordsman Hat", {"BuyItem", "Swordsman Hat"}},
 				{"Buy Tomoe Ring", {"BuyItem", "Tomoe Ring"}},
-                {"Buy Ghoul Mask", {"Ectoplasm", "Buy", 2}}
+				{"Buy Ghoul Mask", {"Ectoplasm", "Buy", 2}}
 			}},
 			{"Race", {{"Ghoul Race", {"Ectoplasm", "Change", 4}}, {"Cyborg Race", {"CyborgTrainer", "Buy"}}}}
 		}
@@ -551,35 +359,29 @@ local Module = {} do
 	
 	do
 		Module.IsSuperBring = false
-		
 		Module.RemoveCanTouch = 0
 		Module.AttackCooldown = 0
 		Module.PirateRaid = 0
-		
 		Module.Webhooks = true
 		Module.JobIds = true
-		
 		Module.Progress = {}
 		Module.EnemyLocations = {}
 		Module.SpawnLocations = {}
-		
 		Module.Cached = Cached
 	end
 	
 	Module.Signals = {} do
 		local Signals = Module.Signals
-		
 		Signals.PossibleStaff = Signal.new()
 		Signals.OptionChanged = Signal.new()
 		Signals.EnemyAdded = Signal.new()
 		Signals.EnemyDied = Signal.new()
 		Signals.Notify = Signal.new()
 		Signals.Error = Signal.new()
-
+		
 		Signals.Error:Connect(function(ErrorMessage)
 			_ENV.loadedFarm = false
 			_ENV.OnFarm = false
-			
 			local Message = Instance.new("Message", workspace)
 			_ENV.redz_hub_error = Message
 			Message.Text = (`OMG-Hub error [ {Settings.RunningOption or "Null"} ] {ErrorMessage}`)
@@ -589,80 +391,54 @@ local Module = {} do
 	Module.RunFunctions = {} do
 		Module.RunFunctions.Translator = function(Window, Translation)
 			local MakeTab = Window.MakeTab
-			
 			Window.MakeTab = function(self, Configs)
 				if Translation[ Configs[1] ] then
 					Configs[1] = Translation[ Configs[1] ]
 				end
-				
 				local Tab = MakeTab(self, Configs)
 				local NewTab = {}
-				
-				function NewTab:AddSection(Name)
-					return Tab:AddSection(Translation[Name] or Name)
-				end
-				
+				function NewTab:AddSection(Name) return Tab:AddSection(Translation[Name] or Name) end
 				function NewTab:AddButton(Configs)
 					local Translator = Translation[ Configs[1] ]
-					
 					if Translator then
 						Configs[1] = type(Translator) == "string" and Translator or Translator[1]
 						Configs.Desc = type(Translator) ~= "string" and Translator[2]
 					end
-					
 					return Tab:AddButton(Configs)
 				end
-				
 				function NewTab:AddToggle(Configs)
 					local Translator = Translation[ Configs[1] ]
-					
 					if Translator then
 						Configs[1] = type(Translator) == "string" and Translator or Translator[1]
 						Configs.Desc = type(Translator) ~= "string" and Translator[2]
 					end
-					
 					return Tab:AddToggle(Configs)
 				end
-				
 				function NewTab:AddSlider(Configs)
 					local Translator = Translation[ Configs[1] ]
-					
 					if Translator then
 						Configs[1] = type(Translator) == "string" and Translator or Translator[1]
 						Configs.Desc = type(Translator) ~= "string" and Translator[2]
 					end
-					
 					return Tab:AddSlider(Configs)
 				end
-				
 				function NewTab:AddDropdown(Configs)
 					local Translator = Translation[ Configs[1] ]
-					
 					if Translator then
 						Configs[1] = type(Translator) == "string" and Translator or Translator[1]
 						Configs.Desc = type(Translator) ~= "string" and Translator[2]
 					end
-					
 					return Tab:AddDropdown(Configs)
 				end
-				
 				function NewTab:AddTextBox(Configs)
 					local Translator = Translation[ Configs[1] ]
-					
 					if Translator then
 						Configs[1] = type(Translator) == "string" and Translator or Translator[1]
 						Configs.Desc = type(Translator) ~= "string" and Translator[2]
 					end
-					
 					return Tab:AddTextBox(Configs)
 				end
-				
-				for i,v in pairs(Tab) do
-					if not NewTab[i] then
-						NewTab[i] = v
-					end
-				end
-				
+				for i,v in pairs(Tab) do if not NewTab[i] then NewTab[i] = v end end
 				return NewTab
 			end
 		end
@@ -670,37 +446,23 @@ local Module = {} do
 		Module.RunFunctions.Quests = function(self, QuestsModule, getTasks)
 			local MaxLvl = ({ {0, 700}, {700, 1500}, {1500, math.huge} })[self.Sea]
 			local bl_Quests = {"BartiloQuest", "MarineQuest", "CitizenQuest"}
-			
 			for name, task in QuestsModule do
 				if table.find(bl_Quests, name) then continue end
-				
 				for num, mission in task do
 					local Level = mission.LevelReq
 					if Level >= MaxLvl[1] and Level < MaxLvl[2] then
 						local target, positions = getTasks(mission)
-						table.insert(self.QuestList, {
-							Name = name,
-							Count = num,
-							Enemy = { Name = target, Level = Level, Position = positions }
-						})
+						table.insert(self.QuestList, { Name = name, Count = num, Enemy = { Name = target, Level = Level, Position = positions } })
 					end
 				end
 			end
-			
 			table.sort(self.QuestList, function(v1, v2) return v1.Enemy.Level < v2.Enemy.Level end)
 		end
 		
 		Module.RunFunctions.LibraryToggle = function(EnabledOptions, Options)
 			return function(...)
 				local Tab, Settings, Flag = ...
-				
-				Options[Flag] = Tab:AddToggle({
-					Settings[1],																				 -- Name
-					type(Settings[2]) ~= "string" and Settings[2],			 -- Default
-					function(Value) EnabledOptions[Flag] = Value end,		-- Callback
-					Flag,																								-- Flag
-					Desc = (type(Settings[2]) == "string" and Settings[2]) or Settings[3]
-				})
+				Options[Flag] = Tab:AddToggle({ Settings[1], type(Settings[2]) ~= "string" and Settings[2], function(Value) EnabledOptions[Flag] = Value end, Flag, Desc = (type(Settings[2]) == "string" and Settings[2]) or Settings[3] })
 			end
 		end
 		
@@ -708,11 +470,9 @@ local Module = {} do
 			local Success, ErrorMessage = pcall(function()
 				while task.wait(Settings.SmoothMode and 0.25 or 0) do
 					local Enabled = false
-					
 					for _, Option in Options do
 						Settings.RunningOption = Option.Name
 						local Method = Option.Function()
-						
 						if Method then
 							Settings.RunningMethod = type(Method) == "string" and Method
 							Enabled = true; break
@@ -720,49 +480,38 @@ local Module = {} do
 							Settings.RunningOption, Settings.RunningMethod = nil, nil
 						end
 					end
-					
 					_ENV.OnFarm = (_ENV.teleporting or Enabled)
 				end
 			end)
-			
-		   Module.Signals.Error:Fire(ErrorMessage)
+			Module.Signals.Error:Fire(ErrorMessage)
 		end
 	end
 	
-	function Module.FireRemote(...)
-		return CommF:InvokeServer(...)
-	end
+	function Module.FireRemote(...) return CommF:InvokeServer(...) end
 	
 	function Module.IsAlive(Character)
 		if Character then
 			local Humanoids = Cached.Humanoids
 			local Humanoid = Humanoids[Character] or Character:FindFirstChild("Humanoid")
-			
 			if not Humanoid and Character.Parent == Boats then
 				return true
 			elseif Character.Parent == SeaBeasts then
 				Humanoid = Character:FindFirstChild("Health")
 			end
-			
 			if Humanoid then
-				if not Humanoids[Character] then
-					Humanoids[Character] = Humanoid
-				end
-				
-				return Humanoid[if Humanoid.ClassName == "Humanoid" then "Health" else "Value"] > 0
+				if not Humanoids[Character] then Humanoids[Character] = Humanoid end
+				local prop = (Humanoid.ClassName == "Humanoid") and "Health" or "Value"
+				return Humanoid[prop] > 0
 			end
 		end
 	end
 	
 	function Module.KillAura(Distance: number?, Name: string?): (nil)
 		Distance = Distance or 500
-		
 		local EnemyList = Enemies:GetChildren()
-		
 		for i = 1, #EnemyList do
 			local Enemy = EnemyList[i]
 			local PrimaryPart = Enemy.PrimaryPart
-			
 			if (not Name or Enemy.Name == Name) and PrimaryPart and not Enemy:HasTag(KILLAURA_TAG) then
 				if Module.IsAlive(Enemy) and Player:DistanceFromCharacter(PrimaryPart.Position) < Distance then
 					Enemy:AddTag(KILLAURA_TAG)
@@ -774,76 +523,79 @@ local Module = {} do
 	function Module.IsBoss(Name: string): boolean
 		return Module.Bosses[Name] and true or false
 	end
-
+	
 	function Module.Rejoin(): (nil)
 		task.spawn(TeleportService.TeleportToPlaceInstance, TeleportService, game.PlaceId, game.JobId, Player)
 	end
-
-    function Module:ServerHop()
-   local PlaceID = game.PlaceId
-        local AllIDs = {}
-        local foundAnything = ""
-        local actualHour = os.date("!*t").hour
-        local Deleted = false
-        function TPReturner()
-            local Site;
-            if foundAnything == "" then
-                Site = game.HttpService:JSONDecode(game:HttpGet('https://games.roblox.com/v1/games/' .. PlaceID .. '/servers/Public?sortOrder=Asc&limit=100'))
-            else
-                Site = game.HttpService:JSONDecode(game:HttpGet('https://games.roblox.com/v1/games/' .. PlaceID .. '/servers/Public?sortOrder=Asc&limit=100&cursor=' .. foundAnything))
-            end
-            local ID = ""
-            if Site.nextPageCursor and Site.nextPageCursor ~= "null" and Site.nextPageCursor ~= nil then
-                foundAnything = Site.nextPageCursor
-            end
-            local num = 0;
-            for i,v in pairs(Site.data) do
-                local Possible = true
-                ID = tostring(v.id)
-                if tonumber(v.maxPlayers) > tonumber(v.playing) then
-                    for _,Existing in pairs(AllIDs) do
-                        if num ~= 0 then
-                            if ID == tostring(Existing) then
-                                Possible = false
-                            end
-                        else
-                            if tonumber(actualHour) ~= tonumber(Existing) then
-                                local delFile = pcall(function()
-                                    AllIDs = {}
-                                    table.insert(AllIDs, actualHour)
-                                end)
-                            end
-                        end
-                        num = num + 1
-                    end
-                    if Possible == true then
-                        table.insert(AllIDs, ID)
-                        wait()
-                        pcall(function()
-                            wait()
-                            game:GetService("ReplicatedStorage").__ServerBrowser:InvokeServer("teleport",ID)
-                        end)
-                        wait(4)
-                    end
-                end
-            end
-        end
-        function Teleport() 
-            while wait() do
-                pcall(function()
-                    TPReturner()
-                    if foundAnything ~= "" then
-                        TPReturner()
-                    end
-                end)
-            end
-        end
-        Teleport()
-end
+	
+	function Module:ServerHop(): (nil)
+		local PlaceID = game.PlaceId
+		local AllIDs = {}
+		local foundAnything = ""
+		local actualHour = os.date("!*t").hour
+		local function TPReturner()
+			local Site
+			if foundAnything == "" then
+				Site = game.HttpService:JSONDecode(game:HttpGet('https://games.roblox.com/v1/games/' .. PlaceID .. '/servers/Public?sortOrder=Asc&limit=100'))
+			else
+				Site = game.HttpService:JSONDecode(game:HttpGet('https://games.roblox.com/v1/games/' .. PlaceID .. '/servers/Public?sortOrder=Asc&limit=100&cursor=' .. foundAnything))
+			end
+			local ID = ""
+			if Site.nextPageCursor and Site.nextPageCursor ~= "null" and Site.nextPageCursor ~= nil then
+				foundAnything = Site.nextPageCursor
+			end
+			local num = 0
+			for i,v in pairs(Site.data) do
+				local Possible = true
+				ID = tostring(v.id)
+				if tonumber(v.maxPlayers) > tonumber(v.playing) then
+					for _,Existing in pairs(AllIDs) do
+						if num ~= 0 then
+							if ID == tostring(Existing) then
+								Possible = false
+							end
+						else
+							if tonumber(actualHour) ~= tonumber(Existing) then
+								pcall(function()
+									AllIDs = {}
+									table.insert(AllIDs, actualHour)
+								end)
+							end
+						end
+						num = num + 1
+					end
+					if Possible == true then
+						table.insert(AllIDs, ID)
+						wait()
+						pcall(function()
+							wait()
+							game:GetService("ReplicatedStorage").__ServerBrowser:InvokeServer("teleport",ID)
+						end)
+						wait(4)
+					end
+				end
+			end
+		end
+		local function TeleportLoop()
+			while wait() do
+				pcall(function()
+					TPReturner()
+					if foundAnything ~= "" then
+						TPReturner()
+					end
+				end)
+			end
+		end
+		TeleportLoop()
+	end
 	
 	function Module.EnemySpawned(EnemyName)
 		local Enemies = Module.Enemies
-		return if type(EnemyName) == "table" then Enemies:GetClosest(EnemyName) else Enemies:GetEnemyByTag(EnemyName)
+		if type(EnemyName) == "table" then
+			return Enemies:GetClosest(EnemyName)
+		else
+			return Enemies:GetEnemyByTag(EnemyName)
+		end
 	end
 	
 	function Module:IsBlacklistedExecutor(): boolean
@@ -853,32 +605,27 @@ end
 	function Module:TravelTo(Sea: number?): (nil)
 		Module.FireRemote(`Travel{self.GameData.SeasName[Sea]}`)
 	end
-
+	
 	function Module.EquipTool(ToolName: string, ByType: boolean?): (nil)
-		ByType = if not ToolName then true else ByType
-		ToolName = ToolName or Settings.FarmTool
-		
-		if not Module.IsAlive(Player.Character) then
-			return nil
+		if not ToolName then
+			ByType = true
+			ToolName = Settings.FarmTool
+		else
+			if ByType == nil then ByType = false end
 		end
-		
+		if not Module.IsAlive(Player.Character) then return nil end
 		local Equipped = Cached.Equipped
-		
-		if Equipped and Equipped.Parent and Equipped[if ByType then "ToolTip" else "Name"] == ToolName then
-			if Equipped:GetAttribute("Locks") then
-				Equipped:SetAttribute("Locks", nil)
-			end
-			
+		local key = ByType and "ToolTip" or "Name"
+		if Equipped and Equipped.Parent and Equipped[key] == ToolName then
+			if Equipped:GetAttribute("Locks") then Equipped:SetAttribute("Locks", nil) end
 			if Equipped.Parent == Player.Backpack then
 				Player.Character.Humanoid:EquipTool(Equipped)
 			elseif Equipped.Parent == Player.Character then
 				return nil
 			end
 		end
-		
 		if ToolName and not ByType then
 			local BackpackTool = Player.Backpack:FindFirstChild(ToolName)
-			
 			if BackpackTool then
 				Cached.Equipped = BackpackTool
 				Player.Character.Humanoid:EquipTool(BackpackTool)
@@ -893,52 +640,38 @@ end
 			end
 		end
 	end
-
- function Module:BringEnemies(ToEnemy: Instance, SuperBring: boolean?): (nil)
-    if not self.IsAlive(ToEnemy) or not ToEnemy.PrimaryPart then
-      return nil
-    end
-    
-    if Settings.BringMobs then
-      Module.IsSuperBring = if SuperBring then true else false
-      
-      local Name = ToEnemy.Name
-      local Position = (Player.Character or Player.CharacterAdded:Wait()):GetPivot().Position
-      local Target = ToEnemy.PrimaryPart.CFrame
-      local BringPositionTag = if SuperBring then "ALL_MOBS" else Name
-      
-      if not Cached.Bring[BringPositionTag] or (Target.Position - Cached.Bring[BringPositionTag].Position).Magnitude > 25 then
-        Cached.Bring[BringPositionTag] = Target
-      end
-      
-      local EnemyList = (not SuperBring and self.Enemies:GetTagged(Name)) or Enemies:GetChildren()
-      
-      for i = 1, #EnemyList do
-        local Enemy = EnemyList[i]
-        if Enemy.Parent ~= Enemies or Enemy:HasTag(BRING_TAG) then continue end
-        if not Enemy:FindFirstChild("CharacterReady") then continue end
-        
-        local PrimaryPart = Enemy.PrimaryPart
-        if self.IsAlive(Enemy) and PrimaryPart then
-          if (Position - PrimaryPart.Position).Magnitude < Settings.BringDistance then
-            Enemy:AddTag(BRING_TAG)
-          end
-        end
-      end
-    else
-      if not Cached.Bring[ToEnemy] then
-        Cached.Bring[ToEnemy] = ToEnemy.PrimaryPart.CFrame
-      end
-      
-      ToEnemy.PrimaryPart.CFrame = Cached.Bring[ToEnemy]
-    end
-  end
-
-	function Module:GetRaidIsland(): Instance?
-		if Cached.RaidIsland and Cached.RaidIsland:IsDescendantOf(Locations) then
-			return Cached.RaidIsland
+	
+	function Module:BringEnemies(ToEnemy: Instance, SuperBring: boolean?): (nil)
+		if not self.IsAlive(ToEnemy) or not ToEnemy.PrimaryPart then return nil end
+		if Settings.BringMobs then
+			Module.IsSuperBring = SuperBring and true or false
+			local Name = ToEnemy.Name
+			local Position = (Player.Character or Player.CharacterAdded:Wait()):GetPivot().Position
+			local Target = ToEnemy.PrimaryPart.CFrame
+			local BringPositionTag = SuperBring and "ALL_MOBS" or Name
+			if not Cached.Bring[BringPositionTag] or (Target.Position - Cached.Bring[BringPositionTag].Position).Magnitude > 25 then
+				Cached.Bring[BringPositionTag] = Target
+			end
+			local EnemyList = (not SuperBring and self.Enemies:GetTagged(Name)) or Enemies:GetChildren()
+			for i = 1, #EnemyList do
+				local Enemy = EnemyList[i]
+				if Enemy.Parent ~= Enemies or Enemy:HasTag(BRING_TAG) then continue end
+				if not Enemy:FindFirstChild("CharacterReady") then continue end
+				local PrimaryPart = Enemy.PrimaryPart
+				if self.IsAlive(Enemy) and PrimaryPart then
+					if (Position - PrimaryPart.Position).Magnitude < Settings.BringDistance then
+						Enemy:AddTag(BRING_TAG)
+					end
+				end
+			end
+		else
+			if not Cached.Bring[ToEnemy] then Cached.Bring[ToEnemy] = ToEnemy.PrimaryPart.CFrame end
+			ToEnemy.PrimaryPart.CFrame = Cached.Bring[ToEnemy]
 		end
-		
+	end
+	
+	function Module:GetRaidIsland(): Instance?
+		if Cached.RaidIsland and Cached.RaidIsland:IsDescendantOf(Locations) then return Cached.RaidIsland end
 		for i = 5, 1, -1 do
 			local Name = "Island " .. i
 			for _, Island in ipairs(Locations:GetChildren()) do
@@ -953,81 +686,52 @@ end
 	function Module:GetProgress(Tag, ...)
 		local Progress = Cached.Progress
 		local entry = Progress[Tag]
-		
-		if entry and (tick() - entry.debounce) < 2 then
-			return entry.result
-		end
-		
+		if entry and (tick() - entry.debounce) < 2 then return entry.result end
 		local result = self.FireRemote(...)
-		
 		if entry then
 			entry.result = result
 			entry.debounce = tick()
 		else
-			Progress[Tag] = {
-				debounce = tick(),
-				result = result
-			}
+			Progress[Tag] = { debounce = tick(), result = result }
 		end
-		
 		return result
 	end
 	
 	function Module:RemoveVolcanoLava()
 		local PrehistoricIsland = Map.PrehistoricIsland
-		
-		if PrehistoricIsland.Core:FindFirstChild("InteriorLava") then
-			PrehistoricIsland.Core.InteriorLava:Destroy()
-		end
-		
+		if PrehistoricIsland.Core:FindFirstChild("InteriorLava") then PrehistoricIsland.Core.InteriorLava:Destroy() end
 		for _, Instance in PrehistoricIsland:GetDescendants() do
-			if string.find(string.lower(Instance.Name), "lava") and Instance:IsA("BasePart") then
-				Instance:Destroy()
-			end
+			if string.find(string.lower(Instance.Name), "lava") and Instance:IsA("BasePart") then Instance:Destroy() end
 		end
 	end
 	
 	function Module:RemoveBoatCollision(Boat)
 		local Objects = Boat:GetDescendants()
-		
 		for i = 1, #Objects do
 			local BasePart = Objects[i]
-			if BasePart:IsA("BasePart") and BasePart.CanCollide then
-				BasePart.CanCollide = false
-			end
+			if BasePart:IsA("BasePart") and BasePart.CanCollide then BasePart.CanCollide = false end
 		end
 	end
 	
 	Module.Chests = setmetatable({}, {
 		__call = function(self, SelectedIsland)
 			local CachedChest = self.Cached
-			
 			if CachedChest and not CachedChest:GetAttribute("IsDisabled") then
-				if not SelectedIsland or CachedChest:IsDescendantOf(SelectedIsland) then
-					return CachedChest
-				end
+				if not SelectedIsland or CachedChest:IsDescendantOf(SelectedIsland) then return CachedChest end
 			end
-			
-			if self.Debounce and (tick() - self.Debounce) < 0.5 then
-				return nil
-			end
-			
+			if self.Debounce and (tick() - self.Debounce) < 0.5 then return nil end
 			local Position = (Player.Character or Player.CharacterAdded:Wait()):GetPivot().Position
 			local Chests = CollectionService:GetTagged("_ChestTagged")
-			
 			local Distance, Nearest = math.huge
-			
 			for i = 1, #Chests do
 				local Chest = Chests[i]
 				local Magnitude = (Chest:GetPivot().Position - Position).Magnitude
-				
 				if not SelectedIsland or Chest:IsDescendantOf(SelectedIsland) then
 					if not Chest:GetAttribute("IsDisabled") and Magnitude < Distance then
 						Distance, Nearest = Magnitude, Chest
 					end
 				end
 			end
-			
 			self.Debounce = tick()
 			self.Cached = Nearest
 			return Nearest
@@ -1037,36 +741,22 @@ end
 	Module.Berry = setmetatable({}, {
 		__call = function(self, BerryArray)
 			local CachedBush = self.Cached
-			
 			if CachedBush and CachedBush:IsDescendantOf(Map) then
-				for Tag, CFrame in pairs(CachedBush:GetAttributes()) do
-					return CachedBush
-				end
+				for Tag, CFrame in pairs(CachedBush:GetAttributes()) do return CachedBush end
 			end
-			
-			if self.Debounce and (tick() - self.Debounce) < 0.5 then
-				return nil
-			end
-			
+			if self.Debounce and (tick() - self.Debounce) < 0.5 then return nil end
 			local Position = (Player.Character or Player.CharacterAdded:Wait()):GetPivot().Position
 			local BerryBush = CollectionService:GetTagged("BerryBush")
-			
 			local Distance, Nearest = math.huge
-			
 			for i = 1, #BerryBush do
 				local Bush = BerryBush[i]
-				
 				for AttributeName, BerryName in pairs(Bush:GetAttributes()) do
 					if not BerryArray or table.find(BerryArray, BerryName) then
 						local Magnitude = (Bush.Parent:GetPivot().Position - Position).Magnitude
-						
-						if Magnitude < Distance then
-							Nearest, Distance = Bush, Magnitude
-						end
+						if Magnitude < Distance then Nearest, Distance = Bush, Magnitude end
 					end
 				end
 			end
-			
 			self.Debounce = tick()
 			self.Cached = Nearest
 			return Nearest
@@ -1077,46 +767,30 @@ end
 		__index = function(self, Fruit)
 			local RealFruitsName = Module.FruitsId
 			local Name = Fruit.Name
-			
-			if Name ~= "Fruit " then
-				rawset(self, Fruit, Name)
-				return Name
-			end
-			
+			if Name ~= "Fruit " then rawset(self, Fruit, Name); return Name end
 			rawset(self, Fruit, "Fruit [ ??? ]")
-			
 			local Model = Fruit:WaitForChild("Fruit", 9e9)
 			local Idle = FastWait(2, Model, "Idle") or FastWait(1, Model, "Animation") or FastWait(1, Model, "Fruit")
-			
 			if Idle and (Idle:IsA("Animation") or Idle:IsA("MeshPart")) then
-				local Property = if Idle:IsA("MeshPart") then "MeshId" else "AnimationId"
+				local Property = Idle:IsA("MeshPart") and "MeshId" or "AnimationId"
 				local RealName = RealFruitsName[Idle[Property] or ""]
-				
-				if RealName and type(RealName) == "string" then
-					rawset(self, Fruit, `Fruit [ {RealName} ]`)
-				end
+				if RealName and type(RealName) == "string" then rawset(self, Fruit, `Fruit [ {RealName} ]`) end
 			end
-			
 			return rawget(self, Fruit)
 		end
 	})
 	
 	Module.Enemies = (function()
-		local EnemiesModule = CreateDictionary({
-			"__CakePrince", "__PirateRaid", "__RaidBoss", "__TyrantSkies", "__Bones", "__Elite", "__Others", 
-		}, {})
-		
+		local EnemiesModule = CreateDictionary({ "__CakePrince", "__PirateRaid", "__RaidBoss", "__TyrantSkies", "__Bones", "__Elite", "__Others" }, {})
 		local Signals = Module.Signals
 		local IsAlive = Module.IsAlive
 		local SeaCastle = CFrame.new(-5556, 314, -2988)
-		
 		local TagsMobs = {
 			__Elite = CreateDictionary({ "Deandre", "Diablo", "Urban" }, true),
 			__Bones = CreateDictionary({ "Reborn Skeleton", "Living Zombie", "Demonic Soul", "Posessed Mummy" }, true),
 			__CakePrince = CreateDictionary({ "Head Baker", "Baking Staff", "Cake Guard", "Cookie Crafter" }, true),
 			__TyrantSkies = CreateDictionary({ "Sun-kissed Warrior", "Skull Slayer", "Isle Champion", "Serpent Hunter" }, true)
 		}
-		
 		local Attachment = Instance.new("Attachment") do
 			local AlignPosition = Instance.new("AlignPosition")
 			AlignPosition.Mode = Enum.PositionAlignmentMode.OneAttachment
@@ -1129,9 +803,7 @@ end
 		
 		local function New(list, NewEnemy)
 			if table.find(list, NewEnemy) then return end
-			
 			local Humanoid = NewEnemy:WaitForChild("Humanoid")
-			
 			if Humanoid and Humanoid.ClassName == "Humanoid" and Humanoid.Health > 0 then
 				table.insert(list, NewEnemy)
 				Humanoid.Died:Wait()
@@ -1141,10 +813,8 @@ end
 		
 		local function IsFromPiratesSea(Enemy)
 			if not Enemy:WaitForChild("Humanoid") or Enemy.Humanoid.Health <= 0 then return end
-			
 			local HumanoidRootPart = Enemy:WaitForChild("HumanoidRootPart")
-			
-			if HumanoidRootPart and (Enemy.Name ~= "rip_indra True Form" and Enemy.Name ~= "Blank Buddy") then
+			if HumanoidRootPart and Enemy.Name ~= "rip_indra True Form" and Enemy.Name ~= "Blank Buddy" then
 				if (HumanoidRootPart.Position - SeaCastle.Position).Magnitude <= 750 then
 					task.spawn(New, EnemiesModule.__PirateRaid, Enemy)
 					Module.PirateRaid = tick()
@@ -1152,17 +822,12 @@ end
 			end
 		end
 		
-		local function NewEnemyAdded(Enemy)			
+		local function NewEnemyAdded(Enemy)
 			local EnemyName = Enemy.Name
 			local Others = EnemiesModule.__Others
-			
 			Others[EnemyName] = Others[EnemyName] or {}
 			task.spawn(New, Others[EnemyName], Enemy)
-			
-			if Module.GameData.Sea == 3 then
-				task.spawn(IsFromPiratesSea, Enemy)
-			end
-			
+			if Module.GameData.Sea == 3 then task.spawn(IsFromPiratesSea, Enemy) end
 			if Enemy:GetAttribute("RaidBoss") then
 				task.spawn(New, EnemiesModule.__RaidBoss, Enemy)
 			elseif EnemiesModule[`__{ EnemyName }`] then
@@ -1179,11 +844,9 @@ end
 		
 		function EnemiesModule.IsSpawned(EnemyName: string): boolean
 			local Cached = Module.SpawnLocations[EnemyName]
-			
 			if Cached and Cached.Parent then
 				return (Cached:GetAttribute("Active") or EnemiesModule:GetEnemyByTag(EnemyName)) and true or false
 			end
-			
 			return EnemiesModule:GetEnemyByTag(EnemyName) and true or false
 		end
 		
@@ -1193,21 +856,12 @@ end
 		
 		function EnemiesModule:GetEnemyByTag(TagName: string): Model?
 			local CachedEnemy = Cached.Enemies[TagName]
-			
-			if CachedEnemy and IsAlive(CachedEnemy) then
-				return CachedEnemy
-			end
-			
+			if CachedEnemy and IsAlive(CachedEnemy) then return CachedEnemy end
 			local Enemies = self:GetTagged(TagName)
-			
 			if Enemies and #Enemies > 0 then
 				for i = 1, #Enemies do
 					local Enemy = Enemies[i]
-					
-					if IsAlive(Enemy) then
-						Cached.Enemies[TagName] = Enemy
-						return Enemy
-					end
+					if IsAlive(Enemy) then Cached.Enemies[TagName] = Enemy; return Enemy end
 				end
 			end
 		end
@@ -1215,49 +869,30 @@ end
 		function EnemiesModule:GetClosest(Enemies: table): Model?
 			local SpecialTag = table.concat(Enemies, ".")
 			local CachedEnemy = Cached.Enemies[SpecialTag]
-			
-			if CachedEnemy and IsAlive(CachedEnemy) then
-				return CachedEnemy
-			end
-			
+			if CachedEnemy and IsAlive(CachedEnemy) then return CachedEnemy end
 			local Distance, Nearest = math.huge
-			
 			for i = 1, #Enemies do
 				local Enemy = self:GetClosestByTag(Enemies[i])
 				local Magnitude = Enemy and Player:DistanceFromCharacter(Enemy.PrimaryPart.Position)
-				
-				if Enemy and Magnitude <= Distance then
+				if Enemy and Magnitude and Magnitude <= Distance then
 					Distance, Nearest = Magnitude, Enemy
 				end
 			end
-			
-			if Nearest then
-				Cached.Enemies[SpecialTag] = Nearest
-				return Nearest
-			end
+			if Nearest then Cached.Enemies[SpecialTag] = Nearest; return Nearest end
 		end
 		
 		function EnemiesModule:GetClosestByTag(TagName: string): Model?
 			local CachedEnemy = Cached.Enemies[TagName]
-			
-			if CachedEnemy and IsAlive(CachedEnemy) then
-				return CachedEnemy
-			end
-			
+			if CachedEnemy and IsAlive(CachedEnemy) then return CachedEnemy end
 			local Enemies = self:GetTagged(TagName)
-			
 			if Enemies and #Enemies > 0 then
 				local Distance, Nearest = math.huge
-				
 				local Position = (Player.Character or Player.CharacterAdded()):GetPivot().Position
-				
 				for i = 1, #Enemies do
 					local Enemy = Enemies[i]
 					local PrimaryPart = Enemy.PrimaryPart
-					
 					if PrimaryPart and IsAlive(Enemy) then
 						local Magnitude = (Position - PrimaryPart.Position).Magnitude
-						
 						if Magnitude <= 15 then
 							Cached.Enemies[TagName] = Enemy
 							return Enemy
@@ -1266,7 +901,6 @@ end
 						end
 					end
 				end
-				
 				if Nearest then
 					Cached.Enemies[TagName] = Nearest
 					return Nearest
@@ -1277,58 +911,50 @@ end
 		function EnemiesModule:CreateNewTag(Tag: string, Enemies: table): table?
 			local NewTag = {}
 			self[`__{Tag}`] = NewTag
-			
 			for i = 1, #Enemies do
 				self[`__{Enemies[i]}`] = NewTag
 				local Others = self.__Others[ Enemies[i] ]
-				
 				if Others then
-					for i = 1, #Others do
-						task.spawm(newEnemy, NewTag, Others[i])
+					for j = 1, #Others do
+						task.spawn(New, NewTag, Others[j])
 					end
 				end
 			end
-			
 			return NewTag
 		end
-
-    local function Bring(Enemy)
-      local PlayerRootPart = (Player.Character or Player.CharacterAdded()):WaitForChild("HumanoidRootPart")
-      local RootPart = Enemy:WaitForChild("HumanoidRootPart")
-      local Humanoid = Enemy:WaitForChild("Humanoid")
-      local EnemyName = Enemy.Name
-      sethiddenproperty(game.Players.LocalPlayer, "SimulationRadius", math.huge)
-      
-      local BodyVelocity = Instance.new("BodyVelocity", RootPart)
-      BodyVelocity.Velocity = Vector3.zero
-      BodyVelocity.MaxForce = Vector3.new(math.huge, math.huge, math.huge)
-      
-      local BodyPosition = Instance.new("BodyPosition", RootPart)
-      BodyPosition.Position = RootPart.Position
-      BodyPosition.P, BodyPosition.D = 3e4, 3e3
-      BodyPosition.MaxForce = Vector3.new(math.huge, math.huge, math.huge)
-      
-      while PlayerRootPart and RootPart and Humanoid and Humanoid.Health > 0 and Enemy and Enemy.Parent == Enemies and Enemy:HasTag(BRING_TAG) do
-        local Target = Cached.Bring[if Module.IsSuperBring then "ALL_MOBS" else EnemyName]
-        
-        if Target and (PlayerRootPart.Position - RootPart.Position).Magnitude <= Settings.BringDistance then
-          if (RootPart.Position - Target.Position).Magnitude <= 70 then
-            RootPart.CFrame = Target
-          else
-            RootPart.CanCollide = false
-            BodyPosition.Position = Target.Position
-          end
-        end;task.wait()
-      end
-      if Enemy and Enemy:HasTag(BRING_TAG) then Enemy:RemoveTag(BRING_TAG) end
-    end
+		
+		local function Bring(Enemy)
+			local PlayerRootPart = (Player.Character or Player.CharacterAdded()):WaitForChild("HumanoidRootPart")
+			local RootPart = Enemy:WaitForChild("HumanoidRootPart")
+			local Humanoid = Enemy:WaitForChild("Humanoid")
+			local EnemyName = Enemy.Name
+			sethiddenproperty(Player, "SimulationRadius", math.huge)
+			local BodyVelocity = Instance.new("BodyVelocity", RootPart)
+			BodyVelocity.Velocity = Vector3.zero
+			BodyVelocity.MaxForce = Vector3.new(math.huge, math.huge, math.huge)
+			local BodyPosition = Instance.new("BodyPosition", RootPart)
+			BodyPosition.Position = RootPart.Position
+			BodyPosition.P, BodyPosition.D = 3e4, 3e3
+			BodyPosition.MaxForce = Vector3.new(math.huge, math.huge, math.huge)
+			while PlayerRootPart and RootPart and Humanoid and Humanoid.Health > 0 and Enemy and Enemy.Parent == Enemies and Enemy:HasTag(BRING_TAG) do
+				local Target = Cached.Bring[Module.IsSuperBring and "ALL_MOBS" or EnemyName]
+				if Target and (PlayerRootPart.Position - RootPart.Position).Magnitude <= Settings.BringDistance then
+					if (RootPart.Position - Target.Position).Magnitude <= 70 then
+						RootPart.CFrame = Target
+					else
+						RootPart.CanCollide = false
+						BodyPosition.Position = Target.Position
+					end
+				end
+				task.wait()
+			end
+			if Enemy and Enemy:HasTag(BRING_TAG) then Enemy:RemoveTag(BRING_TAG) end
+		end
 		
 		local function KillAura(Enemy)
 			local Humanoid = Enemy:FindFirstChild("Humanoid")
 			local RootPart = Enemy:FindFirstChild("HumanoidRootPart")
-			
 			pcall(sethiddenproperty, Player, "SimulationRadius", math.huge)
-			
 			if Humanoid and RootPart then
 				RootPart.CanCollide = false
 				RootPart.Size = Vector3.new(60, 60, 60)
@@ -1344,7 +970,6 @@ end
 		
 		table.insert(Connections, CollectionService:GetInstanceAddedSignal("BasicMob"):Connect(NewEnemyAdded))
 		table.insert(Connections, Enemies.ChildAdded:Connect(NewEnemyAdded))
-		
 		table.insert(Connections, CollectionService:GetInstanceAddedSignal(KILLAURA_TAG):Connect(KillAura))
 		table.insert(Connections, CollectionService:GetInstanceAddedSignal(BRING_TAG):Connect(Bring))
 		
@@ -1362,14 +987,9 @@ end
 		
 		function Inventory:UpdateItem(item)
 			if type(item) == "table" then
-				if item.Type == "Wear" then
-					item.Type = "Accessory"
-				end
-				
+				if item.Type == "Wear" then item.Type = "Accessory" end
 				local Name = item.Name
-				
 				self.Items[Name] = item
-				
 				if not self.Unlocked[Name] then self.Unlocked[Name] = true end
 				if item.Count then self.Count[Name] = item.Count end
 				if item.Mastery then self.Mastery[Name] = item.Mastery end
@@ -1387,15 +1007,10 @@ end
 		end
 		
 		local function OnClientEvent(Method, ...)
-			if Method == "ItemChanged" then
-				Inventory:UpdateItem(...)
-			elseif Method == "ItemAdded" then
-				Inventory:UpdateItem(...)
-			elseif Method == "ItemRemoved" then
-				Inventory:RemoveItem(...)
-			elseif Method == "Notify" then
-				Module.Signals.Notify:Fire(...)
-			end
+			if Method == "ItemChanged" then Inventory:UpdateItem(...)
+			elseif Method == "ItemAdded" then Inventory:UpdateItem(...)
+			elseif Method == "ItemRemoved" then Inventory:RemoveItem(...)
+			elseif Method == "Notify" then Module.Signals.Notify:Fire(...) end
 		end
 		
 		task.spawn(function()
@@ -1405,8 +1020,8 @@ end
 		
 		return Inventory
 	end)()
-
-   Module.FastAttack = (function()
+	
+	Module.FastAttack = (function()
 		local FastAttack = {
 			Distance = 50,
 			attackMobs = true,
@@ -1416,25 +1031,9 @@ end
 			ComboDebounce = 0,
 			ShootDebounce = 0,
 			M1Combo = 0,
-			
-			Overheat = {
-				["Dragonstorm"] = {
-					MaxOverheat = 3,
-					Cooldown = 0,
-					TotalOverheat = 0,
-					Distance = 400,
-					Shooting = false
-				}
-			},
-			ShootsPerTarget = {
-				["Dual Flintlock"] = 2
-			},
-			SpecialShoots = {
-				["Skull Guitar"] = "TAP",
-				["Bazooka"] = "Position",
-				["Cannon"] = "Position",
-				["Dragonstorm"] = "Overheat"
-			},
+			Overheat = { ["Dragonstorm"] = { MaxOverheat = 3, Cooldown = 0, TotalOverheat = 0, Distance = 400, Shooting = false } },
+			ShootsPerTarget = { ["Dual Flintlock"] = 2 },
+			SpecialShoots = { ["Skull Guitar"] = "TAP", ["Bazooka"] = "Position", ["Cannon"] = "Position", ["Dragonstorm"] = "Overheat" },
 			HitboxLimbs = {"RightLowerArm", "RightUpperArm", "LeftLowerArm", "LeftUpperArm", "RightHand", "LeftHand"}
 		}
 		
@@ -1443,25 +1042,20 @@ end
 		local RE_RegisterHit = Net:WaitForChild("RE/RegisterHit")
 		local Events = ReplicatedStorage:WaitForChild("Events")
 		
-		local SUCCESS_FLAGS, COMBAT_REMOTE_THREAD = pcall(function()
-			return require(Modules.Flags).COMBAT_REMOTE_THREAD or false
-		end)
-		
-		local SUCCESS_SHOOT, SHOOT_FUNCTION = pcall(function()
-			return getupvalue(require(ReplicatedStorage.Controllers.CombatController).Attack, 9)
-		end)
-		
-		local HIT_FUNCTION; task.defer(function()			
+		local SUCCESS_FLAGS, COMBAT_REMOTE_THREAD = pcall(function() return require(Modules.Flags).COMBAT_REMOTE_THREAD or false end)
+		local SUCCESS_SHOOT, SHOOT_FUNCTION = pcall(function() return getupvalue(require(ReplicatedStorage.Controllers.CombatController).Attack, 9) end)
+		local HIT_FUNCTION
+		task.defer(function()
 			if getsenv then
-					HIT_FUNCTION = (getmenv or getsenv)(Net)._G.SendHitsToServer
-				end
+				HIT_FUNCTION = (getmenv or getsenv)(Net)._G.SendHitsToServer
+			end
 		end)
-
+		
 		local IsAlive = Module.IsAlive
 		
 		FastAttack.ShootsFunctions = {
-			["Skull Guitar"] = function(self: FastAttack, Equipped: Tool, Position: Vector3)
-				Equipped.RemoteEvent:FireServer("TAP", Position) -- Events.ShootSoulGuitar:Invoke(Position)
+			["Skull Guitar"] = function(self, Equipped, Position)
+				Equipped.RemoteEvent:FireServer("TAP", Position)
 			end
 		}
 		
@@ -1472,66 +1066,52 @@ end
 			end
 		end
 		
-		function FastAttack:ShootInTarget(TargetPosition: Vector3): (nil)
+		function FastAttack:ShootInTarget(TargetPosition: Vector3)
 			local Equipped = IsAlive(Player.Character) and Player.Character:FindFirstChildOfClass("Tool")
-			
 			if Equipped and Equipped.ToolTip == "Gun" then
 				if Equipped:FindFirstChild("Cooldown") and (tick() - self.ShootDebounce) >= Equipped.Cooldown.Value then
 					if self.ShootsFunctions[Equipped.Name] then
 						return self.ShootsFunctions[Equipped.Name](self, Equipped, TargetPosition)
 					end
-					
 					if SUCCESS_SHOOT and SHOOT_FUNCTION then
 						local ShootType = self.SpecialShoots[Equipped.Name] or "Normal"
-						
 						if ShootType == "Position" or (ShootType == "TAP" and Equipped:FindFirstChild("RemoteEvent")) then
 							Equipped:SetAttribute("LocalTotalShots", (Equipped:GetAttribute("LocalTotalShots") or 0) + 1)
 							GunValidator:FireServer(self:GetValidator2())
-							
 							if ShootType == "TAP" then
 								Equipped.RemoteEvent:FireServer("TAP", TargetPosition)
 							else
 								RE_ShootGunEvent:FireServer(TargetPosition)
 							end
-							
 							self.ShootDebounce = tick()
 						end
 					else
-						VirtualInputManager:SendMouseButtonEvent(0, 0, 0, true, game, 1);task.wait(0.05)
-						VirtualInputManager:SendMouseButtonEvent(0, 0, 0, false, game, 1);task.wait(0.05)
+						VirtualInputManager:SendMouseButtonEvent(0, 0, 0, true, game, 1); task.wait(0.05)
+						VirtualInputManager:SendMouseButtonEvent(0, 0, 0, false, game, 1); task.wait(0.05)
 						self.ShootDebounce = tick()
 					end
 				end
 			end
 		end
 		
-		function FastAttack:CheckStun(ToolTip: string, Character: Character, Humanoid: Humanoid): boolean
+		function FastAttack:CheckStun(ToolTip, Character, Humanoid)
 			local Stun = Character:FindFirstChild("Stun")
 			local Busy = Character:FindFirstChild("Busy")
-			
 			if Humanoid.Sit and (ToolTip == "Sword" or ToolTip == "Melee" or ToolTip == "Gun") then
 				return false
-			-- elseif Stun and Stun.Value > 0 then {{ or Busy and Busy.Value }}
-			--	 return false
 			end
-			
 			return true
 		end
 		
-		function FastAttack:Process(assert: boolean, Enemies: Folder, BladeHits: table, Position: Vector3, Distance: number): (nil)
+		function FastAttack:Process(assert, EnemiesFolder, BladeHits, Position, Distance)
 			if not assert then return end
-			
 			local HitboxLimbs = self.HitboxLimbs
-			local Mobs = Enemies:GetChildren()
-			
+			local Mobs = EnemiesFolder:GetChildren()
 			for i = 1, #Mobs do
 				local Enemy = Mobs[i]
 				local BasePart = Enemy:FindFirstChild(HitboxLimbs[math.random(#HitboxLimbs)]) or Enemy.PrimaryPart
-				
 				if not BasePart then continue end
-				
 				local CanAttack = Enemy.Parent == Characters and CheckPlayerAlly(Players:GetPlayerFromCharacter(Enemy))
-				
 				if Enemy ~= Player.Character and (Enemy.Parent ~= Characters or CanAttack) then
 					if IsAlive(Enemy) and (Position - BasePart.Position).Magnitude <= Distance then
 						if not self.EnemyRootPart then
@@ -1544,61 +1124,50 @@ end
 			end
 		end
 		
-		function FastAttack:GetAllBladeHits(Character: Character, Distance: number?): (nil)
+		function FastAttack:GetAllBladeHits(Character, Distance)
 			local Position = Character:GetPivot().Position
 			local BladeHits = {}
 			Distance = Distance or self.Distance
-			
 			self:Process(self.attackMobs, Enemies, BladeHits, Position, Distance)
-            self:Process(self.attackMobs, SeaBeasts, BladeHits, Position, Distance)
+			self:Process(self.attackMobs, SeaBeasts, BladeHits, Position, Distance)
 			self:Process(self.attackPlayers, Characters, BladeHits, Position, Distance)
-			
 			return BladeHits
 		end
 		
-		function FastAttack:GetClosestEnemy(Character: Character, Distance: number?): (nil)
+		function FastAttack:GetClosestEnemy(Character, Distance)
 			local BladeHits = self:GetAllBladeHits(Character, Distance)
-			
-			local Distance, Closest = math.huge
-			
+			local Dist, Closest = math.huge
 			for i = 1, #BladeHits do
-				local Magnitude = if Closest then (Closest.Position - BladeHits[i][2].Position).Magnitude else Distance
-				
-				if Magnitude <= Distance then
-					Distance, Closest = Magnitude, BladeHits[i][2]
+				local Magnitude = Closest and (Closest.Position - BladeHits[i][2].Position).Magnitude or Dist
+				if Magnitude <= Dist then
+					Dist, Closest = Magnitude, BladeHits[i][2]
 				end
 			end
-			
 			return Closest
 		end
 		
-		function FastAttack:GetGunHits(Character: Character, Distance: number?)
+		function FastAttack:GetGunHits(Character, Distance)
 			local BladeHits = self:GetAllBladeHits(Character, Distance)
 			local GunHits = {}
-			
 			for i = 1, #BladeHits do
 				if not GunHits[1] or (BladeHits[i][2].Position - GunHits[1].Position).Magnitude <= 10 then
 					table.insert(GunHits, BladeHits[i][2])
 				end
 			end
-			
 			return GunHits
 		end
 		
-		function FastAttack:GetCombo(): number
-			local Combo = if tick() - self.ComboDebounce <= 0.4 then self.M1Combo else 0
-			Combo = if Combo >= 4 then 1 else Combo + 1
-			
+		function FastAttack:GetCombo()
+			local Combo = (tick() - self.ComboDebounce <= 0.4) and self.M1Combo or 0
+			Combo = (Combo >= 4) and 1 or Combo + 1
 			self.ComboDebounce = tick()
 			self.M1Combo = Combo
-			
 			return Combo
 		end
 		
-		function FastAttack:UseFruitM1(Character: Character, Equipped: Tool, Combo: number): (nil)
+		function FastAttack:UseFruitM1(Character, Equipped, Combo)
 			local Position = Character:GetPivot().Position
 			local EnemyList = Enemies:GetChildren()
-			
 			for i = 1, #EnemyList do
 				local Enemy = EnemyList[i]
 				local PrimaryPart = Enemy.PrimaryPart
@@ -1609,11 +1178,10 @@ end
 			end
 		end
 		
-		function FastAttack:UseNormalClick(Humanoid: Humanoid, Character: Character, Cooldown: number): (nil)
+		function FastAttack:UseNormalClick(Humanoid, Character, Cooldown)
 			self.EnemyRootPart = nil
 			local BladeHits = self:GetAllBladeHits(Character)
 			local EnemyHitBox = self.EnemyRootPart
-			
 			if EnemyHitBox then
 				if SUCCESS_FLAGS and COMBAT_REMOTE_THREAD and HIT_FUNCTION then
 					RE_RegisterAttack:FireServer(Cooldown)
@@ -1622,86 +1190,69 @@ end
 					RE_RegisterAttack:FireServer(Cooldown)
 					RE_RegisterHit:FireServer(EnemyHitBox, BladeHits)
 				else
-					table.insert(BladeHits, { Enemy, EnemyHitBox })
+					table.insert(BladeHits, { EnemyHitBox.Parent, EnemyHitBox })
 					ExpandsHitBox(BladeHits)
-					
-					VirtualInputManager:SendMouseButtonEvent(0, 0, 0, true, game, 1);task.wait(0.05)
+					VirtualInputManager:SendMouseButtonEvent(0, 0, 0, true, game, 1); task.wait(0.05)
 					VirtualInputManager:SendMouseButtonEvent(0, 0, 0, false, game, 1)
 				end
 			end
 		end
 		
 		function FastAttack:GetValidator2()
-			local v1 = getupvalue(SHOOT_FUNCTION, 15) -- v40, 15
-			local v2 = getupvalue(SHOOT_FUNCTION, 13) -- v41, 13
-			local v3 = getupvalue(SHOOT_FUNCTION, 16) -- v42, 16
-			local v4 = getupvalue(SHOOT_FUNCTION, 17) -- v43, 17
-			local v5 = getupvalue(SHOOT_FUNCTION, 14) -- v44, 14
-			local v6 = getupvalue(SHOOT_FUNCTION, 12) -- v45, 12
-			local v7 = getupvalue(SHOOT_FUNCTION, 18) -- v46, 18
-			
-			local v8 = v6 * v2									-- v133
-			local v9 = (v5 * v2 + v6 * v1) % v3 -- v134
-			
+			local v1 = getupvalue(SHOOT_FUNCTION, 15)
+			local v2 = getupvalue(SHOOT_FUNCTION, 13)
+			local v3 = getupvalue(SHOOT_FUNCTION, 16)
+			local v4 = getupvalue(SHOOT_FUNCTION, 17)
+			local v5 = getupvalue(SHOOT_FUNCTION, 14)
+			local v6 = getupvalue(SHOOT_FUNCTION, 12)
+			local v7 = getupvalue(SHOOT_FUNCTION, 18)
+			local v8 = v6 * v2
+			local v9 = (v5 * v2 + v6 * v1) % v3
 			v9 = (v9 * v3 + v8) % v4
 			v5 = math.floor(v9 / v3)
 			v6 = v9 - v5 * v3
 			v7 = v7 + 1
-			
-			setupvalue(SHOOT_FUNCTION, 15, v1) -- v40, 15
-			setupvalue(SHOOT_FUNCTION, 13, v2) -- v41, 13
-			setupvalue(SHOOT_FUNCTION, 16, v3) -- v42, 16
-			setupvalue(SHOOT_FUNCTION, 17, v4) -- v43, 17
-			setupvalue(SHOOT_FUNCTION, 14, v5) -- v44, 14
-			setupvalue(SHOOT_FUNCTION, 12, v6) -- v45, 12
-			setupvalue(SHOOT_FUNCTION, 18, v7) -- v46, 18
-			
+			setupvalue(SHOOT_FUNCTION, 15, v1)
+			setupvalue(SHOOT_FUNCTION, 13, v2)
+			setupvalue(SHOOT_FUNCTION, 16, v3)
+			setupvalue(SHOOT_FUNCTION, 17, v4)
+			setupvalue(SHOOT_FUNCTION, 14, v5)
+			setupvalue(SHOOT_FUNCTION, 12, v6)
+			setupvalue(SHOOT_FUNCTION, 18, v7)
 			return math.floor(v9 / v4 * 16777215), v7
 		end
 		
 		function FastAttack:UseGunShoot(Character, Equipped)
 			if not Equipped.Enabled then return end
-			
 			local ShootType = self.SpecialShoots[Equipped.Name] or "Normal"
-			
 			if ShootType == "Normal" or ShootType == "Overheat" then
 				if ShootType == "Overheat" then
 					local Data = self.Overheat[Equipped.Name]
-					
-					if Data.Shooting then
-						return nil
-					end
-					
+					if Data.Shooting then return nil end
 					local Target = self:GetClosestEnemy(Character, Data.Distance or 100)
-					
 					if Target then
 						Data.Shooting = true
-						
 						while Equipped and Equipped.Parent == Player.Character and Data.TotalOverheat < Data.MaxOverheat do
 							if Target and Target.Parent and IsAlive(Target.Parent) then
 								Equipped:SetAttribute("LocalTotalShots", (Equipped:GetAttribute("LocalTotalShots") or 0) + 1)
 								GunValidator:FireServer(self:GetValidator2())
 								RE_ShootGunEvent:FireServer(Target.Position, { Target })
-								Data.TotalOverheat += task.wait(Data.Cooldown)
+								Data.TotalOverheat = Data.TotalOverheat + task.wait(Data.Cooldown)
 							else
 								break
 							end
 						end
-						
 						while Data.TotalOverheat > 0 do
 							Data.TotalOverheat = math.clamp(Data.TotalOverheat - task.wait(), 0, Data.MaxOverheat)
 						end
-						
 						Data.Shooting = false
 					end
 				else
 					local Hits = self:GetGunHits(Character, 120)
 					local Target = Hits[1] and Hits[1].Position
-					
 					if Target then
 						Equipped:SetAttribute("LocalTotalShots", (Equipped:GetAttribute("LocalTotalShots") or 0) + 1)
 						GunValidator:FireServer(self:GetValidator2())
-						
 						for i = 1, (self.ShootsPerTarget[Equipped.Name] or 1) do
 							RE_ShootGunEvent:FireServer(Target, Hits)
 						end
@@ -1709,15 +1260,12 @@ end
 				end
 			elseif ShootType == "Position" or (ShootType == "TAP" and Equipped:FindFirstChild("RemoteEvent")) then
 				local Target = self:GetClosestEnemy(Character, 200)
-				
 				if Target then
 					if self.ShootsFunctions[Equipped.Name] then
 						return self.ShootsFunctions[Equipped.Name](self, Equipped, Target.Position)
 					end
-					
 					Equipped:SetAttribute("LocalTotalShots", (Equipped:GetAttribute("LocalTotalShots") or 0) + 1)
 					GunValidator:FireServer(self:GetValidator2())
-					
 					if ShootType == "TAP" then
 						Equipped.RemoteEvent:FireServer("TAP", Target.Position)
 					else
@@ -1730,39 +1278,31 @@ end
 		function FastAttack.attack()
 			if not Settings.AutoClick then return end
 			if not IsAlive(Player.Character) then return end
-			
 			local self = FastAttack
 			local Character = Player.Character
 			local Humanoid = Character.Humanoid
-			
 			local Equipped = Character:FindFirstChildOfClass("Tool")
 			local ToolTip = Equipped and Equipped.ToolTip
 			local ToolName = Equipped and Equipped.Name
-			
 			if not Equipped or (ToolTip ~= "Gun" and ToolTip ~= "Melee" and ToolTip ~= "Blox Fruit" and ToolTip ~= "Sword") then
 				return nil
 			end
-			
 			local Cooldown = Equipped:FindFirstChild("Cooldown") and Equipped.Cooldown.Value or 0.3
-			
 			if (tick() - self.Debounce) >= Cooldown and self:CheckStun(ToolTip, Character, Humanoid) then
 				local Combo = self:GetCombo()
-				Cooldown += if Combo >= 4 then 0.01 else 0
-				
+				if Combo >= 4 then Cooldown = Cooldown + 0.01 end
 				self.Equipped = Equipped
-				self.Debounce = if Combo >= 4 and ToolTip ~= "Gun" then (tick() + 0.05) else tick()
-					
+				self.Debounce = (Combo >= 4 and ToolTip ~= "Gun") and (tick() + 0.05) or tick()
 				if ToolTip == "Blox Fruit" then
 					if ToolName == "Ice-Ice" or ToolName == "Light-Light" then
-                       return self:UseNormalClick(Humanoid, Character, Cooldown)
-                    elseif Equipped:FindFirstChild("LeftClickRemote") then
-                        if ToolName == "Blade-Blade" or ToolName == "Gas-Gas" then
-						return self:UseFruitM1(Character, Equipped, Combo)
-                       else 
-                      return Equipped.LeftClickRemote:FireServer(Vector3.new(0.01,-500,0.01),1,true)
-                     end
+						return self:UseNormalClick(Humanoid, Character, Cooldown)
+					elseif Equipped:FindFirstChild("LeftClickRemote") then
+						if ToolName == "Blade-Blade" or ToolName == "Gas-Gas" then
+							return self:UseFruitM1(Character, Equipped, Combo)
+						else
+							return Equipped.LeftClickRemote:FireServer(Vector3.new(0.01,-500,0.01),1,true)
+						end
 					end
-
 				elseif ToolTip == "Gun" then
 					if SUCCESS_SHOOT and SHOOT_FUNCTION then
 						return self:UseGunShoot(Character, Equipped)
@@ -1774,27 +1314,19 @@ end
 		end
 		
 		table.insert(Connections, Stepped:Connect(FastAttack.attack))
-		
 		return FastAttack
 	end)()
 	
 	Module.RaidList = (function()
 		local Success, RaidModule = pcall(require, ReplicatedStorage:WaitForChild("Raids"))
-		
 		if not Success or type(RaidModule) ~= "table" then
-			return {
-				"Phoenix", "Dough", "Flame", "Ice", "Quake", "Light";
-				"Dark", "Spider", "Rumble", "Magma", "Buddha", "Sand";
-			}
+			return { "Phoenix", "Dough", "Flame", "Ice", "Quake", "Light", "Dark", "Spider", "Rumble", "Magma", "Buddha", "Sand" }
 		end
-		
 		local AdvancedRaids = RaidModule.advancedRaids or {}
 		local NormalRaids = RaidModule.raids or {}
 		local RaidList = {}
-		
 		for i = 1, #AdvancedRaids do table.insert(RaidList, AdvancedRaids[i]) end
 		for i = 1, #NormalRaids do table.insert(RaidList, NormalRaids[i]) end
-		
 		return RaidList
 	end)()
 	
@@ -1803,52 +1335,36 @@ end
 		BodyVelocity.Velocity = Vector3.zero
 		BodyVelocity.MaxForce = Vector3.new(math.huge, math.huge, math.huge)
 		BodyVelocity.P = 1000
-		
-		if _ENV.tween_bodyvelocity then
-			_ENV.tween_bodyvelocity:Destroy()
-		end
-		
+		if _ENV.tween_bodyvelocity then _ENV.tween_bodyvelocity:Destroy() end
 		_ENV.tween_bodyvelocity = BodyVelocity
-		
 		local IsAlive = Module.IsAlive
 		local CanRemoveTag = false
-		
-		local BaseParts, CanCollideObjects, CanTouchObjects = {}, {}, {} do
+		local BaseParts, CanCollideObjects, CanTouchObjects = {}, {}, {}
+		do
 			local function AddObjectToBaseParts(Object)
 				if Object:IsA("BasePart") and (Object.CanCollide or Object.CanTouch) then
 					table.insert(BaseParts, Object)
-					
 					if Object.CanCollide then CanCollideObjects[Object] = true end
 					if Object.CanTouch then CanTouchObjects[Object] = true end
 				end
 			end
-			
 			local function RemoveObjectsFromBaseParts(BasePart)
-				local index = table.find(BaseParts, BasePart)
-				
-				if index then
-					table.remove(BaseParts, index)
-				end
+				local idx = table.find(BaseParts, BasePart)
+				if idx then table.remove(BaseParts, idx) end
 			end
-			
 			local function NewCharacter(Character)
 				table.clear(BaseParts)
-				
 				for _, Object in ipairs(Character:GetDescendants()) do AddObjectToBaseParts(Object) end
 				Character.DescendantAdded:Connect(AddObjectToBaseParts)
 				Character.DescendantRemoving:Connect(RemoveObjectsFromBaseParts)
-				
 				Character:WaitForChild("Humanoid", 9e9).Died:Wait()
 				table.clear(BaseParts)
 			end
-			
 			table.insert(Connections, Player.CharacterAdded:Connect(NewCharacter))
 			task.spawn(NewCharacter, Player.Character)
 		end
-		
 		local function NoClipOnStepped(Character)
 			if not IsAlive(Character) then return end
-			
 			if _ENV.OnFarm and not Player:HasTag("Teleporting") then
 				Player:AddTag("Teleporting")
 				CanRemoveTag = true
@@ -1856,12 +1372,10 @@ end
 				Player:RemoveTag("Teleporting")
 				CanRemoveTag = false
 			end
-			
 			if _ENV.OnFarm then
 				for i = 1, #BaseParts do
 					local BasePart = BaseParts[i]
-					local CanTouchValue = if (tick() - Module.RemoveCanTouch) <= 1 then false else true
-					
+					local CanTouchValue = (tick() - Module.RemoveCanTouch > 1)
 					if CanTouchObjects[BasePart] and BasePart.CanTouch ~= CanTouchValue then
 						BasePart.CanTouch = CanTouchValue
 					end
@@ -1872,67 +1386,46 @@ end
 			elseif Character.PrimaryPart and (not Character.PrimaryPart.CanCollide or not Character.PrimaryPart.CanTouch) then
 				for i = 1, #BaseParts do
 					local BasePart = BaseParts[i]
-					
-					if CanCollideObjects[BasePart] then
-						BasePart.CanCollide = true
-					end
-					if CanTouchObjects[BasePart] then
-						BasePart.CanTouch = true
-					end
+					if CanCollideObjects[BasePart] then BasePart.CanCollide = true end
+					if CanTouchObjects[BasePart] then BasePart.CanTouch = true end
 				end
 			end
 		end
-		
 		local function UpdateVelocityOnStepped(Character)
 			local RootPart = Character and Character:FindFirstChild("UpperTorso")
 			local Humanoid = Character and Character:FindFirstChild("Humanoid")
 			local BodyVelocity = _ENV.tween_bodyvelocity
-			
 			if _ENV.OnFarm and RootPart and Humanoid and Humanoid.Health > 0 then
-				if BodyVelocity.Parent ~= RootPart then
-					BodyVelocity.Parent = RootPart
-				end
+				if BodyVelocity.Parent ~= RootPart then BodyVelocity.Parent = RootPart end
 			else
-				if BodyVelocity.Parent then
-					BodyVelocity.Parent = nil
-				end
+				if BodyVelocity.Parent then BodyVelocity.Parent = nil end
 			end
-			
 			if BodyVelocity.Velocity ~= Vector3.zero and (not Humanoid or not Humanoid.SeatPart or not _ENV.OnFarm) then
 				BodyVelocity.Velocity = Vector3.zero
 			end
 		end
-		
 		table.insert(Connections, Stepped:Connect(function()
 			local Character = Player.Character
 			UpdateVelocityOnStepped(Character)
 			NoClipOnStepped(Character)
 		end))
-		
 		return BodyVelocity
 	end)()
 	
 	Module.Hooking = (function()
-		local Hooking = {
-			Skills = CreateDictionary({ "Z", "X", "C", "V", "F" }, true),
-			ClosestsEnemies = {}
-		}
-		
+		local Hooking = { Skills = CreateDictionary({ "Z", "X", "C", "V", "F" }, true), ClosestsEnemies = {} }
 		local Enabled = _ENV.rz_EnabledOptions
 		local Debounce = Module.Debounce
 		local IsAlive = Module.IsAlive
-		
-		local function GetNextTarget(Mode: string, ClosestList: boolean): any?
+		local function GetNextTarget(Mode, ClosestList)
 			if (tick() - Debounce.TargetDebounce) <= 2 or _ENV[Mode] then
-				return if ClosestList then Hooking.ClosestsEnemies else Hooking.ClosestsEnemies.Closest
+				return ClosestList and Hooking.ClosestsEnemies or Hooking.ClosestsEnemies.Closest
 			end
 		end
-		
-		function Hooking:SetTarget(RootPart: BasePart, Character: Model?, IsEnemy: boolean?): (nil)
+		function Hooking:SetTarget(RootPart, Character, IsEnemy)
 			table.clear(self.ClosestsEnemies)
 			self.ClosestsEnemies.Closest = RootPart
 			Debounce.TargetDebounce = tick()
-			
 			if IsEnemy then
 				for _, Enemy in ipairs(Module.Enemies:GetTagged(Character.Name)) do
 					if Enemy ~= Character and Enemy:FindFirstChild("UpperTorso") then
@@ -1941,61 +1434,43 @@ end
 				end
 			end
 		end
-		
 		function Hooking.UpdateClosests()
 			local SmoothDebounce = Settings.SmoothMode and 0.5 or 0.25
-			
 			if (tick() - Debounce.TargetDebounce) <= 2 or (tick() - Debounce.UpdateDebounce) <= SmoothDebounce then
 				return nil
 			end
-			
 			Debounce.UpdateDebounce = tick()
 			local Equipped = IsAlive(Player.Character) and Player.Character:FindFirstChildOfClass("Tool")
-			
 			if Equipped and Equipped.ToolTip then
 				local ClosestsEnemies = Hooking.ClosestsEnemies
 				table.clear(ClosestsEnemies)
-				
 				local Position = Player.Character:GetPivot().Position
-				
-				local Players = Players:GetPlayers()
-				local Enemies = Enemies:GetChildren()
-				
-				local Distance = if Equipped.ToolTip == "Gun" then 120 else 900
-				local ClosestsDistance = if Equipped.ToolTip == "Gun" then 120 else 60
-				
-				for i = 1, #Players do
-					local __Player = Players[i]
+				local PlayersList = Players:GetPlayers()
+				local EnemiesList = Enemies:GetChildren()
+				local Distance = Equipped.ToolTip == "Gun" and 120 or 900
+				local ClosestsDistance = Equipped.ToolTip == "Gun" and 120 or 60
+				for i = 1, #PlayersList do
+					local __Player = PlayersList[i]
 					local Character = __Player.Character
-					
 					if Player ~= __Player and CheckPlayerAlly(__Player) and IsAlive(Character) then
 						local UpperTorso = Character:FindFirstChild("UpperTorso")
 						local Magnitude = UpperTorso and (UpperTorso.Position - Position).Magnitude
-						
-						if UpperTorso and Magnitude <= ClosestsDistance then
-							table.insert(ClosestsEnemies, UpperTorso)
-						end
-						if UpperTorso and Magnitude <= Distance then
-							ClosestsEnemies.Closest = UpperTorso
-							Distance = if UpperTorso then Magnitude else Distance
+						if UpperTorso and Magnitude then
+							if Magnitude <= ClosestsDistance then table.insert(ClosestsEnemies, UpperTorso) end
+							if Magnitude <= Distance then
+								ClosestsEnemies.Closest = UpperTorso
+								Distance = Magnitude
+							end
 						end
 					end
 				end
-				
-				if Settings.NoAimMobs then
-					return nil
-				end
-				
-				for i = 1, #Enemies do
-					local Enemy = Enemies[i]
+				if Settings.NoAimMobs then return nil end
+				for i = 1, #EnemiesList do
+					local Enemy = EnemiesList[i]
 					local UpperTorso = Enemy and Enemy:FindFirstChild("UpperTorso")
-					
 					if UpperTorso and IsAlive(Enemy) then
 						local Magnitude = (UpperTorso.Position - Position).Magnitude
-						
-						if Magnitude <= ClosestsDistance then
-							table.insert(ClosestsEnemies, UpperTorso)
-						end
+						if Magnitude <= ClosestsDistance then table.insert(ClosestsEnemies, UpperTorso) end
 						if Magnitude <= Distance then
 							Distance, ClosestsEnemies.Closest = Magnitude, UpperTorso
 						end
@@ -2003,163 +1478,124 @@ end
 				end
 			end
 		end
-		
 		task.defer(function()
-			if _ENV.original_namecall then
-				return nil
-			end
-			
-			local old_namecall; old_namecall = hookmetamethod(game, "__namecall", function(self, ...)
+			if _ENV.original_namecall then return nil end
+			local old_namecall = hookmetamethod(game, "__namecall", function(self, ...)
 				if string.lower(getnamecallmethod()) ~= "fireserver" then
 					return old_namecall(self, ...)
 				end
-				
 				local Name = self.Name
-				
 				if Name == "RE/ShootGunEvent" then
-					local Position, Enemies = ...
-					
-					if typeof(Position) == "Vector3" and type(Enemies) == "table" then
+					local Position, EnemiesList = ...
+					if typeof(Position) == "Vector3" and type(EnemiesList) == "table" then
 						local ClosestList = GetNextTarget("AimBot_Gun", true)
-						
 						if ClosestList and #ClosestList > 0 then
 							for i = 1, #ClosestList do
 								local BasePart = ClosestList[i]
-								
-								if BasePart and (not Enemies[1] or (BasePart.Position - Enemies[1].Position).Magnitude <= 15) then
-									table.insert(Enemies, BasePart)
+								if BasePart and (not EnemiesList[1] or (BasePart.Position - EnemiesList[1].Position).Magnitude <= 15) then
+									table.insert(EnemiesList, BasePart)
 								end
 							end
-							
-							return old_namecall(self, Enemies[1].Position, Enemies)
+							return old_namecall(self, EnemiesList[1].Position, EnemiesList)
 						end
 					end
 				elseif Name == "RemoteEvent" then
 					local v1, v2 = ...
-					
 					if typeof(v1) == "Vector3" and not v2 then
-						local Target = GetNextTarget("AimBot_Skills")
-						
-						if Target then
-							return old_namecall(self, Target.Position)
-						end
+						local Target = GetNextTarget("AimBot_Skills", false)
+						if Target then return old_namecall(self, Target.Position) end
 					elseif v1 == "TAP" and typeof(v2) == "Vector3" then
-						local Target = GetNextTarget("AimBot_Tap")
-						
-						if Target then
-							return old_namecall(self, "TAP", Target.Position)
-						end
+						local Target = GetNextTarget("AimBot_Tap", false)
+						if Target then return old_namecall(self, "TAP", Target.Position) end
 					end
 				end
-				
 				return old_namecall(self, ...)
 			end)
-			
 			_ENV.original_namecall = old_namecall
 		end)
-		
 		table.insert(Connections, Heartbeat:Connect(Hooking.UpdateClosests))
-		
 		return Hooking
 	end)()
-
-  task.defer(function()
-	 	local DeathEffect = require(WaitChilds(ReplicatedStorage, "Effect", "Container", "Death"))
-	 	local CameraShaker = require(WaitChilds(ReplicatedStorage, "Util", "CameraShaker"))
-	 	
-		if CameraShaker then
-	 		CameraShaker:Stop()
-	 	end
-	 	if hookfunction then
- 		hookfunction(DeathEffect, function(...) return ... end)
-	 	end
+	
+	task.defer(function()
+		local DeathEffect = require(WaitChilds(ReplicatedStorage, "Effect", "Container", "Death"))
+		local CameraShaker = require(WaitChilds(ReplicatedStorage, "Util", "CameraShaker"))
+		if CameraShaker then CameraShaker:Stop() end
+		if hookfunction then hookfunction(DeathEffect, function(...) return ... end) end
 	end)
 	
 	task.spawn(function()
 		local SpawnLocations = Module.SpawnLocations
 		local EnemyLocations = Module.EnemyLocations
-		
 		local function NewIslandAdded(Island)
-			if Island.Name:find("Island") then
-				Cached.RaidIsland = nil
-			end
+			if Island.Name:find("Island") then Cached.RaidIsland = nil end
 		end
-		
 		local function NewSpawn(Part)
 			local EnemyName = GetEnemyName(Part.Name)
 			EnemyLocations[EnemyName] = EnemyLocations[EnemyName] or {}
-			
 			local EnemySpawn = Part.CFrame + Vector3.new(0, 25, 0)
 			SpawnLocations[EnemyName] = Part
-			
 			if not table.find(EnemyLocations[EnemyName], EnemySpawn) then
 				table.insert(EnemyLocations[EnemyName], EnemySpawn)
 			end
 		end
-		
 		for _, Spawn in EnemySpawns:GetChildren() do NewSpawn(Spawn) end
 		table.insert(Connections, EnemySpawns.ChildAdded:Connect(NewSpawn))
 		table.insert(Connections, Locations.ChildAdded:Connect(NewIslandAdded))
 	end)
 end
 
-function EnableBuso()
+-- Вспомогательные функции как методы модуля
+function Module:EnableBuso()
 	local Character = Player.Character
-	local IsAlive = Module.IsAlive(Character)
-	
-	if Settings.AutoBuso and IsAlive and not Character:FindFirstChild("HasBuso") then
+	if Settings.AutoBuso and self.IsAlive(Character) and not Character:FindFirstChild("HasBuso") then
 		if Character:HasTag("Buso") then
-			Module.FireRemote("Buso")
-		elseif Money.Value >= 25e3 then
-			Module.FireRemote("BuyHaki", "Buso")
+			self.FireRemote("Buso")
+		elseif Money.Value >= 25000 then
+			self.FireRemote("BuyHaki", "Buso")
 		end
 	end
 end
 
-function GetToolByName(Name)
-	local Cached = Module.Cached.Tools[Name]
-	local Character = Module.IsAlive(Player.Character) and Player.Character and Player:FindFirstChild("Backpack")
-
-	if Cached and (Cached.Parent == Player.Character or Cached.Parent == Player.Backpack) then
-		return Cached
+function Module:GetToolByName(Name)
+	local CachedTool = self.Cached.Tools[Name]
+	if CachedTool and (CachedTool.Parent == Player.Character or CachedTool.Parent == Player.Backpack) then
+		return CachedTool
 	end
-	
-	if Character then
-		local HasTool = Player.Character:FindFirstChild(Name) or Player.Backpack:FindFirstChild(Name)
-		
-		if HasTool then
-			Module.Cached.Tools[Name] = HasTool
-			return HasTool
-		end
-	end
-end
-
-function GetToolMastery(Name)
-	local HasTool = GetToolByName(Name)
-	return HasTool and HasTool:GetAttribute("Level") or 0
-end
-
-function GetToolTip(ToolTip, Folder)
-	for _, Tool in Folder:GetChildren() do
-		if Tool:IsA("Tool") and Tool.ToolTip == ToolTip then
-			Module.Cached.Tools[`ToolTip_{ToolTip}`] = Tool
+	if self.IsAlive(Player.Character) then
+		local Tool = Player.Character:FindFirstChild(Name) or Player.Backpack:FindFirstChild(Name)
+		if Tool then
+			self.Cached.Tools[Name] = Tool
 			return Tool
 		end
 	end
 end
 
-function VerifyToolTip(ToolTip)
-	local Cached = Module.Cached.Tools[`ToolTip_{ToolTip}`]
-	
-	if Cached and (Cached.Parent == Player.Character or Cached.Parent == Player.Backpack) then
-		return Cached
-	end
-	
-	local Character = Module.IsAlive(Player.Character) and Player.Character
-	
-	return GetToolTip(ToolTip, Player.Backpack) or Character and GetToolTip(ToolTip, Character)
+function Module:GetToolMastery(Name)
+	local Tool = self:GetToolByName(Name)
+	return Tool and Tool:GetAttribute("Level") or 0
 end
 
-function VerifyTool(Name)
-	return if GetToolByName(Name) then true else false
+function Module:GetToolTip(ToolTip, Folder)
+	for _, Tool in Folder:GetChildren() do
+		if Tool:IsA("Tool") and Tool.ToolTip == ToolTip then
+			self.Cached.Tools[`ToolTip_{ToolTip}`] = Tool
+			return Tool
+		end
+	end
 end
+
+function Module:VerifyToolTip(ToolTip)
+	local CachedTool = self.Cached.Tools[`ToolTip_{ToolTip}`]
+	if CachedTool and (CachedTool.Parent == Player.Character or CachedTool.Parent == Player.Backpack) then
+		return CachedTool
+	end
+	local Character = self.IsAlive(Player.Character) and Player.Character
+	return self:GetToolTip(ToolTip, Player.Backpack) or (Character and self:GetToolTip(ToolTip, Character))
+end
+
+function Module:VerifyTool(Name)
+	return self:GetToolByName(Name) and true or false
+end
+
+return Module
