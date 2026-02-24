@@ -127,6 +127,9 @@ function CreateDictionary(array: { string }, value: any?): { [string]: any? }
 	return Dictionary
 end
 
+-- Делаем функцию глобальной для использования в скрипте
+_ENV.CreateDictionary = CreateDictionary
+
 local Signal = {} do
 	local Connection = {} do
 		Connection.__index = Connection
@@ -582,7 +585,7 @@ local Module = {} do
 			
 			local Message = Instance.new("Message", workspace)
 			_ENV.redz_hub_error = Message
-			Message.Text = (`OMG-Hub error [ {Settings.RunningOption or "Null"} ] {ErrorMessage}`)
+			Message.Text = (`redz-Hub error [ {Settings.RunningOption or "Null"} ] {ErrorMessage}`)
 		end)
 	end
 	
