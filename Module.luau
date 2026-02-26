@@ -1916,8 +1916,7 @@ Module.FastAttack = (function()
 	  end)()
 end
 
-end 
+return Module
 
-return Module
-return Module
+
 
