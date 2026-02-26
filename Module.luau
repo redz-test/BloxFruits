@@ -101,13 +101,12 @@ local function WaitChilds(Instance, ...)
 end
 
 local function FastWait(Seconds, Instance, ...)
-  local args = {...}
-  local Success, Result = pcall(function()
-    for _, ChildName in ipairs(args) do
+  local Success, Result = pcall(function(...)
+    for _, ChildName in ipairs({...}) do
       Instance = Instance:WaitForChild(ChildName, Seconds)
     end
     return Instance
-  end)
+  end, ...)
   
   return if (Success and Result) then Result else nil
 end
@@ -1916,7 +1915,10 @@ Module.FastAttack = (function()
 		table.insert(Connections, Stepped:Connect(FastAttack.attack))
 		
 		return FastAttack
-	end)()
+	  end)()
 end
 
+end 
+
+return Module
 return Module
