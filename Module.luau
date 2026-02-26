@@ -178,7 +178,9 @@ local Module = {} do
     ["rbxassetid://15482881956"] = "Kitsune-Kitsune",
     ["rbxassetid://11911905519"] = "Spirit-Spirit",
     ["rbxassetid://118054805452821"] = "Gas-Gas",
-    ["rbxassetid://115276580506154"] = "Yeti-Yeti"
+    ["rbxassetid://115276580506154"] = "Yeti-Yeti",
+    ["https://assetdelivery.roblox.com/v1/asset/?id=10395893751"] = "Venom-Venom",
+    ["https://assetdelivery.roblox.com/v1/asset/?id=10537896371"] = "Dragon-Dragon"
   }
   Module.Bosses = {
     -- Bosses Sea 1
@@ -657,7 +659,7 @@ local Module = {} do
       local Mobs = self.allMobs[Name]
       
       if Mobs then
-        for _, Enemy in Mobs do
+        for _, Enemy in ipairs(Mobs) do
           if self.IsAlive(Enemy) then
             self.newCachedEnemy(Name, Enemy)
             return Enemy
@@ -1892,7 +1894,7 @@ Module.FastAttack = (function()
 				Cooldown += if Combo >= 4 then 0.05 else 0
 				
 				self.Equipped = Equipped
-				self.Debounce = if Combo >= 4 and ToolTip ~= "Gun" then (tick() + 0.05) else tick() end
+				self.Debounce = if Combo >= 4 and ToolTip ~= "Gun" then (tick() + 0.05) else tick()
 					
 				if ToolTip == "Blox Fruit" then
 					if ToolName == "Ice-Ice" or ToolName == "Light-Light" then
@@ -1913,11 +1915,7 @@ Module.FastAttack = (function()
 		table.insert(Connections, Stepped:Connect(FastAttack.attack))
 		
 		return FastAttack
-	  end)()
+	end)()
 end
 
 return Module
-
-
-
-
