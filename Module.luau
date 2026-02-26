@@ -1,7 +1,7 @@
 local Settings = ...
 
 if type(Settings) ~= "table" then
-  return nil
+  return {}
 end
 
 local _ENV = (getgenv or getrenv or getfenv)()
@@ -1919,4 +1919,5 @@ Module.FastAttack = (function()
 end
 
 return Module
+
 
