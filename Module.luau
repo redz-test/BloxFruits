@@ -962,7 +962,7 @@ local Module = {} do
       local Position = (Player.Character or Player.CharacterAdded:Wait()):GetPivot().Position
       local Distance, Nearest = math.huge
       
-      for _, Enemy in Mobs do
+      for _, Enemy in ipairs(Mobs) do
         local PrimaryPart = Enemy.PrimaryPart
         
         if PrimaryPart and self.IsAlive(Enemy) then
@@ -1919,3 +1919,4 @@ Module.FastAttack = (function()
 end
 
 return Module
+
