@@ -1,7 +1,7 @@
 local Settings = ...
 
 if type(Settings) ~= "table" then
-  return {}
+  return nil
 end
 
 local _ENV = (getgenv or getrenv or getfenv)()
@@ -659,7 +659,7 @@ local Module = {} do
       local Mobs = self.allMobs[Name]
       
       if Mobs then
-        for _, Enemy in ipairs(Mobs) do
+        for _, Enemy in Mobs do
           if self.IsAlive(Enemy) then
             self.newCachedEnemy(Name, Enemy)
             return Enemy
@@ -962,7 +962,7 @@ local Module = {} do
       local Position = (Player.Character or Player.CharacterAdded:Wait()):GetPivot().Position
       local Distance, Nearest = math.huge
       
-      for _, Enemy in ipairs(Mobs) do
+      for _, Enemy in Mobs do
         local PrimaryPart = Enemy.PrimaryPart
         
         if PrimaryPart and self.IsAlive(Enemy) then
@@ -1919,6 +1919,3 @@ Module.FastAttack = (function()
 end
 
 return Module
-
-
-
