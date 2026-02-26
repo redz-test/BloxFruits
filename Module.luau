@@ -178,9 +178,7 @@ local Module = {} do
     ["rbxassetid://15482881956"] = "Kitsune-Kitsune",
     ["rbxassetid://11911905519"] = "Spirit-Spirit",
     ["rbxassetid://118054805452821"] = "Gas-Gas",
-    ["rbxassetid://115276580506154"] = "Yeti-Yeti",
-    ["https://assetdelivery.roblox.com/v1/asset/?id=10395893751"] = "Venom-Venom",
-    ["https://assetdelivery.roblox.com/v1/asset/?id=10537896371"] = "Dragon-Dragon"
+    ["rbxassetid://115276580506154"] = "Yeti-Yeti"
   }
   Module.Bosses = {
     -- Bosses Sea 1
@@ -1922,3 +1920,4 @@ end
 
 return Module
 return Module
+
