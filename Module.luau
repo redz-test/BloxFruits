@@ -1892,7 +1892,7 @@ Module.FastAttack = (function()
 				Cooldown += if Combo >= 4 then 0.05 else 0
 				
 				self.Equipped = Equipped
-				self.Debounce = if Combo >= 4 and ToolTip ~= "Gun" then (tick() + 0.05) else tick()
+				self.Debounce = if Combo >= 4 and ToolTip ~= "Gun" then (tick() + 0.05) else tick() end
 					
 				if ToolTip == "Blox Fruit" then
 					if ToolName == "Ice-Ice" or ToolName == "Light-Light" then
@@ -1917,6 +1917,7 @@ Module.FastAttack = (function()
 end
 
 return Module
+
 
 
 
