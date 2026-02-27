@@ -59,7 +59,10 @@ local WaitSeconds = nil;
 
 local HIDDEN_SETTINGS: { [string]: any } = {
 	SKILL_COOLDOWN = 0.5,
-	CLEAR_AFTER = 50
+	CLEAR_AFTER = 50,
+	
+	SILENT_AIM_ENABLED = false,
+	WALKSPEED_BYPASS_ENABLED = true
 }
 
 _ENV._Bring_Tag = BRING_TAG
@@ -853,9 +856,9 @@ local Module = {} do
 		local Enemies = Module.Enemies
 		return if type(EnemyName) == "table" then Enemies:GetClosest(EnemyName) else Enemies:GetEnemyByTag(EnemyName)
 	end
-	
+  
 	function Module:IsBlacklistedExecutor(): boolean
-		return IS_BLACKLISTED_EXECUTOR
+		return if IS_BLACKLISTED_EXECUTOR then true else false
 	end
 	
 	function Module:TravelTo(Sea: number?): (nil)
@@ -866,14 +869,26 @@ local Module = {} do
 		MaxPlayers = MaxPlayers or self.SH_MaxPlrs or 8
 		-- Region = Region or self.SH_Region or "Singapore"
 		
-		local ServerBrowser = ReplicatedStorage.__ServerBrowser
+		local ServerBrowser = ReplicatedStorage.__ServerBrowser -- o evento que gerência tudo relacionado a "servidores"
+		local InvokeServer = ServerBrowser.InvokeServer -- armazena a função de "InvokeServer" para otimizar
+		local MyJobId = game.JobId -- armazena o JobId do server atual, também para otimizar o loop
+		local CurrentPage = 1 -- a "página" atual de servidores ServerBrowser:InvokeServer(1. 2. 3...)
 		
-		for i = 1, 100 do
-			local Servers = ServerBrowser:InvokeServer(i)
-			for id,info in pairs(Servers) do
-				if id ~= game.JobId and info["Count"] <= MaxPlayers then
-					task.spawn(ServerBrowser.InvokeServer, ServerBrowser, "teleport", id)
+		while true do
+			local Servers = InvokeServer(ServerBrowser, CurrentPage) -- retorna a lista de servidores atuais
+			if not Servers then return end -- se nenhum servidor for encontrado, ele retorna e quebra o loop
+			CurrentPage += 1 -- avança para o próximo número da página
+			
+			local lowServerCount, lowServerId = MaxPlayers;
+			
+			for id, data in Servers do
+				if id ~= MyJobId and data.Count <= lowServerCount then
+					lowServerCount, lowServerId = data.Count, id;
 				end
+			end
+			
+			if lowServerId then
+				task.spawn(InvokeServer, ServerBrowser, "teleport", lowServerId)
 			end
 		end
 	end
@@ -1967,16 +1982,18 @@ local Module = {} do
 		end
 		
 		function Hooking:EnableBypass()
-			if not _ENV.enabled_bypass then
-				_ENV.enabled_bypass = true
-				
-				local old_newindex; old_newindex = hookmetamethod(Player, "__newindex", function(self, index, value)
-					if tostring(self) == "Humanoid" and index == "WalkSpeed" then
-						return old_newindex(self, "WalkSpeed", _ENV.WalkSpeedBypass or value)
-					end
-					return old_newindex(self, index, value)
-				end)
+			if _ENV.enabled_bypass or not HIDDEN_SETTINGS.SILENT_AIM_ENABLED then
+			  return nil
 			end
+			
+			_ENV.enabled_bypass = true
+			
+			local old_newindex; old_newindex = hookmetamethod(Player, "__newindex", function(self, index, value)
+				if tostring(self) == "Humanoid" and index == "WalkSpeed" then
+					return old_newindex(self, "WalkSpeed", _ENV.WalkSpeedBypass or value)
+				end
+				return old_newindex(self, index, value)
+			end)
 		end
 		
 		function Hooking:SetTarget(RootPart: BasePart, Character: Model?, IsEnemy: boolean?): (nil)
@@ -2055,8 +2072,8 @@ local Module = {} do
 			end
 		end
 		
-		task.defer(function()
-			if _ENV.original_namecall then
+		task.delay(5, function()
+			if _ENV.original_namecall or not HIDDEN_SETTINGS.WALKSPEED_BYPASS_ENABLED then
 				return nil
 			end
 			
