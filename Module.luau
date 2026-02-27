@@ -4,7 +4,6 @@ if type(Settings) ~= "table" then
   Settings = {}
 end
 
--- Safe defaults so the module doesn't crash if a setting is missing
 setmetatable(Settings, {
   __index = {
     AutoBuso = false,
@@ -1043,7 +1042,7 @@ local Module = {} do
     end
     
     local function Bring(Enemy)
-      local PlayerRootPart = (Player.Character or Player.CharacterAdded()):WaitForChild("HumanoidRootPart")
+      local PlayerRootPart = (Player.Character or Player.CharacterAdded:Wait()):WaitForChild("HumanoidRootPart")
       local RootPart = Enemy:WaitForChild("HumanoidRootPart")
       local Humanoid = Enemy:WaitForChild("Humanoid")
       local EnemyName = Enemy.Name
