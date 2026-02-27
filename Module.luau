@@ -1,4 +1,5 @@
 local Settings, Connections = ...
+
 if type(Settings) ~= "table" or type(Connections) ~= "table" then
   return {}
 end
@@ -121,6 +122,26 @@ local Module = {} do
   Module.Webhooks = false
   Module.JobIds = true
   
+
+  -- Compatibility with the main loader: expected by StartFunctions()
+  local maxLevel = workspace:GetAttribute("LEVEL_CAP")
+  if typeof(maxLevel) ~= "number" then
+    maxLevel = Module.MaxLevel
+  end
+
+  local stringVersion = "Unknown"
+  pcall(function()
+    stringVersion = require(ReplicatedStorage:WaitForChild("BuildInfo")).VERSION
+  end)
+
+  Module.GameData = {
+    Sea = Module.Sea,
+    SeasName = { "Main", "Dressrosa", "Zou" },
+    MaxMastery = 600,
+    MaxLevel = maxLevel,
+    StringVersion = stringVersion
+  }
+
   Module.allMobs = { __RaidBoss = {}, __Bones = {}, __Elite = {}, __CakePrince = {} }
   Module.Progress = {}
   Module.SpawnedFruits = {}
