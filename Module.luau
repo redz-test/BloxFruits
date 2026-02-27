@@ -1,20 +1,8 @@
-local Settings = ...
-
-if type(Settings) ~= "table" then
-  Settings = {}
+local Settings, Connections = ...
+if type(Settings) ~= "table" or type(Connections) ~= "table" then
+  return {}
 end
 
-setmetatable(Settings, {
-  __index = {
-    AutoBuso = false,
-    BringMobs = false,
-    BringDistance = 300,
-    AutoClick = false,
-    AutoShoot = false,
-    FarmTool = "Melee",
-    NoAimMobs = false,
-  }
-})
 local _ENV = (getgenv or getrenv or getfenv)()
 
 local VirtualInputManager: VirtualInputManager = game:GetService("VirtualInputManager")
@@ -23,8 +11,6 @@ local ReplicatedStorage: ReplicatedStorage = game:GetService("ReplicatedStorage"
 local TeleportService: TeleportService = game:GetService("TeleportService")
 local RunService: RunService = game:GetService("RunService")
 local Players: Players = game:GetService("Players")
-
-local Lighting: Lighting = game:GetService("Lighting")
 
 local Remotes = ReplicatedStorage:WaitForChild("Remotes")
 local GunValidator: RemoteEvent = Remotes:WaitForChild("Validator2")
@@ -68,11 +54,6 @@ local KILLAURA_TAG = _ENV._KillAura_Tag or `k{math.random(120, 2e4)}t`
 _ENV._Bring_Tag = BRING_TAG
 _ENV._KillAura_Tag = KILLAURA_TAG
 
-local Connections = {} do
-  if _ENV.rz_connections then
-    for _, Connection in ipairs(_ENV.rz_connections) do
-      Connection:Disconnect()
-    end
   end
   
   _ENV.rz_connections = Connections
@@ -1042,7 +1023,7 @@ local Module = {} do
     end
     
     local function Bring(Enemy)
-      local PlayerRootPart = (Player.Character or Player.CharacterAdded:Wait()):WaitForChild("HumanoidRootPart")
+      local PlayerRootPart = (Player.Character or Player.CharacterAdded()):WaitForChild("HumanoidRootPart")
       local RootPart = Enemy:WaitForChild("HumanoidRootPart")
       local Humanoid = Enemy:WaitForChild("Humanoid")
       local EnemyName = Enemy.Name
@@ -1931,4 +1912,3 @@ Module.FastAttack = (function()
 	end)()
 end
 
-return Module
