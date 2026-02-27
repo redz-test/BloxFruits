@@ -1,5 +1,4 @@
 local Settings, Connections = ...
-
 if type(Settings) ~= "table" or type(Connections) ~= "table" then
   return {}
 end
@@ -1926,5 +1925,236 @@ Module.FastAttack = (function()
 		
 		return FastAttack
 	end)()
+end
+
+
+
+--[[ Compatibility layer for the main loader (v4)
+     - Adds Module.Signals + lightweight Signal implementation
+     - Adds Module.RunFunctions: Translator / Quests / LibraryToggle / FarmQueue
+--]]
+do
+  local function newSignal()
+    local sig = { Connections = {} }
+
+    function sig:Connect(fn)
+      if type(fn) ~= "function" then
+        return nil
+      end
+
+      local conn = { Connected = true }
+
+      function conn:Disconnect()
+        conn.Connected = false
+      end
+
+      function conn:Fire(...)
+        if not conn.Connected then return end
+        local ok, err = pcall(fn, ...)
+        if not ok then
+          warn(err)
+        end
+      end
+
+      table.insert(sig.Connections, conn)
+      -- ensure main script cleanup (Disconnect loop) also clears our connections
+      table.insert(Connections, conn)
+      return conn
+    end
+
+    function sig:Once(fn)
+      local conn
+      conn = self:Connect(function(...)
+        conn:Disconnect()
+        fn(...)
+      end)
+      return conn
+    end
+
+    function sig:Wait()
+      local thread = coroutine.running()
+      local conn
+      conn = self:Connect(function(...)
+        conn:Disconnect()
+        task.spawn(thread, ...)
+      end)
+      return coroutine.yield()
+    end
+
+    function sig:Fire(...)
+      for _, c in ipairs(self.Connections) do
+        if c.Connected and c.Fire then
+          c:Fire(...)
+        end
+      end
+    end
+
+    return sig
+  end
+
+  Module.Signals = Module.Signals or {}
+  local Signals = Module.Signals
+
+  Signals.PossibleStaff = Signals.PossibleStaff or newSignal()
+  Signals.OptionChanged = Signals.OptionChanged or newSignal()
+  Signals.EnemyAdded = Signals.EnemyAdded or newSignal()
+  Signals.EnemyDied = Signals.EnemyDied or newSignal()
+  Signals.Notify = Signals.Notify or newSignal()
+  Signals.Error = Signals.Error or newSignal()
+
+  if not Signals.__error_hooked then
+    Signals.__error_hooked = true
+    Signals.Error:Connect(function(ErrorMessage)
+      _ENV.loadedFarm = false
+      _ENV.OnFarm = false
+
+      local msg = Instance.new("Message", workspace)
+      _ENV.redz_hub_error = msg
+      msg.Text = ("redz-Hub error [ %s ] %s"):format(Settings.RunningOption or "Null", tostring(ErrorMessage))
+    end)
+  end
+
+  Module.RunFunctions = Module.RunFunctions or {}
+  local RF = Module.RunFunctions
+
+  -- Wrap UI library elements with translation table (optional in main script).
+  RF.Translator = RF.Translator or function(Window, Translation)
+    local MakeTab = Window.MakeTab
+
+    Window.MakeTab = function(self, Configs)
+      if Translation[Configs[1]] then
+        Configs[1] = Translation[Configs[1]]
+      end
+
+      local Tab = MakeTab(self, Configs)
+      local NewTab = {}
+
+      function NewTab:AddSection(Name)
+        return Tab:AddSection(Translation[Name] or Name)
+      end
+
+      function NewTab:AddButton(Configs)
+        local Translator = Translation[Configs[1]]
+        if Translator then
+          Configs[1] = type(Translator) == "string" and Translator or Translator[1]
+          Configs.Desc = type(Translator) ~= "string" and Translator[2]
+        end
+        return Tab:AddButton(Configs)
+      end
+
+      function NewTab:AddToggle(Configs)
+        local Translator = Translation[Configs[1]]
+        if Translator then
+          Configs[1] = type(Translator) == "string" and Translator or Translator[1]
+          Configs.Desc = type(Translator) ~= "string" and Translator[2]
+        end
+        return Tab:AddToggle(Configs)
+      end
+
+      function NewTab:AddSlider(Configs)
+        local Translator = Translation[Configs[1]]
+        if Translator then
+          Configs[1] = type(Translator) == "string" and Translator or Translator[1]
+          Configs.Desc = type(Translator) ~= "string" and Translator[2]
+        end
+        return Tab:AddSlider(Configs)
+      end
+
+      function NewTab:AddDropdown(Configs)
+        local Translator = Translation[Configs[1]]
+        if Translator then
+          Configs[1] = type(Translator) == "string" and Translator or Translator[1]
+          Configs.Desc = type(Translator) ~= "string" and Translator[2]
+        end
+        return Tab:AddDropdown(Configs)
+      end
+
+      function NewTab:AddTextBox(Configs)
+        local Translator = Translation[Configs[1]]
+        if Translator then
+          Configs[1] = type(Translator) == "string" and Translator or Translator[1]
+          Configs.Desc = type(Translator) ~= "string" and Translator[2]
+        end
+        return Tab:AddTextBox(Configs)
+      end
+
+      for k, v in pairs(Tab) do
+        if NewTab[k] == nil then
+          NewTab[k] = v
+        end
+      end
+
+      return NewTab
+    end
+  end
+
+  -- Build quest list for QuestManager.
+  RF.Quests = RF.Quests or function(self, QuestsModule, getTasks)
+    local MaxLvl = ({ {0, 700}, {700, 1500}, {1500, math.huge} })[self.Sea]
+    local bl_Quests = {"BartiloQuest", "MarineQuest", "CitizenQuest"}
+
+    for name, taskTbl in pairs(QuestsModule) do
+      if table.find(bl_Quests, name) then
+        continue
+      end
+
+      for num, mission in pairs(taskTbl) do
+        local LevelReq = mission.LevelReq
+        if LevelReq and LevelReq >= MaxLvl[1] and LevelReq < MaxLvl[2] then
+          local target, positions = getTasks(mission)
+          table.insert(self.QuestList, {
+            Name = name,
+            Count = num,
+            Enemy = { Name = target, Level = LevelReq, Position = positions }
+          })
+        end
+      end
+    end
+
+    table.sort(self.QuestList, function(v1, v2)
+      return (v1.Enemy.Level or 0) < (v2.Enemy.Level or 0)
+    end)
+  end
+
+  -- Creates a toggle factory used by the UI layer.
+  RF.LibraryToggle = RF.LibraryToggle or function(EnabledOptions, Options)
+    return function(Tab, ToggleSettings, Flag)
+      Options[Flag] = Tab:AddToggle({
+        ToggleSettings[1],
+        type(ToggleSettings[2]) ~= "string" and ToggleSettings[2],
+        function(Value) EnabledOptions[Flag] = Value end,
+        Flag,
+        Desc = (type(ToggleSettings[2]) == "string" and ToggleSettings[2]) or ToggleSettings[3]
+      })
+    end
+  end
+
+  -- Main farming loop runner.
+  RF.FarmQueue = RF.FarmQueue or function(Options)
+    local ok, err = pcall(function()
+      while task.wait(Settings.SmoothMode and 0.25 or 0) do
+        local enabled = false
+
+        for _, Option in ipairs(Options) do
+          Settings.RunningOption = Option.Name
+          local Method = Option.Function()
+
+          if Method then
+            Settings.RunningMethod = type(Method) == "string" and Method or Settings.RunningMethod
+            enabled = true
+            break
+          else
+            Settings.RunningOption, Settings.RunningMethod = nil, nil
+          end
+        end
+
+        _ENV.OnFarm = (_ENV.teleporting or enabled)
+      end
+    end)
+
+    if not ok then
+      Signals.Error:Fire(err)
+    end
+  end
 end
 
