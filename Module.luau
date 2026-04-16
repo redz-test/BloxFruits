@@ -44,7 +44,7 @@ local Net: ModuleScript = Modules:WaitForChild("Net")
 
 local BLACKLISTED_EXECUTORS: { string } = {"NULL"}
 
-local EXECUTOR_NAME: string = string.upper(if identifyexecutor then identifyexecutor() else "NULL")
+local EXECUTOR_NAME: string = string.upper(if identifyexecutor then "NULL")
 local IS_BLACKLISTED_EXECUTOR: boolean = if table.find(BLACKLISTED_EXECUTORS, EXECUTOR_NAME) then true else false
 
 local hookmetamethod = (not IS_BLACKLISTED_EXECUTOR and hookmetamethod) or (function(...) return ... end)
