@@ -14,6 +14,7 @@ local RunService: RunService = game:GetService("RunService")
 local Players: Players = game:GetService("Players")
 
 local Remotes = ReplicatedStorage:WaitForChild("Remotes")
+local GunValidator: RemoteEvent = Remotes:WaitForChild("Validator2")
 local CommF: RemoteFunction = Remotes:WaitForChild("CommF_")
 local CommE: RemoteEvent = Remotes:WaitForChild("CommE")
 
@@ -1443,11 +1444,11 @@ local Module = {} do
 		local Events = ReplicatedStorage:WaitForChild("Events")
 		
 		local SUCCESS_FLAGS, COMBAT_REMOTE_THREAD = pcall(function()
-			return nil
+			return require(Modules.Flags).COMBAT_REMOTE_THREAD or false
 		end)
 		
 		local SUCCESS_SHOOT, SHOOT_FUNCTION = pcall(function()
-			return nil
+			return getupvalue(require(ReplicatedStorage.Controllers.CombatController).Attack, 9)
 		end)
 		
 		local HIT_FUNCTION; task.defer(function()			
@@ -1778,7 +1779,7 @@ local Module = {} do
 	end)()
 	
 	Module.RaidList = (function()
-		local Success, RaidModule = nil
+		local Success, RaidModule = pcall(require, ReplicatedStorage:WaitForChild("Raids"))
 		
 		if not Success or type(RaidModule) ~= "table" then
 			return {
@@ -2061,6 +2062,18 @@ local Module = {} do
 		
 		return Hooking
 	end)()
+
+  task.defer(function()
+	 	local DeathEffect = require(WaitChilds(ReplicatedStorage, "Effect", "Container", "Death"))
+	 	local CameraShaker = require(WaitChilds(ReplicatedStorage, "Util", "CameraShaker"))
+	 	
+		if CameraShaker then
+	 		CameraShaker:Stop()
+	 	end
+	 	if hookfunction then
+ 		hookfunction(DeathEffect, function(...) return ... end)
+	 	end
+	end)
 	
 	task.spawn(function()
 		local SpawnLocations = Module.SpawnLocations
