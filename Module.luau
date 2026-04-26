@@ -1443,11 +1443,11 @@ local Module = {} do
 		local Events = ReplicatedStorage:WaitForChild("Events")
 		
 		local SUCCESS_FLAGS, COMBAT_REMOTE_THREAD = pcall(function()
-			return require(Modules.Flags).COMBAT_REMOTE_THREAD or false
+			return nil
 		end)
 		
 		local SUCCESS_SHOOT, SHOOT_FUNCTION = pcall(function()
-			return getupvalue(require(ReplicatedStorage.Controllers.CombatController).Attack, 9)
+			return nil
 		end)
 		
 		local HIT_FUNCTION; task.defer(function()			
@@ -1778,7 +1778,7 @@ local Module = {} do
 	end)()
 	
 	Module.RaidList = (function()
-		local Success, RaidModule = pcall(require, ReplicatedStorage:WaitForChild("Raids"))
+		local Success, RaidModule = nil
 		
 		if not Success or type(RaidModule) ~= "table" then
 			return {
@@ -2062,9 +2062,7 @@ local Module = {} do
 		return Hooking
 	end)()
 
-  task.defer(function()
-	 	local DeathEffect = require(WaitChilds(ReplicatedStorage, "Effect", "Container", "Death"))
-	 	local CameraShaker = require(WaitChilds(ReplicatedStorage, "Util", "CameraShaker"))
+  task.defer(function(
 	 	
 		if CameraShaker then
 	 		CameraShaker:Stop()
