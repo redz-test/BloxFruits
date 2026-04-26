@@ -2061,16 +2061,6 @@ local Module = {} do
 		
 		return Hooking
 	end)()
-
-  task.defer(function(
-	 	
-		if CameraShaker then
-	 		CameraShaker:Stop()
-	 	end
-	 	if hookfunction then
- 		hookfunction(DeathEffect, function(...) return ... end)
-	 	end
-	end)
 	
 	task.spawn(function()
 		local SpawnLocations = Module.SpawnLocations
