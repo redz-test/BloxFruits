@@ -585,7 +585,7 @@ local Module = {} do
 			_ENV.redz_hub_error = Message
 			Message.Text = (`redz Hub error [ {Settings.RunningOption or "Null"} ] {ErrorMessage}`)
         else
-            return nil
+            
             end 
 		end)
 	end
