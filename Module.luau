@@ -1802,9 +1802,9 @@ local Module = {} do
     local BaseParts = {}
     
     local BodyVelocity = Instance.new("BodyVelocity")
-    BodyVelocity.Velocity = Vector3.new(0, 0, 0)
-    BodyVelocity.MaxForce = Vector3.new(math.huge, math.huge, math.huge)
-    BodyVelocity.P = 1000
+    BodyVelocity.Velocity = Vector3.zero
+    BodyVelocity.MaxForce = Vector3.zero -- ВЫКЛЮЧЕНО ПО УМОЛЧАНИЮ
+    BodyVelocity.P = 1250
     _ENV.tween_bodyvelocity = BodyVelocity
 
     local function NewCharacter(Character)
@@ -1813,7 +1813,7 @@ local Module = {} do
         for _, Object in ipairs(Character:GetDescendants()) do 
             if Object:IsA("BasePart") then table.insert(BaseParts, Object) end 
         end
-        local Root = Character:WaitForChild("HumanoidRootPart", 5)
+        local Root = Character:WaitForChild("HumanoidRootPart", 10)
         if Root then BodyVelocity.Parent = Root end
     end
     
@@ -1830,9 +1830,14 @@ local Module = {} do
     
     table.insert(Connections, RunService.Stepped:Connect(function()
         NoClipOnStepped(Player.Character)
-        if _ENV.OnFarm and _ENV.tween_bodyvelocity then
-            if _ENV.tween_bodyvelocity.Parent ~= Player.Character:FindFirstChild("HumanoidRootPart") then
-                _ENV.tween_bodyvelocity.Parent = Player.Character:FindFirstChild("HumanoidRootPart")
+        if _ENV.tween_bodyvelocity then
+            local Root = Player.Character and Player.Character:FindFirstChild("HumanoidRootPart")
+            if _ENV.OnFarm and Root then
+                if _ENV.tween_bodyvelocity.Parent ~= Root then
+                    _ENV.tween_bodyvelocity.Parent = Root
+                end
+            else
+                _ENV.tween_bodyvelocity.MaxForce = Vector3.zero -- Гасим силу, если не фармим
             end
         end
     end))
