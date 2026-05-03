@@ -577,7 +577,6 @@ local Module = {} do
 		Signals.Error = Signal.new()
 
 		Signals.Error:Connect(function(ErrorMessage)
-        if not _ENV.Errors then return end
 			_ENV.loadedFarm = false
 			_ENV.OnFarm = false
 			local Message = Instance.new("Message", workspace)
