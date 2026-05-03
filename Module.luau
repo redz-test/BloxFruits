@@ -1801,27 +1801,19 @@ local Module = {} do
     local IsAlive = Module.IsAlive
     local BaseParts = {}
     
-    local BodyVelocity = Instance.new("BodyVelocity")
-    BodyVelocity.Velocity = Vector3.zero
-    BodyVelocity.MaxForce = Vector3.zero -- ВЫКЛЮЧЕНО ПО УМОЛЧАНИЮ
-    BodyVelocity.P = 1250
-    _ENV.tween_bodyvelocity = BodyVelocity
-
     local function NewCharacter(Character)
         table.clear(BaseParts)
         if not Character then return end
         for _, Object in ipairs(Character:GetDescendants()) do 
             if Object:IsA("BasePart") then table.insert(BaseParts, Object) end 
         end
-        local Root = Character:WaitForChild("HumanoidRootPart", 10)
-        if Root then BodyVelocity.Parent = Root end
     end
     
     table.insert(Connections, Player.CharacterAdded:Connect(NewCharacter))
     task.spawn(NewCharacter, Player.Character)
 
     local function NoClipOnStepped(Character)
-        if not IsAlive(Character) or not _ENV.OnFarm then return end
+        if not IsAlive(Character) or not _G.OnFarm then return end -- Юзаем _G для надежности
         for i = 1, #BaseParts do
             local p = BaseParts[i]
             if p and p.Parent then p.CanCollide = false end
@@ -1830,19 +1822,9 @@ local Module = {} do
     
     table.insert(Connections, RunService.Stepped:Connect(function()
         NoClipOnStepped(Player.Character)
-        if _ENV.tween_bodyvelocity then
-            local Root = Player.Character and Player.Character:FindFirstChild("HumanoidRootPart")
-            if _ENV.OnFarm and Root then
-                if _ENV.tween_bodyvelocity.Parent ~= Root then
-                    _ENV.tween_bodyvelocity.Parent = Root
-                end
-            else
-                _ENV.tween_bodyvelocity.MaxForce = Vector3.zero -- Гасим силу, если не фармим
-            end
-        end
     end))
     
-    return BodyVelocity
+    return nil 
 end)()
 		
 	Module.Hooking = (function()
