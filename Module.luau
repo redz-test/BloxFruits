@@ -577,7 +577,7 @@ local Module = {} do
 		Signals.Error = Signal.new()
 
 		Signals.Error:Connect(function(ErrorMessage)
-        if _ENV.Errors then
+        if not _ENV.Errors then
 			_ENV.loadedFarm = false
 			_ENV.OnFarm = false
 			
