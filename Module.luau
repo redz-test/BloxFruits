@@ -1798,33 +1798,26 @@ local Module = {} do
 	end)()
 	
 	Module.Tween = (function()
-    local IsAlive = Module.IsAlive
     local BaseParts = {}
-    
     local function NewCharacter(Character)
         table.clear(BaseParts)
         if not Character then return end
-        for _, Object in ipairs(Character:GetDescendants()) do 
-            if Object:IsA("BasePart") then table.insert(BaseParts, Object) end 
+        for _, v in ipairs(Character:GetDescendants()) do 
+            if v:IsA("BasePart") then table.insert(BaseParts, v) end 
         end
     end
-    
-    table.insert(Connections, Player.CharacterAdded:Connect(NewCharacter))
-    task.spawn(NewCharacter, Player.Character)
+    table.insert(Connections, game:GetService("Players").LocalPlayer.CharacterAdded:Connect(NewCharacter))
+    task.spawn(NewCharacter, game:GetService("Players").LocalPlayer.Character)
 
-    local function NoClipOnStepped(Character)
-        if not IsAlive(Character) or not _G.OnFarm then return end -- Юзаем _G для надежности
-        for i = 1, #BaseParts do
-            local p = BaseParts[i]
-            if p and p.Parent then p.CanCollide = false end
+    game:GetService("RunService").Stepped:Connect(function()
+        if _ENV.OnFarm and game:GetService("Players").LocalPlayer.Character then
+            for i = 1, #BaseParts do
+                local p = BaseParts[i]
+                if p and p.Parent then p.CanCollide = false end
+            end
         end
-    end
-    
-    table.insert(Connections, RunService.Stepped:Connect(function()
-        NoClipOnStepped(Player.Character)
-    end))
-    
-    return nil 
+    end)
+    return {}
 end)()
 		
 	Module.Hooking = (function()
