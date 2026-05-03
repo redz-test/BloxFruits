@@ -577,14 +577,12 @@ local Module = {} do
 		Signals.Error = Signal.new()
 
 		Signals.Error:Connect(function(ErrorMessage)
-        if not _ENV.Errors then
 			_ENV.loadedFarm = false
 			_ENV.OnFarm = false
 			
 			local Message = Instance.new("Message", workspace)
 			_ENV.redz_hub_error = Message
 			Message.Text = (`redz Hub error [ {Settings.RunningOption or "Null"} ] {ErrorMessage}`)
-            end
 		end)
 	end
 	
