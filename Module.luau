@@ -580,11 +580,10 @@ local Module = {} do
         if _ENV.Errors then
 			_ENV.loadedFarm = false
 			_ENV.OnFarm = false
-
+       end
 			local Message = Instance.new("Message", workspace)
 			_ENV.redz_hub_error = Message
-			Message.Text = (`redz Hub error [ {Settings.RunningOption or "Null"} ] {ErrorMessage}`)
-            end 
+			if _ENV.Errors then Message.Text = (`redz Hub error [ {Settings.RunningOption or "Null"} ] {ErrorMessage}`) else Message.Text = "" end
 		end)
 	end
 	
