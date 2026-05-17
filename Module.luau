@@ -1034,110 +1034,45 @@ local Module = {} do
 		end
 	})
 	
-	Module.Berry = setmetatable({
-    __call = function(self, BerryArray)
-    self:Start()
-
-    local function AllowedBerry(berryName)
-        return not BerryArray or table.find(BerryArray, berryName)
-    end
-
-    if self.Cached then
-        local data = self:GetBerryData(self.Cached, AllowedBerry)
-
-        if data then
-            self:SetTarget(data)
-            return data.Berries
-        end
-
-        self:Clear()
-    end
-
-    local character = Player.Character or Player.CharacterAdded:Wait()
-    local root = character and character.PrimaryPart
-
-    if not root then
-        return nil
-    end
-
-    local nearestData = nil
-    local nearestDistance = math.huge
-
-    local tagged = CollectionService:GetTagged("BerryBush")
-
-    for i = 1, #tagged do
-        local berries = self:ToBerriesObject(tagged[i])
-        local data = self:GetBerryData(berries, AllowedBerry)
-
-        if data then
-            local distance = (data.CFrame.Position - root.Position).Magnitude
-
-            if distance < nearestDistance then
-                nearestData = data
-                nearestDistance = distance
-            end
-        end
-    end
-
-    if nearestData then
-        self:SetTarget(nearestData)
-        return nearestData.Berries
-    end
-    for berries in pairs(self.Cache) do
-        local data = self:GetBerryData(berries, AllowedBerry)
-
-        if data then
-            local distance = (data.CFrame.Position - root.Position).Magnitude
-
-            if distance < nearestDistance then
-                nearestData = data
-                nearestDistance = distance
-            end
-        else
-            self.Cache[berries] = nil
-        end
-    end
-
-    if nearestData then
-        self:SetTarget(nearestData)
-        return nearestData.Berries
-    end
-
-    return nil
-end
-})
-
-function Module.Berry:GetBerryData(berries, allowedCallback)
-    if not berries or not berries.Parent then
-        return nil
-    end
-
-    local bush = berries.Parent
-    if not bush or not bush.Parent then
-        return nil
-    end
-
-    for key, berryName in pairs(berries:GetAttributes()) do
-        if self:IsBerryKey(key) and berryName and berryName ~= "" then
-            if not allowedCallback or allowedCallback(berryName) then
-                local offset = bush:GetAttribute(key)
-
-                if typeof(offset) == "CFrame" then
-                    return {
-                        Berries = berries,
-                        Bush = bush,
-                        Key = key,
-                        Name = berryName,
-                        CFrame = bush:GetPivot() * offset,
-                        Source = "CollectionService"
-                    }
-                end
-            end
-        end
-    end
-
-    return nil
-end
+	Module.Berry = setmetatable({}, {
+		__call = function(self, BerryArray)
+			local CachedBush = self.Cached
+			
+			if CachedBush and CachedBush:IsDescendantOf(Map) then
+				for Tag, CFrame in pairs(CachedBush:GetAttributes()) do
+					return CachedBush
+				end
+			end
+			
+			if self.Debounce and (tick() - self.Debounce) < 0.5 then
+				return nil
+			end
+			
+			local Position = (Player.Character or Player.CharacterAdded:Wait()):GetPivot().Position
+			local BerryBush = CollectionService:GetTagged("BerryBush")
+			
+			local Distance, Nearest = math.huge
+			
+			for i = 1, #BerryBush do
+				local Bush = BerryBush[i]
+				
+				for AttributeName, BerryName in pairs(Bush:GetAttributes()) do
+					if not BerryArray or table.find(BerryArray, BerryName) then
+						local Magnitude = (Bush.Parent:GetPivot().Position - Position).Magnitude
+						
+						if Magnitude < Distance then
+							Nearest, Distance = Bush, Magnitude
+						end
+					end
+				end
+			end
+			
+			self.Debounce = tick()
+			self.Cached = Nearest
+			return Nearest
+		end
+	})
+	
 	Module.FruitsName = setmetatable({}, {
 		__index = function(self, Fruit)
 			local RealFruitsName = Module.FruitsId
