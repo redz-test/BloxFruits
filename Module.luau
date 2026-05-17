@@ -1034,52 +1034,57 @@ local Module = {} do
 		end
 	})
 	
-    Module.Berry = setmetatable({
+   Module.Berry = setmetatable({
     Cached = nil,
     CachedKey = nil,
     CachedName = nil,
-    CachedCFrame = nil,
-    LastTweenKey = nil,
-    LastTweenTime = 0
+    CachedCFrame = nil
 }, {
     __call = function(self, BerryArray)
-        local function IsBerryKey(key)
-            return type(key) == "string" and key:match("^_?BerryCFrame%d+$") ~= nil
-        end
-
-        local function IsAllowedBerry(berryName)
-            return not BerryArray or table.find(BerryArray, berryName)
-        end
-
-        local function ClearCached()
+        local function Clear()
             self.Cached = nil
             self.CachedKey = nil
             self.CachedName = nil
             self.CachedCFrame = nil
-            self.LastTweenKey = nil
-            self.LastTweenTime = 0
         end
 
-        local function GetBerryData(berryObject)
-            if not berryObject or not berryObject.Parent then
+        local function IsBerryKey(key)
+            return type(key) == "string" and key:match("^_?BerryCFrame%d+$") ~= nil
+        end
+
+        local function GetBerryData(Bush)
+            if not Bush or not Bush.Parent then
                 return nil
             end
 
-            local bush = berryObject.Parent
-            if not bush or not bush.Parent then
+            if not Bush:IsDescendantOf(workspace) then
                 return nil
             end
 
-            if Map and not berryObject:IsDescendantOf(Map) then
+            local Parent = Bush.Parent
+
+            if not Parent or not Parent.Parent then
                 return nil
             end
 
-            for key, berryName in pairs(berryObject:GetAttributes()) do
-                if IsBerryKey(key) and berryName and IsAllowedBerry(berryName) then
-                    local offset = bush:GetAttribute(key)
+            if not Parent:IsDescendantOf(workspace) then
+                return nil
+            end
 
-                    if typeof(offset) == "CFrame" then
-                        return key, berryName, bush:GetPivot() * offset
+            for AttributeName, BerryName in pairs(Bush:GetAttributes()) do
+                if IsBerryKey(AttributeName) and BerryName and BerryName ~= "" then
+                    if not BerryArray or table.find(BerryArray, BerryName) then
+                        local Offset = Parent:GetAttribute(AttributeName)
+
+                        if typeof(Offset) == "CFrame" then
+                            local ok, Pivot = pcall(function()
+                                return Parent:GetPivot()
+                            end)
+
+                            if ok and typeof(Pivot) == "CFrame" then
+                                return AttributeName, BerryName, Pivot * Offset
+                            end
+                        end
                     end
                 end
             end
@@ -1088,57 +1093,57 @@ local Module = {} do
         end
 
         if self.Cached then
-            local key, berryName, berryCFrame = GetBerryData(self.Cached)
+            local Key, Name, CF = GetBerryData(self.Cached)
 
-            if key and berryName and berryCFrame then
-                self.CachedKey = key
-                self.CachedName = berryName
-                self.CachedCFrame = berryCFrame
+            if Key and Name and CF then
+                self.CachedKey = Key
+                self.CachedName = Name
+                self.CachedCFrame = CF
 
                 return self.Cached
             else
-                ClearCached()
+                Clear()
             end
         end
 
-        local character = Player.Character or Player.CharacterAdded:Wait()
-        local root = character and character.PrimaryPart
+        local Character = Player.Character or Player.CharacterAdded:Wait()
+        local Root = Character and Character.PrimaryPart
 
-        if not root then
+        if not Root then
             return nil
         end
 
-        local nearest = nil
-        local nearestKey = nil
-        local nearestName = nil
-        local nearestCFrame = nil
-        local nearestDistance = math.huge
+        local Distance = math.huge
+        local Nearest = nil
+        local NearestKey = nil
+        local NearestName = nil
+        local NearestCFrame = nil
 
-        local taggedBerries = CollectionService:GetTagged("BerryBush")
+        local BerryBush = CollectionService:GetTagged("BerryBush")
 
-        for i = 1, #taggedBerries do
-            local berryObject = taggedBerries[i]
-            local key, berryName, berryCFrame = GetBerryData(berryObject)
+        for i = 1, #BerryBush do
+            local Bush = BerryBush[i]
+            local Key, Name, CF = GetBerryData(Bush)
 
-            if key and berryName and berryCFrame then
-                local distance = (berryCFrame.Position - root.Position).Magnitude
+            if Key and Name and CF then
+                local Magnitude = (CF.Position - Root.Position).Magnitude
 
-                if distance < nearestDistance then
-                    nearest = berryObject
-                    nearestKey = key
-                    nearestName = berryName
-                    nearestCFrame = berryCFrame
-                    nearestDistance = distance
+                if Magnitude < Distance then
+                    Distance = Magnitude
+                    Nearest = Bush
+                    NearestKey = Key
+                    NearestName = Name
+                    NearestCFrame = CF
                 end
             end
         end
 
-        self.Cached = nearest
-        self.CachedKey = nearestKey
-        self.CachedName = nearestName
-        self.CachedCFrame = nearestCFrame
+        self.Cached = Nearest
+        self.CachedKey = NearestKey
+        self.CachedName = NearestName
+        self.CachedCFrame = NearestCFrame
 
-        return nearest
+        return Nearest
     end
 })
 
@@ -1147,10 +1152,7 @@ function Module.Berry:Clear()
     self.CachedKey = nil
     self.CachedName = nil
     self.CachedCFrame = nil
-    self.LastTweenKey = nil
-    self.LastTweenTime = 0
 end
-
 	Module.FruitsName = setmetatable({}, {
 		__index = function(self, Fruit)
 			local RealFruitsName = Module.FruitsId
