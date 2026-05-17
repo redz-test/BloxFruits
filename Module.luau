@@ -1035,122 +1035,109 @@ local Module = {} do
 	})
 	
 	Module.Berry = setmetatable({
-    Cached = nil,
-    CachedKey = nil,
-    CachedName = nil,
-    CachedCFrame = nil,
-    LastTweenKey = nil,
-    LastTweenTime = 0
-}, {
     __call = function(self, BerryArray)
-        local function IsBerryKey(key)
-            return type(key) == "string" and key:match("^_?BerryCFrame%d+$") ~= nil
-        end
+    self:Start()
 
-        local function IsAllowedBerry(berryName)
-            return not BerryArray or table.find(BerryArray, berryName)
-        end
-
-        local function ClearCached()
-            self.Cached = nil
-            self.CachedKey = nil
-            self.CachedName = nil
-            self.CachedCFrame = nil
-            self.LastTweenKey = nil
-            self.LastTweenTime = 0
-        end
-
-        local function GetBerryData(berryObject)
-            if not berryObject or not berryObject.Parent then
-                return nil
-            end
-
-            local bush = berryObject.Parent
-            if not bush or not bush.Parent then
-                return nil
-            end
-
-            if Map and not berryObject:IsDescendantOf(Map) then
-                return nil
-            end
-
-            for key, berryName in pairs(berryObject:GetAttributes()) do
-                if IsBerryKey(key) and berryName and IsAllowedBerry(berryName) then
-                    local offset = bush:GetAttribute(key)
-
-                    if typeof(offset) == "CFrame" then
-                        return key, berryName, bush:GetPivot() * offset
-                    end
-                end
-            end
-
-            return nil
-        end
-
-        if self.Cached then
-            local key, berryName, berryCFrame = GetBerryData(self.Cached)
-
-            if key and berryName and berryCFrame then
-                self.CachedKey = key
-                self.CachedName = berryName
-                self.CachedCFrame = berryCFrame
-
-                return self.Cached
-            else
-                ClearCached()
-            end
-        end
-
-        local character = Player.Character or Player.CharacterAdded:Wait()
-        local root = character and character.PrimaryPart
-
-        if not root then
-            return nil
-        end
-
-        local nearest = nil
-        local nearestKey = nil
-        local nearestName = nil
-        local nearestCFrame = nil
-        local nearestDistance = math.huge
-
-        local taggedBerries = CollectionService:GetTagged("BerryBush")
-
-        for i = 1, #taggedBerries do
-            local berryObject = taggedBerries[i]
-            local key, berryName, berryCFrame = GetBerryData(berryObject)
-
-            if key and berryName and berryCFrame then
-                local distance = (berryCFrame.Position - root.Position).Magnitude
-
-                if distance < nearestDistance then
-                    nearest = berryObject
-                    nearestKey = key
-                    nearestName = berryName
-                    nearestCFrame = berryCFrame
-                    nearestDistance = distance
-                end
-            end
-        end
-
-        self.Cached = nearest
-        self.CachedKey = nearestKey
-        self.CachedName = nearestName
-        self.CachedCFrame = nearestCFrame
-
-        return nearest
+    local function AllowedBerry(berryName)
+        return not BerryArray or table.find(BerryArray, berryName)
     end
+
+    if self.Cached then
+        local data = self:GetBerryData(self.Cached, AllowedBerry)
+
+        if data then
+            self:SetTarget(data)
+            return data.Berries
+        end
+
+        self:Clear()
+    end
+
+    local character = Player.Character or Player.CharacterAdded:Wait()
+    local root = character and character.PrimaryPart
+
+    if not root then
+        return nil
+    end
+
+    local nearestData = nil
+    local nearestDistance = math.huge
+
+    local tagged = CollectionService:GetTagged("BerryBush")
+
+    for i = 1, #tagged do
+        local berries = self:ToBerriesObject(tagged[i])
+        local data = self:GetBerryData(berries, AllowedBerry)
+
+        if data then
+            local distance = (data.CFrame.Position - root.Position).Magnitude
+
+            if distance < nearestDistance then
+                nearestData = data
+                nearestDistance = distance
+            end
+        end
+    end
+
+    if nearestData then
+        self:SetTarget(nearestData)
+        return nearestData.Berries
+    end
+    for berries in pairs(self.Cache) do
+        local data = self:GetBerryData(berries, AllowedBerry)
+
+        if data then
+            local distance = (data.CFrame.Position - root.Position).Magnitude
+
+            if distance < nearestDistance then
+                nearestData = data
+                nearestDistance = distance
+            end
+        else
+            self.Cache[berries] = nil
+        end
+    end
+
+    if nearestData then
+        self:SetTarget(nearestData)
+        return nearestData.Berries
+    end
+
+    return nil
+end
 })
 
-function Module.Berry:Clear()
-    self.Cached = nil
-    self.CachedKey = nil
-    self.CachedName = nil
-    self.CachedCFrame = nil
-    self.LastTweenKey = nil
-    self.LastTweenTime = 0
+function Module.Berry:GetBerryData(berries, allowedCallback)
+    if not berries or not berries.Parent then
+        return nil
+    end
+
+    local bush = berries.Parent
+    if not bush or not bush.Parent then
+        return nil
+    end
+
+    for key, berryName in pairs(berries:GetAttributes()) do
+        if self:IsBerryKey(key) and berryName and berryName ~= "" then
+            if not allowedCallback or allowedCallback(berryName) then
+                local offset = bush:GetAttribute(key)
+
+                if typeof(offset) == "CFrame" then
+                    return {
+                        Berries = berries,
+                        Bush = bush,
+                        Key = key,
+                        Name = berryName,
+                        CFrame = bush:GetPivot() * offset,
+                        Source = "CollectionService"
+                    }
+                end
+            end
+        end
+    end
+
+    return nil
 end
-	
 	Module.FruitsName = setmetatable({}, {
 		__index = function(self, Fruit)
 			local RealFruitsName = Module.FruitsId
