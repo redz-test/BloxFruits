@@ -1035,80 +1035,51 @@ local Module = {} do
 	})
 	
 	Module.Berry = setmetatable({
-    Cache = {},
     Cached = nil,
     CachedKey = nil,
     CachedName = nil,
     CachedCFrame = nil,
-    Started = false,
-    Scanning = false
+    LastTweenKey = nil,
+    LastTweenTime = 0
 }, {
     __call = function(self, BerryArray)
-        local function IsObfuscatedName(name)
-            return type(name) == "string"
-                and #name > 20
-                and name:sub(1, 1) == "{"
-                and name:sub(-1) == "}"
-        end
-
         local function IsBerryKey(key)
-            return type(key) == "string" and key:match("^_BerryCFrame%d+$") ~= nil
+            return type(key) == "string" and key:match("^_?BerryCFrame%d+$") ~= nil
         end
 
-        local function Register(obj)
-            if not obj then
-                return
-            end
-
-            if obj.Name == "Berries" and obj.Parent and IsObfuscatedName(obj.Parent.Name) then
-                self.Cache[obj] = true
-                return
-            end
-
-            if IsObfuscatedName(obj.Name) then
-                local berries = obj:FindFirstChild("Berries")
-                if berries then
-                    self.Cache[berries] = true
-                end
-            end
+        local function IsAllowedBerry(berryName)
+            return not BerryArray or table.find(BerryArray, berryName)
         end
 
-        local function Unregister(obj)
-            if self.Cache[obj] then
-                self.Cache[obj] = nil
-            end
-
-            local berries = obj and obj:FindFirstChild("Berries")
-            if berries and self.Cache[berries] then
-                self.Cache[berries] = nil
-            end
-
-            if self.Cached == obj or self.Cached == berries then
-                self.Cached = nil
-                self.CachedKey = nil
-                self.CachedName = nil
-                self.CachedCFrame = nil
-            end
+        local function ClearCached()
+            self.Cached = nil
+            self.CachedKey = nil
+            self.CachedName = nil
+            self.CachedCFrame = nil
+            self.LastTweenKey = nil
+            self.LastTweenTime = 0
         end
 
-        local function GetBerryData(berries)
-            if not berries or not berries.Parent then
+        local function GetBerryData(berryObject)
+            if not berryObject or not berryObject.Parent then
                 return nil
             end
 
-            local bush = berries.Parent
+            local bush = berryObject.Parent
             if not bush or not bush.Parent then
                 return nil
             end
 
-            for key, berryName in pairs(berries:GetAttributes()) do
-                if IsBerryKey(key) and berryName then
-                    if not BerryArray or table.find(BerryArray, berryName) then
-                        local offset = bush:GetAttribute(key)
+            if Map and not berryObject:IsDescendantOf(Map) then
+                return nil
+            end
 
-                        if typeof(offset) == "CFrame" then
-                            return key, berryName, bush:GetPivot() * offset
-                        end
+            for key, berryName in pairs(berryObject:GetAttributes()) do
+                if IsBerryKey(key) and berryName and IsAllowedBerry(berryName) then
+                    local offset = bush:GetAttribute(key)
+
+                    if typeof(offset) == "CFrame" then
+                        return key, berryName, bush:GetPivot() * offset
                     end
                 end
             end
@@ -1116,69 +1087,17 @@ local Module = {} do
             return nil
         end
 
-        local function StartCache()
-            if self.Started then
-                return
-            end
-
-            self.Started = true
-
-            local map = workspace:FindFirstChild("Map")
-            if not map then
-                return
-            end
-
-            task.spawn(function()
-                self.Scanning = true
-
-                local descendants = map:GetDescendants()
-
-                for i, obj in ipairs(descendants) do
-                    Register(obj)
-
-                    if i % 150 == 0 then
-                        task.wait()
-                    end
-                end
-
-                self.Scanning = false
-            end)
-
-            if Connections then
-                table.insert(Connections, map.DescendantAdded:Connect(function(obj)
-                    Register(obj)
-                end))
-
-                table.insert(Connections, map.DescendantRemoving:Connect(function(obj)
-                    Unregister(obj)
-                end))
-            else
-                map.DescendantAdded:Connect(function(obj)
-                    Register(obj)
-                end)
-
-                map.DescendantRemoving:Connect(function(obj)
-                    Unregister(obj)
-                end)
-            end
-        end
-
-        StartCache()
-
         if self.Cached then
-            local key, berryName, berryCF = GetBerryData(self.Cached)
+            local key, berryName, berryCFrame = GetBerryData(self.Cached)
 
-            if key and berryName and berryCF then
+            if key and berryName and berryCFrame then
                 self.CachedKey = key
                 self.CachedName = berryName
-                self.CachedCFrame = berryCF
+                self.CachedCFrame = berryCFrame
 
                 return self.Cached
             else
-                self.Cached = nil
-                self.CachedKey = nil
-                self.CachedName = nil
-                self.CachedCFrame = nil
+                ClearCached()
             end
         end
 
@@ -1195,23 +1114,22 @@ local Module = {} do
         local nearestCFrame = nil
         local nearestDistance = math.huge
 
-        for berries in pairs(self.Cache) do
-            if berries and berries.Parent then
-                local key, berryName, berryCF = GetBerryData(berries)
+        local taggedBerries = CollectionService:GetTagged("BerryBush")
 
-                if key and berryName and berryCF then
-                    local distance = (berryCF.Position - root.Position).Magnitude
+        for i = 1, #taggedBerries do
+            local berryObject = taggedBerries[i]
+            local key, berryName, berryCFrame = GetBerryData(berryObject)
 
-                    if distance < nearestDistance then
-                        nearest = berries
-                        nearestKey = key
-                        nearestName = berryName
-                        nearestCFrame = berryCF
-                        nearestDistance = distance
-                    end
+            if key and berryName and berryCFrame then
+                local distance = (berryCFrame.Position - root.Position).Magnitude
+
+                if distance < nearestDistance then
+                    nearest = berryObject
+                    nearestKey = key
+                    nearestName = berryName
+                    nearestCFrame = berryCFrame
+                    nearestDistance = distance
                 end
-            else
-                self.Cache[berries] = nil
             end
         end
 
@@ -1223,6 +1141,15 @@ local Module = {} do
         return nearest
     end
 })
+
+function Module.Berry:Clear()
+    self.Cached = nil
+    self.CachedKey = nil
+    self.CachedName = nil
+    self.CachedCFrame = nil
+    self.LastTweenKey = nil
+    self.LastTweenTime = 0
+end
 	
 	Module.FruitsName = setmetatable({}, {
 		__index = function(self, Fruit)
