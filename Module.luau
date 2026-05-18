@@ -1034,123 +1034,44 @@ local Module = {} do
 		end
 	})
 	
-	Module.Berry = setmetatable({
-    Cached = nil,
-    CachedKey = nil,
-    CachedName = nil,
-    CachedCFrame = nil,
-    LastTweenKey = nil
-}, {
-    __call = function(self, BerryArray)
-        local function Clear()
-            self.Cached = nil
-            self.CachedKey = nil
-            self.CachedName = nil
-            self.CachedCFrame = nil
-            self.LastTweenKey = nil
-        end
-
-        local function IsBerryKey(key)
-            return type(key) == "string" and key:match("^_?BerryCFrame%d+$") ~= nil
-        end
-
-        local function GetBerryData(Bush)
-            if not Bush or not Bush.Parent then
-                return nil
-            end
-
-            if not Bush:IsDescendantOf(workspace) then
-                return nil
-            end
-
-            local Parent = Bush.Parent
-
-            if not Parent or not Parent.Parent then
-                return nil
-            end
-
-            for AttributeName, BerryName in pairs(Bush:GetAttributes()) do
-                if IsBerryKey(AttributeName) and BerryName and BerryName ~= "" then
-                    if not BerryArray or table.find(BerryArray, BerryName) then
-                        local Offset = Parent:GetAttribute(AttributeName)
-
-                        if typeof(Offset) == "CFrame" then
-                            local ok, Pivot = pcall(function()
-                                return Parent:GetPivot()
-                            end)
-
-                            if ok and typeof(Pivot) == "CFrame" then
-                                return AttributeName, BerryName, Pivot * Offset
-                            end
-                        end
-                    end
-                end
-            end
-
-            return nil
-        end
-
-        if self.Cached then
-            local Key, Name, CF = GetBerryData(self.Cached)
-
-            if Key and Name and CF then
-                self.CachedKey = Key
-                self.CachedName = Name
-                self.CachedCFrame = CF
-                return self.Cached
-            end
-
-            Clear()
-        end
-
-        local Character = Player.Character or Player.CharacterAdded:Wait()
-        local Root = Character and Character.PrimaryPart
-
-        if not Root then
-            return nil
-        end
-
-        local Distance = math.huge
-        local Nearest = nil
-        local NearestKey = nil
-        local NearestName = nil
-        local NearestCFrame = nil
-
-        local BerryBush = CollectionService:GetTagged("BerryBush")
-
-        for i = 1, #BerryBush do
-            local Bush = BerryBush[i]
-            local Key, Name, CF = GetBerryData(Bush)
-
-            if Key and Name and CF then
-                local Magnitude = (CF.Position - Root.Position).Magnitude
-
-                if Magnitude < Distance then
-                    Distance = Magnitude
-                    Nearest = Bush
-                    NearestKey = Key
-                    NearestName = Name
-                    NearestCFrame = CF
-                end
-            end
-        end
-
-        self.Cached = Nearest
-        self.CachedKey = NearestKey
-        self.CachedName = NearestName
-        self.CachedCFrame = NearestCFrame
-
-        return Nearest
-    end
-})
-
-function Module.Berry:Clear()
-    self.Cached = nil
-    self.CachedKey = nil
-    self.CachedName = nil
-    self.CachedCFrame = nil
-    self.LastTweenKey = nil
-end
+	Module.Berry = setmetatable({}, {
+		__call = function(self, BerryArray)
+			local CachedBush = self.Cached
+			
+			if CachedBush and CachedBush:IsDescendantOf(Map) then
+				for Tag, CFrame in pairs(CachedBush:GetAttributes()) do
+					return CachedBush
+				end
+			end
+			
+			if self.Debounce and (tick() - self.Debounce) < 0.5 then
+				return nil
+			end
+			
+			local Position = (Player.Character or Player.CharacterAdded:Wait()):GetPivot().Position
+			local BerryBush = CollectionService:GetTagged("BerryBush")
+			
+			local Distance, Nearest = math.huge
+			
+			for i = 1, #BerryBush do
+				local Bush = BerryBush[i]
+				
+				for AttributeName, BerryName in pairs(Bush:GetAttributes()) do
+					if not BerryArray or table.find(BerryArray, BerryName) then
+						local Magnitude = (Bush.Parent:GetPivot().Position - Position).Magnitude
+						
+						if Magnitude < Distance then
+							Nearest, Distance = Bush, Magnitude
+						end
+					end
+				end
+			end
+			
+			self.Debounce = tick()
+			self.Cached = Nearest
+			return Nearest
+		end
+	})
 	
 	Module.FruitsName = setmetatable({}, {
 		__index = function(self, Fruit)
@@ -2213,6 +2134,129 @@ function GetToolByName(Name)
 	end
 end
 
+do
+    local VirtualInputManager = game:GetService("VirtualInputManager")
+    local Players = game:GetService("Players")
+    local LocalPlayer = Players.LocalPlayer
+
+    local SkillCooldown = {}
+    local SKILL_COOLDOWN = 0.5
+
+    local function GetDistanceFromCharacter(target)
+        if not target then
+            return math.huge
+        end
+
+        local position
+
+        if typeof(target) == "Vector3" then
+            position = target
+        elseif typeof(target) == "CFrame" then
+            position = target.Position
+        elseif typeof(target) == "Instance" then
+            if target:IsA("BasePart") then
+                position = target.Position
+            elseif target:IsA("Model") then
+                local ok, pivot = pcall(function()
+                    return target:GetPivot()
+                end)
+
+                if ok and typeof(pivot) == "CFrame" then
+                    position = pivot.Position
+                end
+            end
+        end
+
+        if not position then
+            return math.huge
+        end
+
+        local character = LocalPlayer.Character
+        local root = character and character:FindFirstChild("HumanoidRootPart")
+
+        if not root then
+            return math.huge
+        end
+
+        return (root.Position - position).Magnitude
+    end
+
+    local function GetMasteryRequirements()
+        if Module.Services
+            and Module.Services.Inventory
+            and Module.Services.Inventory.MasteryRequirements then
+            return Module.Services.Inventory.MasteryRequirements
+        end
+
+        if Module.Inventory and Module.Inventory.MasteryRequirements then
+            return Module.Inventory.MasteryRequirements
+        end
+
+        Module.MasteryRequirements = Module.MasteryRequirements or {}
+        return Module.MasteryRequirements
+    end
+
+    function Module.UseSkills(target, skills)
+        if type(skills) ~= "table" then
+            return nil
+        end
+
+        if GetDistanceFromCharacter(target) >= 60 then
+            return nil
+        end
+
+        local character = LocalPlayer.Character
+        if not character then
+            return nil
+        end
+
+        local tool = character:FindFirstChildOfClass("Tool")
+        if not tool then
+            return nil
+        end
+
+        local toolLevel = tool:GetAttribute("Level") or 0
+        local masteryRequirements = GetMasteryRequirements()
+        local requirements = masteryRequirements[tool.Name]
+
+        if requirements == nil and tool:FindFirstChild("Data") then
+            local ok, data = pcall(require, tool.Data)
+
+            if ok and type(data) == "table" then
+                masteryRequirements[tool.Name] = data.Lvl or false
+            else
+                masteryRequirements[tool.Name] = false
+            end
+
+            requirements = masteryRequirements[tool.Name]
+        end
+
+        for key, enabled in pairs(skills) do
+            if enabled then
+                local canUse = true
+
+                if requirements then
+                    if not requirements[key] or toolLevel < requirements[key] then
+                        canUse = false
+                    end
+                end
+
+                if canUse then
+                    local nextUse = SkillCooldown[key] or 0
+
+                    if tick() >= nextUse then
+                        VirtualInputManager:SendKeyEvent(true, key, false, game)
+                        VirtualInputManager:SendKeyEvent(false, key, false, game)
+
+                        SkillCooldown[key] = tick() + SKILL_COOLDOWN
+                    end
+                end
+            end
+        end
+
+        return true
+    end
+end
 function GetToolMastery(Name)
 	local HasTool = GetToolByName(Name)
 	return HasTool and HasTool:GetAttribute("Level") or 0
