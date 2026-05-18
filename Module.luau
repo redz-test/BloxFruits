@@ -998,41 +998,110 @@ local Module = {} do
 		end
 	end
 	
-	Module.Chests = setmetatable({}, {
-		__call = function(self, SelectedIsland)
-			local CachedChest = self.Cached
-			
-			if CachedChest and not CachedChest:GetAttribute("IsDisabled") then
-				if not SelectedIsland or CachedChest:IsDescendantOf(SelectedIsland) then
-					return CachedChest
-				end
-			end
-			
-			if self.Debounce and (tick() - self.Debounce) < 0.5 then
-				return nil
-			end
-			
-			local Position = (Player.Character or Player.CharacterAdded:Wait()):GetPivot().Position
-			local Chests = CollectionService:GetTagged("_ChestTagged")
-			
-			local Distance, Nearest = math.huge
-			
-			for i = 1, #Chests do
-				local Chest = Chests[i]
-				local Magnitude = (Chest:GetPivot().Position - Position).Magnitude
-				
-				if not SelectedIsland or Chest:IsDescendantOf(SelectedIsland) then
-					if not Chest:GetAttribute("IsDisabled") and Magnitude < Distance then
-						Distance, Nearest = Magnitude, Chest
-					end
-				end
-			end
-			
-			self.Debounce = tick()
-			self.Cached = Nearest
-			return Nearest
-		end
-	})
+	Module.Chests = setmetatable({
+    Cached = nil,
+    Ignored = {}
+}, {
+    __call = function(self, SelectedIsland)
+        local function IsValidChest(Chest)
+            if not Chest or not Chest.Parent then
+                return false
+            end
+
+            if not Chest:IsDescendantOf(workspace) then
+                return false
+            end
+
+            if Chest:GetAttribute("IsDisabled") then
+                return false
+            end
+
+            if self.Ignored[Chest] and tick() < self.Ignored[Chest] then
+                return false
+            end
+
+            if SelectedIsland and not Chest:IsDescendantOf(SelectedIsland) then
+                return false
+            end
+
+            return true
+        end
+
+        local function GetChestPosition(Chest)
+            local ok, Pivot = pcall(function()
+                return Chest:GetPivot()
+            end)
+
+            if ok and typeof(Pivot) == "CFrame" then
+                return Pivot.Position
+            end
+
+            local Part = Chest.PrimaryPart or Chest:FindFirstChildWhichIsA("BasePart", true)
+
+            if Part then
+                return Part.Position
+            end
+
+            return nil
+        end
+
+        local CachedChest = self.Cached
+
+        if IsValidChest(CachedChest) then
+            local Position = GetChestPosition(CachedChest)
+
+            if Position then
+                if Player:DistanceFromCharacter(Position) <= 8 then
+                    self.Ignored[CachedChest] = tick() + 3
+                    self.Cached = nil
+                else
+                    return CachedChest
+                end
+            else
+                self.Cached = nil
+            end
+        else
+            self.Cached = nil
+        end
+
+        local Character = Player.Character or Player.CharacterAdded:Wait()
+        local Root = Character and Character.PrimaryPart
+
+        if not Root then
+            return nil
+        end
+
+        local Position = Root.Position
+        local Chests = CollectionService:GetTagged("_ChestTagged")
+
+        local Distance = math.huge
+        local Nearest = nil
+
+        for i = 1, #Chests do
+            local Chest = Chests[i]
+
+            if IsValidChest(Chest) then
+                local ChestPosition = GetChestPosition(Chest)
+
+                if ChestPosition then
+                    local Magnitude = (ChestPosition - Position).Magnitude
+
+                    if Magnitude < Distance then
+                        Distance = Magnitude
+                        Nearest = Chest
+                    end
+                end
+            end
+        end
+
+        self.Cached = Nearest
+        return Nearest
+    end
+})
+
+function Module.Chests:Clear()
+    self.Cached = nil
+end
 	
 	Module.Berry = setmetatable({}, {
 		__call = function(self, BerryArray)
