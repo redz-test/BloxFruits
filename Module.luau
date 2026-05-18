@@ -1044,10 +1044,6 @@ local Module = {} do
 				end
 			end
 			
-			if self.Debounce and (tick() - self.Debounce) < 0.5 then
-				return nil
-			end
-			
 			local Position = (Player.Character or Player.CharacterAdded:Wait()):GetPivot().Position
 			local BerryBush = CollectionService:GetTagged("BerryBush")
 			
