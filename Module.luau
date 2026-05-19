@@ -1044,10 +1044,6 @@ local Module = {} do
 				end
 			end
 			
-			if self.Debounce and (tick() - self.Debounce) < 0.5 then
-				return nil
-			end
-			
 			local Position = (Player.Character or Player.CharacterAdded:Wait()):GetPivot().Position
 			local BerryBush = CollectionService:GetTagged("BerryBush")
 			
@@ -1406,7 +1402,43 @@ local Module = {} do
 		return Inventory
 	end)()
 
-  function Module.UseSkills(target, skills)
+   do
+    local SkillCooldown = {}
+    local SKILL_COOLDOWN = 0.5
+
+    local function GetTargetPosition(target)
+        if not target then
+            return nil
+        end
+
+        if typeof(target) == "Vector3" then
+            return target
+        end
+
+        if typeof(target) == "CFrame" then
+            return target.Position
+        end
+
+        if typeof(target) == "Instance" then
+            if target:IsA("BasePart") then
+                return target.Position
+            end
+
+            if target:IsA("Model") then
+                local ok, pivot = pcall(function()
+                    return target:GetPivot()
+                end)
+
+                if ok and typeof(pivot) == "CFrame" then
+                    return pivot.Position
+                end
+            end
+        end
+
+        return nil
+    end
+
+    function Module.UseSkills(target, skills)
         if type(skills) ~= "table" then
             return nil
         end
