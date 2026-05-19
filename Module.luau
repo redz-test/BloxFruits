@@ -1406,6 +1406,81 @@ local Module = {} do
 		return Inventory
 	end)()
 
+  function Module.UseSkills(target, skills)
+        if type(skills) ~= "table" then
+            return nil
+        end
+
+        local character = Player.Character
+        local root = character and (character:FindFirstChild("HumanoidRootPart") or character.PrimaryPart)
+
+        if not character or not root then
+            return nil
+        end
+
+        local targetPosition = GetTargetPosition(target)
+
+        if not targetPosition then
+            return nil
+        end
+
+        if (root.Position - targetPosition).Magnitude >= 60 then
+            return nil
+        end
+
+        local tool = character:FindFirstChildOfClass("Tool")
+
+        if not tool then
+            return nil
+        end
+
+        local toolLevel = tool:GetAttribute("Level") or 0
+        local masteryRequirements = Module.Inventory and Module.Inventory.MasteryRequirements or {}
+        local requirements = masteryRequirements[tool.Name]
+
+        if requirements == nil and tool:FindFirstChild("Data") then
+            local ok, data = pcall(require, tool.Data)
+
+            if ok and type(data) == "table" then
+                masteryRequirements[tool.Name] = data.Lvl or false
+            else
+                masteryRequirements[tool.Name] = false
+            end
+
+            requirements = masteryRequirements[tool.Name]
+        end
+
+        for key, enabled in pairs(skills) do
+            if enabled then
+                local canUse = true
+
+                if requirements then
+                    if not requirements[key] or toolLevel < requirements[key] then
+                        canUse = false
+                    end
+                end
+
+                if canUse then
+                    local nextUse = SkillCooldown[key] or 0
+
+                    if tick() >= nextUse then
+                        local keyCode = Enum.KeyCode[key] or key
+
+                        pcall(function()
+                            VirtualInputManager:SendKeyEvent(true, keyCode, false, game)
+                            VirtualInputManager:SendKeyEvent(false, keyCode, false, game)
+                        end)
+
+                        SkillCooldown[key] = tick() + SKILL_COOLDOWN
+                    end
+                end
+            end
+        end
+
+        return true
+    end
+end
+
    Module.FastAttack = (function()
 		local FastAttack = {
 			Distance = 50,
