@@ -776,7 +776,7 @@ local Module = {} do
 	end
 
 	function Module.Rejoin(): (nil)
-		task.spawn(TeleportService.TeleportToPlaceInstance, TeleportService, game.PlaceId, game.JobId, Player)
+		TeleportService:TeleportToPlaceInstance(game.PlaceId, game.JobId, player)
 	end
 
    function Module:ServerHop(): (nil)
