@@ -239,6 +239,7 @@ local function detectSea(placeId)
         return 2
     elseif table.find(sea3, placeId) then
         return 3
+    elseif table.find(dungeon, placeId)
     end
     return 0
 end
