@@ -332,7 +332,7 @@ local Module = {} do
 				Position = CFrame.new(-1128, 6, -451),
 				Quest = {"JungleQuest", CFrame.new(-1598, 37, 153)}
 			},
-			["Bobby"] = {
+			["Chef"] = {
 				IsBoss = true,
 				Level = 55,
 				Position = CFrame.new(-1131, 14, 4080),
@@ -507,7 +507,91 @@ local Module = {} do
 				Position = CFrame.new(-10218, 333, -9444)
 			}
 		}
-		
+
+        Module.Materials = {
+        ["Leather + Scrap Metal"] = {
+            [1] = {
+                Mobs = { "Pirate", "Brute" },
+                Quest = { 30, "BuggyQuest1", 1, CFrame.new(-1140, 4, 3829) }
+                },
+            [2] = {
+                Mobs = { "Mercenary" },
+                Quest = { 725, "Area1Quest", 2, CFrame.new(-427, 73, 1835) }
+                },
+            [3] = {
+                Mobs = { "Jungle Pirate" },
+                Quest = { 1900, "DeepForestIsland2", 1, CFrame.new(-12682, 391, -9901) }
+                }
+            },
+            ["Magma Ore"] = {
+            [1] = {
+                Mobs = { "Military Soldier" },
+                Quest = { 325, "MagmaQuest", 1, CFrame.new(-5319, 12, 8515) }
+                },
+            [2] = {
+                Mobs = { "Magma Ninja", "Lava Pirate" },
+                Quest = { 1175, "FireSideQuest", 1, CFrame.new(-5404, 29, -5369) }
+                }
+            },
+            ["Fish Tail"] = {
+            [1] = {
+                Mobs = { "Fishman Warrior", "Fishman Commando" },
+                Quest = { 375, "FishmanQuest2", 1, CFrame.new(61122, 18, 1567) }
+                },
+            [3] = {
+                Mobs = { "Fishman Raider", "Fishman Captain" },
+                Quest = { 1775, "DeepForestIsland3", 1, CFrame.new(-10581, 331, -8759) }
+                },
+            },
+            ["Angel Wings"] = {
+            [1] = {
+                Mobs = { "Royal Squad", "Royal Soldier" },
+                Quest = { 525, "SkyExp2Quest", 1, CFrame.new(-7903, 5636, -1412) }
+                }
+            },
+            ["Mystic Droplet"] = {
+            [2] = {
+                Mobs = { "Water Fighter", "Water Soldier" },
+                Quest = { 1450, "ForgottenQuest", 2, CFrame.new(-3056, 240, -10145) }
+                }
+            },
+            ["Radiactive Material"] = {
+            [2] = {
+                Mobs = { "Factory Staff" },
+                Quest = { 800, "Area2Quest", 2, CFrame.new(635, 73, 919) }
+                }
+            },
+            ["Vampire Fang"] = {
+            [2] = {
+                Mobs = { "Vampire" },
+                Quest = { 1050, "ZombieQuest", 2, CFrame.new(-5493, 48, -794) }
+                }
+            },
+            Gunpowder = {
+            [3] = {
+                Mobs = { "Pistol Billionaire" },
+                Quest = { 1525, "PiratePortQuest", 2, CFrame.new(-449, 109, 5950) }
+                }
+            },
+            ["Mini Tusk"] = {
+            [3] = {
+                Mobs = { "Mythological Pirate" },
+                Quest = { 1850, "DeepForestIsland", 2, CFrame.new(-13233, 332, -7626) }
+                }
+            },
+            ["Conjured Cocoa"] = {
+            [3] = {
+                Mobs = { "Cocoa Warrior", "Chocolate Bar Battler" },
+                Quest = { 2300, "ChocQuest1", 1, CFrame.new(231, 24, -12198) }
+                }
+            },
+            ["Dragon Scale"] = {
+            [3] = {
+                Mobs = { "Dragon Crew Archer" },
+                Quest = { 1600, "DragonCrewQuest", 2, CFrame.new(6736, 127, -713) }
+                }
+            },
+        }
 		Module.Shop = {
             --[[{"Magic Elf", {{"Buy 2x EXP", {"Candies", "Buy", 1, 1}}, {"Buy Stats Refund", {"Candies", "Buy", 1, 2}}, {"Buy Race Reroll", {"Candies", "Buy", 1, 3}}}},
             {"Greedy Elf", {{"Buy 200 Fragments", {"Candies", "Buy", 2, 1}}, {"Buy 500 Fragments", {"Candies", "Buy", 2, 2}}}},
