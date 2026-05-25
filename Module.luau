@@ -536,7 +536,7 @@ local Module = {} do
             ["Fish Tail"] = {
             [1] = {
                 Mobs = { "Fishman Warrior", "Fishman Commando" },
-                Quest = { 375, "FishmanQuest2", 1, CFrame.new(61122, 18, 1567) }
+                Quest = { 375, "FishmanQuest", 1, CFrame.new(61122, 18, 1567) }
                 },
             [3] = {
                 Mobs = { "Fishman Raider", "Fishman Captain" },
