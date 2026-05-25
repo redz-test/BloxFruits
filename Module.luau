@@ -230,7 +230,6 @@ end
 local sea1 = {2753915549, 85211729168715}
 local sea2 = {4442272183, 79091703265657}
 local sea3 = {7449423635, 100117331123089}
-local dungeon = {73902483975735}
 
 local function detectSea(placeId)
     if table.find(sea1, placeId) then
@@ -239,8 +238,6 @@ local function detectSea(placeId)
         return 2
     elseif table.find(sea3, placeId) then
         return 3
-    elseif table.find(dungeon, placeId) then
-        return dungeon
     end
     return 0
 end
