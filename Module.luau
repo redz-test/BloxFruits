@@ -814,8 +814,9 @@ local Module = {} do
     
     if not Success then
         Module.Signals.Error:Fire(ErrorMessage)
-    end
-end
+        end
+     end
+  end
 	
 	function Module.FireRemote(...)
 		return CommF:InvokeServer(...)
