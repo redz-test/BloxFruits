@@ -1175,32 +1175,38 @@ local Module = {} do
 })
 	
 	Module.FruitsName = setmetatable({}, {
-		__index = function(self, Fruit)
-			local RealFruitsName = Module.FruitsId
-			local Name = Fruit.Name
-			
-			if Name ~= "Fruit " then
-				rawset(self, Fruit, Name)
-				return Name
-			end
-			
-			rawset(self, Fruit, "Fruit [ ??? ]")
-			
-			local Model = Fruit:WaitForChild("Fruit", 9e9)
-			local Idle = FastWait(2, Model, "Idle") or FastWait(1, Model, "Animation") or FastWait(1, Model, "Fruit")
-			
-			if Idle and (Idle:IsA("Animation") or Idle:IsA("MeshPart")) then
-				local Property = if Idle:IsA("MeshPart") then "MeshId" else "AnimationId"
-				local RealName = RealFruitsName[Idle[Property] or ""]
-				
-				if RealName and type(RealName) == "string" then
-					rawset(self, Fruit, `Fruit [ {RealName} ]`)
-				end
-			end
-			
-			return rawget(self, Fruit)
-		end
-	})
+    __index = function(self, Fruit)
+        if not Fruit then
+            return "Fruit [ ??? ]"
+        end
+
+        if Fruit.Name ~= "Fruit " then
+            rawset(self, Fruit, Fruit.Name)
+            return Fruit.Name
+        end
+
+        local Model = Fruit:FindFirstChild("Fruit")
+        local Idle = Model and (Model:FindFirstChild("Idle") or Model:FindFirstChild("Animation") or Model:FindFirstChild("Fruit"))
+
+        if Idle and (Idle:IsA("Animation") or Idle:IsA("MeshPart")) then
+            local RealName = Module.FruitsId[Idle:IsA("MeshPart") and Idle.MeshId or Idle.AnimationId]
+
+            if RealName then
+                rawset(self, Fruit, "Fruit [ " .. RealName .. " ]")
+                return rawget(self, Fruit)
+            end
+        end
+
+        task.delay(1, function()
+            if Fruit and Fruit.Parent and rawget(self, Fruit) == "Fruit [ ??? ]" then
+                rawset(self, Fruit, nil)
+            end
+        end)
+
+        rawset(self, Fruit, "Fruit [ ??? ]")
+        return rawget(self, Fruit)
+    end
+})
 	
 	Module.Enemies = (function()
 		local EnemiesModule = CreateDictionary({
