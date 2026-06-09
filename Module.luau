@@ -2167,23 +2167,6 @@ end
 		local Enabled = _ENV.rz_EnabledOptions
 		local Debounce = Module.Debounce
 		local IsAlive = Module.IsAlive
-
-        function Hooking:EnableBypass()
-    if _ENV.rz_enabled_bypass then
-        return
-    end
-
-    _ENV.rz_enabled_bypass = true
-
-    local old_newindex
-    old_newindex = hookmetamethod(Player, "__newindex", function(self, key, value)
-        if key == "WalkSpeed" and self.Name == "Humanoid" then
-            return old_newindex(self, key, _ENV.WalkSpeedBypass or value)
-        end
-
-        return old_newindex(self, key, value)
-    end)
-end
 		
 		local function GetNextTarget(Mode: string, ClosestList: boolean): any?
 			if (tick() - Debounce.TargetDebounce) <= 2 or _ENV[Mode] then
