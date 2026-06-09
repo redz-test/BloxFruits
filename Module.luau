@@ -525,7 +525,7 @@ local Module = {} do
             ["Frozen Bait"] = {
                 Beli = 36000,
                 Material = "Yeti Fur"
-            }
+            },
             ["Epic Bait"] = {
                 Beli = 50000,
                 Material = "Terror Eyes"
