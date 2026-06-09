@@ -508,6 +508,34 @@ local Module = {} do
 			}
 		}
 
+        Module.BaitRequirements = {
+            ["Basic Bait"] = {
+                Beli = 1000
+            },
+            ["Kelp Bait"] = {
+                Beli = 12000
+            },
+            ["Good Bait"] = {
+                Beli = 8000
+            },
+            ["Abyssal Bait"] = {
+                Beli = 25000,
+                Material = "Demonic Wisp"
+            },
+            ["Frozen Bait"] = {
+                Beli = 36000,
+                Material = "Yeti Fur"
+            }
+            ["Epic Bait"] = {
+                Beli = 50000,
+                Material = "Terror Eyes"
+            },
+            ["Carnivore Bait"] = {
+                Beli = 60000,
+                Material = "Dragon Scale"
+            }
+        }
+        
         Module.Materials = {
         ["Leather + Scrap Metal"] = {
             [1] = {
