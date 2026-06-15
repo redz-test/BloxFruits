@@ -832,7 +832,7 @@ local Module = {} do
                 end
             end
 
-            if not Enabled then
+            if not Enabled and not _ENV. then
                 Settings.RunningOption, Settings.RunningMethod = nil, nil
             end
             
@@ -840,7 +840,7 @@ local Module = {} do
         end
     end)
     
-    if not Success then
+    if not Success and not ENV.errormessage then
         Module.Signals.Error:Fire(ErrorMessage)
         end
      end
