@@ -840,7 +840,7 @@ local Module = {} do
         end
     end)
     
-    if not Success and not ENV.errormessage then
+    if not Success and not _ENV.errormessage then
         Module.Signals.Error:Fire(ErrorMessage)
         end
      end
