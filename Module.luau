@@ -1011,6 +1011,37 @@ local Module = {} do
 		end
 	end
 
+     local function SetupBring(Enemy, BringTag)
+        local ActiveBrings = {}
+	    local BringAttachment = Instance.new("Attachment")
+	    local AlignPosition = Instance.new("AlignPosition")
+	    AlignPosition.Mode = Enum.PositionAlignmentMode.OneAttachment
+	    AlignPosition.Position = Vector3.new(0, 20, 0)
+	    AlignPosition.Responsiveness = 200
+	    AlignPosition.MaxForce = math.huge
+	    AlignPosition.Parent = BringAttachment
+	    AlignPosition.Attachment0 = BringAttachment
+		if ActiveBrings[Enemy] then return end
+		ActiveBrings[Enemy] = true
+
+		local Humanoid = Enemy:FindFirstChild("Humanoid")
+		local RootPart = Enemy:FindFirstChild("HumanoidRootPart")
+
+		if Humanoid and RootPart then
+			local clonedAttachment = BringAttachment:Clone()
+			local AlignPos = clonedAttachment.AlignPosition
+
+			clonedAttachment.Parent = RootPart
+			UpdateAlignPosition(AlignPos, Enemy, BringTag, Humanoid, RootPart)
+
+			if clonedAttachment then
+				clonedAttachment:Destroy()
+			end
+		end
+
+		ActiveBrings[Enemy] = nil
+	end
+
  function Module:BringEnemies(ToEnemy: Instance, SuperBring: boolean?): (nil)
 		local TargetRoot = self.IsAlive(ToEnemy) and ToEnemy:FindFirstChild("HumanoidRootPart")
 		if not TargetRoot then return nil end
@@ -1445,37 +1476,6 @@ local Module = {} do
 
 			task.wait(0.25)
 		end
-	end
-
-    local function SetupBring(Enemy, BringTag)
-        local ActiveBrings = {}
-	    local BringAttachment = Instance.new("Attachment")
-	    local AlignPosition = Instance.new("AlignPosition")
-	    AlignPosition.Mode = Enum.PositionAlignmentMode.OneAttachment
-	    AlignPosition.Position = Vector3.new(0, 20, 0)
-	    AlignPosition.Responsiveness = 200
-	    AlignPosition.MaxForce = math.huge
-	    AlignPosition.Parent = BringAttachment
-	    AlignPosition.Attachment0 = BringAttachment
-		if ActiveBrings[Enemy] then return end
-		ActiveBrings[Enemy] = true
-
-		local Humanoid = Enemy:FindFirstChild("Humanoid")
-		local RootPart = Enemy:FindFirstChild("HumanoidRootPart")
-
-		if Humanoid and RootPart then
-			local clonedAttachment = BringAttachment:Clone()
-			local AlignPos = clonedAttachment.AlignPosition
-
-			clonedAttachment.Parent = RootPart
-			UpdateAlignPosition(AlignPos, Enemy, BringTag, Humanoid, RootPart)
-
-			if clonedAttachment then
-				clonedAttachment:Destroy()
-			end
-		end
-
-		ActiveBrings[Enemy] = nil
 	end
 		
 		local function KillAura(Enemy)
