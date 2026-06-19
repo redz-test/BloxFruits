@@ -2250,7 +2250,7 @@ end
 			end
 		end
 		
-		task.defer(function()\
+		task.defer(function()
             return
 			if _ENV.original_namecall then
 				return nil
