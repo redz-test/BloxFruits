@@ -2251,7 +2251,7 @@ end
 		end
 		
 		task.defer(function()
-            return
+            if true then return end
 			if _ENV.original_namecall then
 				return nil
 			end
