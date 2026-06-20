@@ -279,6 +279,7 @@ local Module = {} do
 			["rbxassetid://15124220207"] = "Spike",
 			["rbxassetid://121545956771325"] = "Flame",
 			["rbxassetid://15123673019"] = "Sand",
+            ["rbxassetid://15100433167"] = "Ice",
 			["rbxassetid://15123618591"] = "Dark",
 			["rbxassetid://77885466312115"] = "Eagle",
 			["rbxassetid://15112600534"] = "Diamond",
