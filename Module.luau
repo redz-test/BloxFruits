@@ -850,10 +850,6 @@ local Module = {} do
 	function Module.FireRemote(...)
 		return CommF:InvokeServer(...)
 	end
-
-   function Module.FireNetRemote(...)
-		return Net:InvokeServer(...)
-	end
 	
 	function Module.IsAlive(Character)
 		if Character then
@@ -1072,7 +1068,7 @@ local Module = {} do
 		end
 	end
 	
-	function Module:GetProgressCommF(Tag, ...)
+	function Module:GetProgress(Tag, ...)
 		local Progress = Cached.Progress
 		local entry = Progress[Tag]
 		
@@ -1081,29 +1077,6 @@ local Module = {} do
 		end
 		
 		local result = self.FireRemote(...)
-		
-		if entry then
-			entry.result = result
-			entry.debounce = tick()
-		else
-			Progress[Tag] = {
-				debounce = tick(),
-				result = result
-			}
-		end
-		
-		return result
-	end
-
-   function Module:GetProgressNet(Tag, ...)
-		local Progress = Cached.Progress
-		local entry = Progress[Tag]
-		
-		if entry and (tick() - entry.debounce) < 2 then
-			return entry.result
-		end
-		
-		local result = self.FireNetRemote(...)
 		
 		if entry then
 			entry.result = result
