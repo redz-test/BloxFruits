@@ -893,6 +893,43 @@ local Module = {} do
 		return Module.Bosses[Name] and true or false
 	end
 
+    function Module.UseSkills(Target: any?, Skills: table?): (nil)
+		if Player:DistanceFromCharacter(Target.Position) >= 60 then
+			return nil
+		end
+		
+		local Equipped = Player.Character and Player.Character:FindFirstChildOfClass("Tool")
+		local MasteryRequirements = Module.Inventory.MasteryRequirements
+		
+		if Equipped then
+			local Level = Equipped:GetAttribute("Level") or 0
+			local Mastery = MasteryRequirements[Equipped.Name]
+			
+			if Mastery == nil and Equipped:FindFirstChild("Data") then
+				local Success, Requirements = pcall(require, Equipped.Data)
+				
+				if Success and type(Requirements) == "table" then
+					MasteryRequirements[Equipped.Name] = Requirements.Lvl or false
+				else
+					MasteryRequirements[Equipped.Name] = false
+				end
+			end
+			
+			for Skill, Enabled in Skills do
+				if Mastery and not Mastery[Skill] then continue end
+				if Mastery and Level < Mastery[Skill] then continue end
+				
+				local Debounce = Module.Debounce.Skills[Skill]
+				
+				if Enabled and (not Debounce or (tick() - Debounce) >= HIDDEN_SETTINGS.SKILL_COOLDOWN) then
+					VirtualInputManager:SendKeyEvent(true, Skill, false, game)
+					VirtualInputManager:SendKeyEvent(false, Skill, false, game)
+					Module.Debounce.Skills[Skill] = tick()
+				end
+			end
+		end
+	end
+
 	function Module.Rejoin(): (nil)
 		TeleportService:TeleportToPlaceInstance(game.PlaceId, game.JobId, player)
 	end
@@ -1576,81 +1613,7 @@ local Module = {} do
         end
 
         return nil
-    end
-
-    function Module.UseSkills(target, skills)
-        if type(skills) ~= "table" then
-            return nil
-        end
-
-        local character = Player.Character
-        local root = character and (character:FindFirstChild("HumanoidRootPart") or character.PrimaryPart)
-
-        if not character or not root then
-            return nil
-        end
-
-        local targetPosition = GetTargetPosition(target)
-
-        if not targetPosition then
-            return nil
-        end
-
-        if (root.Position - targetPosition).Magnitude >= 60 then
-            return nil
-        end
-
-        local tool = character:FindFirstChildOfClass("Tool")
-
-        if not tool then
-            return nil
-        end
-
-        local toolLevel = tool:GetAttribute("Level") or 0
-        local masteryRequirements = Module.Inventory and Module.Inventory.MasteryRequirements or {}
-        local requirements = masteryRequirements[tool.Name]
-
-        if requirements == nil and tool:FindFirstChild("Data") then
-            local ok, data = pcall(require, tool.Data)
-
-            if ok and type(data) == "table" then
-                masteryRequirements[tool.Name] = data.Lvl or false
-            else
-                masteryRequirements[tool.Name] = false
-            end
-
-            requirements = masteryRequirements[tool.Name]
-        end
-
-        for key, enabled in pairs(skills) do
-            if enabled then
-                local canUse = true
-
-                if requirements then
-                    if not requirements[key] or toolLevel < requirements[key] then
-                        canUse = false
-                    end
-                end
-
-                if canUse then
-                    local nextUse = SkillCooldown[key] or 0
-
-                    if tick() >= nextUse then
-                        local keyCode = Enum.KeyCode[key] or key
-
-                        pcall(function()
-                            VirtualInputManager:SendKeyEvent(true, keyCode, false, game)
-                            VirtualInputManager:SendKeyEvent(false, keyCode, false, game)
-                        end)
-
-                        SkillCooldown[key] = tick() + SKILL_COOLDOWN
-                    end
-                end
-            end
-        end
-
-        return true
-    end
+    end    
 end
 
    Module.FastAttack = (function()
