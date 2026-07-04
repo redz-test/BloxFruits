@@ -1190,55 +1190,43 @@ local Module = {} do
 	})
 	
 	Module.Berry = setmetatable({}, {
-    __call = function(self, BerryArray)
-        local function HasBerry(Bush)
-            if not Bush or not Bush:IsDescendantOf(Map) or not Bush.Parent then
-                return false
-            end
-
-            for AttributeName, BerryName in pairs(Bush:GetAttributes()) do
-                if not BerryArray or table.find(BerryArray, BerryName) then
-                    if typeof(Bush.Parent:GetAttribute(AttributeName)) == "CFrame" then
-                        return true
-                    end
-                end
-            end
-
-            return false
-        end
-
-        local CachedBush = self.Cached
-
-        if HasBerry(CachedBush) then
-            return CachedBush
-        elseif self.Debounce and tick() - self.Debounce < 0.5 then
-            return nil
-        end
-
-        local Position = (Player.Character or Player.CharacterAdded:Wait()):GetPivot().Position
-        local BerryBush = CollectionService:GetTagged("BerryBush")
-
-        local Distance, Nearest = math.huge
-
-        for i = 1, #BerryBush do
-            local Bush = BerryBush[i]
-
-            if HasBerry(Bush) then
-                local Magnitude = (Bush.Parent:GetPivot().Position - Position).Magnitude
-
-                if Magnitude < Distance then
-                    Distance = Magnitude
-                    Nearest = Bush
-                end
-            end
-        end
-
-        self.Debounce = tick()
-        self.Cached = Nearest
-
-        return Nearest
-    end
-})
+		__call = function(self, BerryArray)
+			local CachedBush = self.Cached
+			
+			if CachedBush and CachedBush:IsDescendantOf(Map) then
+				for Tag, CFrame in pairs(CachedBush:GetAttributes()) do
+					return CachedBush
+				end
+			end
+			
+			if self.Debounce and (tick() - self.Debounce) < 0.5 then
+				return nil
+			end
+			
+			local Position = (Player.Character or Player.CharacterAdded:Wait()):GetPivot().Position
+			local BerryBush = CollectionService:GetTagged("BerryBush")
+			
+			local Distance, Nearest = math.huge
+			
+			for i = 1, #BerryBush do
+				local Bush = BerryBush[i]
+				
+				for AttributeName, BerryName in pairs(Bush:GetAttributes()) do
+					if not BerryArray or table.find(BerryArray, BerryName) then
+						local Magnitude = (Bush.Parent:GetPivot().Position - Position).Magnitude
+						
+						if Magnitude < Distance then
+							Nearest, Distance = Bush, Magnitude
+						end
+					end
+				end
+			end
+			
+			self.Debounce = tick()
+			self.Cached = Nearest
+			return Nearest
+		end
+	})
 	
 	Module.FruitsName = setmetatable({}, {
     __index = function(self, Fruit)
