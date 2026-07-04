@@ -627,10 +627,10 @@ local Module = {} do
             {"Santa Claws", {{"Buy Elf Hat", {"Candies", "Buy", 3, 1}}, {"Buy Santa Hat", {"Candies", "Buy", 3, 2}}, {"Buy Sleigh", {"Candies", "Buy", 3, 3}}}},]]
 			{"Frags", {{"Race Reroll", {"BlackbeardReward", "Reroll", "2"}}, {"Reset Stats", {"BlackbeardReward", "Refund", "2"}}}},
 			{"Ability Teacher", {
-				{"Buy Geppo", {"BuyHaki", "Geppo"}},
-				{"Buy Buso", {"BuyHaki", "Buso"}},
-				{"Buy Soru", {"BuyHaki", "Soru"}},
-				{"Buy Ken", {"KenTalk", "Buy"}}
+				{"Buy Air Jumps", {"BuyHaki", "Geppo"}},
+				{"Buy Haki", {"BuyHaki", "Buso"}},
+				{"Buy Flash Step", {"BuyHaki", "Soru"}},
+				{"Buy Instinct", {"KenTalk", "Buy"}}
 			}},
 			{"Sword", {
 				{"Buy Katana", {"BuyItem", "Katana"}},
