@@ -1152,42 +1152,48 @@ local Module = {} do
 			end
 		end
 	end
-	
-	Module.Chests = setmetatable({}, {
-		__call = function(self, SelectedIsland)
-			local CachedChest = self.Cached
-			
-			if CachedChest and not CachedChest:GetAttribute("IsDisabled") then
-				if not SelectedIsland or CachedChest:IsDescendantOf(SelectedIsland) then
-					return CachedChest
-				end
-			end
-			
-			if self.Debounce and (tick() - self.Debounce) < 0.5 then
-				return nil
-			end
-			
-			local Position = (Player.Character or Player.CharacterAdded:Wait()):GetPivot().Position
-			local Chests = CollectionService:GetTagged("_ChestTagged")
-			
-			local Distance, Nearest = math.huge
-			
-			for i = 1, #Chests do
-				local Chest = Chests[i]
-				local Magnitude = (Chest:GetPivot().Position - Position).Magnitude
-				
-				if not SelectedIsland or Chest:IsDescendantOf(SelectedIsland) then
-					if not Chest:GetAttribute("IsDisabled") and Magnitude < Distance then
-						Distance, Nearest = Magnitude, Chest
-					end
-				end
-			end
-			
-			self.Debounce = tick()
-			self.Cached = Nearest
-			return Nearest
-		end
-	})
+
+    Module.Chests = setmetatable({}, {
+    __call = function(self, SelectedIsland)
+        local CachedChest = self.Cached
+        if CachedChest and not CachedChest:GetAttribute("IsDisabled") then
+            if not SelectedIsland or CachedChest:IsDescendantOf(SelectedIsland) then
+                return CachedChest
+            end
+        end
+    
+        if self.Debounce and (tick() - self.Debounce) < 0.5 then
+            return nil
+        end
+        
+        local Position = (Player.Character or Player.CharacterAdded:Wait()):GetPivot().Position
+        local Chests = CollectionService:GetTagged("_ChestTagged")
+        
+        local Distance, Nearest = math.huge
+        
+        for i = 1, #Chests do
+            local Chest = Chests[i]
+            if not Chest:GetAttribute("IsDisabled") then
+                if not SelectedIsland or Chest:IsDescendantOf(SelectedIsland) then
+                    local Magnitude = (Chest:GetPivot().Position - Position).Magnitude
+                    
+                    if Magnitude < Distance then
+                        Distance, Nearest = Magnitude, Chest
+                    end
+                end
+            end
+        end
+
+        if Nearest then
+            self.Debounce = 0
+        else
+            self.Debounce = tick()
+        end
+        
+        self.Cached = Nearest
+        return Nearest
+    end
+})
 	
 	Module.Berry = setmetatable({}, {
 		__call = function(self, BerryArray)
