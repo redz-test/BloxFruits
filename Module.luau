@@ -1106,27 +1106,30 @@ local Module = {} do
 	end
 	
 	function Module:GetProgress(Tag, ...)
-		local Progress = Cached.Progress
-		local entry = Progress[Tag]
-		
-		if entry and (tick() - entry.debounce) < 2 then
-			return entry.result
-		end
-		
-		local result = self.FireRemote(...)
-		
-		if entry then
-			entry.result = result
-			entry.debounce = tick()
-		else
-			Progress[Tag] = {
-				debounce = tick(),
-				result = result
-			}
-		end
-		
-		return result
-	end
+    local Progress = Cached.Progress
+    local entry = Progress[Tag]
+
+    if not entry then
+        entry = {
+            debounce = 0,
+            result = nil,
+            fetching = false
+        }
+        Progress[Tag] = entry
+    end
+
+    if (tick() - entry.debounce) >= 2 and not entry.fetching then
+        entry.fetching = true
+        
+        task.spawn(function(...)
+            entry.result = self.FireRemote(...)
+            entry.debounce = tick()
+            entry.fetching = false
+        end, ...)
+    end
+
+    return entry.result
+end
 	
 	function Module:RemoveVolcanoLava()
 		local PrehistoricIsland = Map.PrehistoricIsland
