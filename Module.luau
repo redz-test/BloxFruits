@@ -1069,7 +1069,7 @@ local Module = {} do
         Cached.BringPositions[targetName] = targetCFrame
     end
 
-    local playerPos = LocalPlayer.Character and LocalPlayer.Character.PrimaryPart and LocalPlayer.Character.PrimaryPart.Position
+    local playerPos = game:GetService("Players").LocalPlayer.Character and game:GetService("Players").LocalPlayer.Character.PrimaryPart and game:GetService("Players").LocalPlayer.Character.PrimaryPart.Position
     if not playerPos then return end
 
     for _, mob in ipairs(Enemies:GetChildren()) do
