@@ -1049,11 +1049,10 @@ local Module = {} do
 		end
 	end
 
-function Module:BringEnemies(targetMob, customCFrame, customDistance)
+    function Module:BringEnemies(targetMob, customCFrame, customDistance)
     if not targetMob or not targetMob.PrimaryPart then return end
     
     local targetName = targetMob.Name
-    
     local targetCFrame = (typeof(customCFrame) == "CFrame" and customCFrame) or targetMob.PrimaryPart.CFrame
     local bringDistance = (type(customCFrame) == "number" and customCFrame) or (type(customDistance) == "number" and customDistance) or Settings.BringDistance or 300
 
@@ -1063,15 +1062,22 @@ function Module:BringEnemies(targetMob, customCFrame, customDistance)
     if tick() - (Cached.LastSimTick or 0) > 5 then
         Cached.LastSimTick = tick()
         if setsimulationradius then pcall(setsimulationradius, 9e9) end
-        if sethiddenproperty then pcall(sethiddenproperty, LocalPlayer, "SimulationRadius", 9e9) end
+        if sethiddenproperty and player then pcall(sethiddenproperty, player, "SimulationRadius", 9e9) end
+    end
+
+    if not Settings.BringMobs then
+        if not Cached.BringPositions[targetName] then
+            Cached.BringPositions[targetName] = targetMob.PrimaryPart.CFrame
+        end
+        targetMob.PrimaryPart.CFrame = Cached.BringPositions[targetName]
+        return
     end
 
     if typeof(Cached.BringPositions[targetName]) ~= "CFrame" or (targetCFrame.Position - Cached.BringPositions[targetName].Position).Magnitude > 25 then
         Cached.BringPositions[targetName] = targetCFrame
     end
 
-    local player = game:GetService("Players").LocalPlayer
-    local playerPos = player and player.Character and player.Character.PrimaryPart and player.Character.PrimaryPart.Position
+    local playerPos = Player and Player.Character and Player.Character.PrimaryPart and Player.Character.PrimaryPart.Position
     if not playerPos then return end
 
     for _, mob in ipairs(Enemies:GetChildren()) do
@@ -1079,57 +1085,13 @@ function Module:BringEnemies(targetMob, customCFrame, customDistance)
             local mobRoot = mob:FindFirstChild("HumanoidRootPart")
             
             if mobRoot and (playerPos - mobRoot.Position).Magnitude < bringDistance then
-                
-                -- Отключаем коллизию сразу при обнаружении
                 for _, part in ipairs(mob:GetChildren()) do
                     if part:IsA("BasePart") and part.CanCollide then
                         part.CanCollide = false
                     end
                 end
                 
-
-                if not Cached.ActiveMobs[mob] then
-                    Cached.ActiveMobs[mob] = true
-
-                    task.spawn(function()
-                        local humanoid = mob:FindFirstChild("Humanoid")
-                        local rootPart = mob:FindFirstChild("HumanoidRootPart")
-
-                        if humanoid and rootPart then
-                            local attach = Instance.new("Attachment", rootPart)
-                            local alignPos = Instance.new("AlignPosition", attach)
-
-                            alignPos.Mode = Enum.PositionAlignmentMode.OneAttachment
-                            alignPos.Attachment0 = attach
-                            alignPos.MaxForce = 9e9
-                            alignPos.MaxVelocity = 9e9
-                            alignPos.Responsiveness = 200
-
-                            while mob.Parent == Enemies and humanoid.Health > 0 and rootPart.Parent == mob do
-                                local targetPos = Cached.BringPositions[targetName].Position
-                                for _, part in ipairs(mob:GetChildren()) do
-                                    if part:IsA("BasePart") and part.CanCollide then
-                                        part.CanCollide = false
-                                    end
-                                end
-
-                                if (targetPos - rootPart.Position).Magnitude <= bringDistance then
-                                    if alignPos.Position ~= targetPos then
-                                        alignPos.Position = targetPos
-                                    end
-                                else
-                                    break
-                                end
-                                
-                                task.wait(0.25)
-                            end
-
-                            if attach then attach:Destroy() end
-                        end
-
-                        Cached.ActiveMobs[mob] = nil
-                    end)
-                end
+                task.spawn(bring, mob, targetName, bringDistance)
             end
         end
     end
@@ -1508,7 +1470,7 @@ end
 			return NewTag
 		end
 
-   local function bring(mob, targetName, bringDistance)
+        local function bring(mob, targetName, bringDistance)
     if Cached.ActiveMobs[mob] then return end
     Cached.ActiveMobs[mob] = true
 
