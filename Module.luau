@@ -1049,12 +1049,11 @@ local Module = {} do
 		end
 	end
 
- function Module:BringEnemies(targetMob, customCFrame)
+ function Module:BringEnemies(targetMob, customCFrame, customDistance)
     if not targetMob or not targetMob.PrimaryPart then return end
-    
     local targetName = targetMob.Name
-    local targetCFrame = customCFrame or targetMob.PrimaryPart.CFrame
-    local bringDistance = Settings.BringDistance or 300
+    local targetCFrame = (typeof(customCFrame) == "CFrame" and customCFrame) or targetMob.PrimaryPart.CFrame
+    local bringDistance = (type(customCFrame) == "number" and customCFrame) or (type(customDistance) == "number" and customDistance) or Settings.BringDistance 
 
     Cached.BringPositions = Cached.BringPositions or {}
     Cached.ActiveMobs = Cached.ActiveMobs or {}
@@ -1065,11 +1064,12 @@ local Module = {} do
         if sethiddenproperty then pcall(sethiddenproperty, LocalPlayer, "SimulationRadius", 9e9) end
     end
 
-    if not Cached.BringPositions[targetName] or (targetCFrame.Position - Cached.BringPositions[targetName].Position).Magnitude > 25 then
+    if typeof(Cached.BringPositions[targetName]) ~= "CFrame" or (targetCFrame.Position - Cached.BringPositions[targetName].Position).Magnitude > 25 then
         Cached.BringPositions[targetName] = targetCFrame
     end
 
-    local playerPos = game:GetService("Players").LocalPlayer.Character and game:GetService("Players").LocalPlayer.Character.PrimaryPart and game:GetService("Players").LocalPlayer.Character.PrimaryPart.Position
+    local player = game:GetService("Players").LocalPlayer
+    local playerPos = player and player.Character and player.Character.PrimaryPart and player.Character.PrimaryPart.Position
     if not playerPos then return end
 
     for _, mob in ipairs(Enemies:GetChildren()) do
