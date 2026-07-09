@@ -1054,17 +1054,19 @@ local Module = {} do
     
     local targetName = targetMob.Name
     local targetCFrame = customCFrame or targetMob.PrimaryPart.CFrame
-    local bringDistance = Settings.BringDistance
-    local cached = self.Cached
+    local bringDistance = Settings.BringDistance or 300
 
-    if tick() - (cached.LastSimTick or 0) > 5 then
-        cached.LastSimTick = tick()
+    Cached.BringPositions = Cached.BringPositions or {}
+    Cached.ActiveMobs = Cached.ActiveMobs or {}
+
+    if tick() - (Cached.LastSimTick or 0) > 5 then
+        Cached.LastSimTick = tick()
         if setsimulationradius then pcall(setsimulationradius, 9e9) end
         if sethiddenproperty then pcall(sethiddenproperty, LocalPlayer, "SimulationRadius", 9e9) end
     end
 
-    if not cached.BringPositions[targetName] or (targetCFrame.Position - cached.BringPositions[targetName].Position).Magnitude > 25 then
-        cached.BringPositions[targetName] = targetCFrame
+    if not Cached.BringPositions[targetName] or (targetCFrame.Position - Cached.BringPositions[targetName].Position).Magnitude > 25 then
+        Cached.BringPositions[targetName] = targetCFrame
     end
 
     local playerPos = LocalPlayer.Character and LocalPlayer.Character.PrimaryPart and LocalPlayer.Character.PrimaryPart.Position
@@ -1460,48 +1462,48 @@ end
 			return NewTag
 		end
 
-    local function bring(mob, targetName, bringDistance)
-        if GameLib.Cached.ActiveMobs[mob] then return end
-        GameLib.Cached.ActiveMobs[mob] = true
+   local function bring(mob, targetName, bringDistance)
+    if Cached.ActiveMobs[mob] then return end
+    Cached.ActiveMobs[mob] = true
 
-        local humanoid = mob:FindFirstChild("Humanoid")
-        local rootPart = mob:FindFirstChild("HumanoidRootPart")
+    local humanoid = mob:FindFirstChild("Humanoid")
+    local rootPart = mob:FindFirstChild("HumanoidRootPart")
 
-        if humanoid and rootPart then
-            local attach = Instance.new("Attachment", rootPart)
-            local alignPos = Instance.new("AlignPosition", attach)
+    if humanoid and rootPart then
+        local attach = Instance.new("Attachment", rootPart)
+        local alignPos = Instance.new("AlignPosition", attach)
 
-            alignPos.Mode = Enum.PositionAlignmentMode.OneAttachment
-            alignPos.Attachment0 = attach
-            alignPos.MaxForce = 9e9
-            alignPos.MaxVelocity = 9e9
-            alignPos.Responsiveness = 200
+        alignPos.Mode = Enum.PositionAlignmentMode.OneAttachment
+        alignPos.Attachment0 = attach
+        alignPos.MaxForce = 9e9
+        alignPos.MaxVelocity = 9e9
+        alignPos.Responsiveness = 200
 
-            while mob.Parent == Enemies and humanoid.Health > 0 and rootPart.Parent == mob do
-                local targetPos = GameLib.Cached.BringPositions[targetName].Position
+        while mob.Parent == Enemies and humanoid.Health > 0 and rootPart.Parent == mob do
+            local targetPos = Cached.BringPositions[targetName].Position
 
-                for _, part in ipairs(mob:GetChildren()) do
-                    if part:IsA("BasePart") and part.CanCollide then
-                        part.CanCollide = false
-                    end
+            for _, part in ipairs(mob:GetChildren()) do
+                if part:IsA("BasePart") and part.CanCollide then
+                    part.CanCollide = false
                 end
-
-                if (targetPos - rootPart.Position).Magnitude <= bringDistance then
-                    if alignPos.Position ~= targetPos then
-                        alignPos.Position = targetPos
-                    end
-                else
-                    break
-                end
-            
-                task.wait(0.25)
             end
 
-            if attach then attach:Destroy() end
+            if (targetPos - rootPart.Position).Magnitude <= bringDistance then
+                if alignPos.Position ~= targetPos then
+                    alignPos.Position = targetPos
+                end
+            else
+                break
+            end
+            
+            task.wait(0.25)
         end
 
-        GameLib.Cached.ActiveMobs[mob] = nil
+        if attach then attach:Destroy() end
     end
+
+    Cached.ActiveMobs[mob] = nil
+end
 		
 		local function KillAura(Enemy)
 			local Humanoid = Enemy:FindFirstChild("Humanoid")
