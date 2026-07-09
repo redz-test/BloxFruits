@@ -1049,11 +1049,13 @@ local Module = {} do
 		end
 	end
 
- function Module:BringEnemies(targetMob, customCFrame, customDistance)
+function Module:BringEnemies(targetMob, customCFrame, customDistance)
     if not targetMob or not targetMob.PrimaryPart then return end
+    
     local targetName = targetMob.Name
+    
     local targetCFrame = (typeof(customCFrame) == "CFrame" and customCFrame) or targetMob.PrimaryPart.CFrame
-    local bringDistance = (type(customCFrame) == "number" and customCFrame) or (type(customDistance) == "number" and customDistance) or Settings.BringDistance 
+    local bringDistance = (type(customCFrame) == "number" and customCFrame) or (type(customDistance) == "number" and customDistance) or Settings.BringDistance or 300
 
     Cached.BringPositions = Cached.BringPositions or {}
     Cached.ActiveMobs = Cached.ActiveMobs or {}
@@ -1077,13 +1079,57 @@ local Module = {} do
             local mobRoot = mob:FindFirstChild("HumanoidRootPart")
             
             if mobRoot and (playerPos - mobRoot.Position).Magnitude < bringDistance then
+                
+                -- Отключаем коллизию сразу при обнаружении
                 for _, part in ipairs(mob:GetChildren()) do
                     if part:IsA("BasePart") and part.CanCollide then
                         part.CanCollide = false
                     end
                 end
                 
-                task.spawn(bring, mob, targetName, bringDistance)
+
+                if not Cached.ActiveMobs[mob] then
+                    Cached.ActiveMobs[mob] = true
+
+                    task.spawn(function()
+                        local humanoid = mob:FindFirstChild("Humanoid")
+                        local rootPart = mob:FindFirstChild("HumanoidRootPart")
+
+                        if humanoid and rootPart then
+                            local attach = Instance.new("Attachment", rootPart)
+                            local alignPos = Instance.new("AlignPosition", attach)
+
+                            alignPos.Mode = Enum.PositionAlignmentMode.OneAttachment
+                            alignPos.Attachment0 = attach
+                            alignPos.MaxForce = 9e9
+                            alignPos.MaxVelocity = 9e9
+                            alignPos.Responsiveness = 200
+
+                            while mob.Parent == Enemies and humanoid.Health > 0 and rootPart.Parent == mob do
+                                local targetPos = Cached.BringPositions[targetName].Position
+                                for _, part in ipairs(mob:GetChildren()) do
+                                    if part:IsA("BasePart") and part.CanCollide then
+                                        part.CanCollide = false
+                                    end
+                                end
+
+                                if (targetPos - rootPart.Position).Magnitude <= bringDistance then
+                                    if alignPos.Position ~= targetPos then
+                                        alignPos.Position = targetPos
+                                    end
+                                else
+                                    break
+                                end
+                                
+                                task.wait(0.25)
+                            end
+
+                            if attach then attach:Destroy() end
+                        end
+
+                        Cached.ActiveMobs[mob] = nil
+                    end)
+                end
             end
         end
     end
