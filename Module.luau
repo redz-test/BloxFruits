@@ -930,39 +930,6 @@ local Module = {} do
 		end
 	end
 
-    function Module:DisplayMessage(Content: string): Instance
-		local Message = Instance.new("Message")
-		local Cleaned = Content:gsub("n/", "\n"):gsub("\\n", "\n")
-		
-		if Cleaned:find(": ") then
-			Cleaned = Cleaned:gsub(": ", ":\n", 1)
-		end
-		
-		local Lines = {}
-		for Line in Cleaned:gmatch("[^\r\n]+") do
-			if #Line > 55 then
-				local Chunk = ""
-				for Word in Line:gmatch("%S+") do
-					if #Chunk + #Word + 1 > 55 then
-						table.insert(Lines, Chunk)
-						Chunk = Word
-					else
-						Chunk = if #Chunk == 0 then Word else Chunk .. " " .. Word
-					end
-				end
-				if #Chunk > 0 then
-					table.insert(Lines, Chunk)
-				end
-			else
-				table.insert(Lines, Line)
-			end
-		end
-		
-		Message.Text = table.concat(Lines, "\n")
-		Message.Parent = workspace
-		return Message
-	end
-
 	function Module.Rejoin(): (nil)
 		TeleportService:TeleportToPlaceInstance(game.PlaceId, game.JobId, player)
 	end
