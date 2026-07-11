@@ -257,8 +257,7 @@ local Module = {} do
 		Sea =  detectSea(game.PlaceId),
 		SeasName = { "Main", "Dressrosa", "Zou" },
 		MaxMastery = 600,
-		MaxLevel = game.Workspace:GetAttribute("LEVEL_CAP"),
-        StringVersion = require(ReplicatedStorage.BuildInfo).VERSION
+		MaxLevel = game.Workspace:GetAttribute("LEVEL_CAP")
 	}
 	
 	Module.Debounce = {
