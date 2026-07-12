@@ -893,6 +893,9 @@ local Module = {} do
 	end
 
     function Module.UseSkills(Target: any?, Skills: table?): (nil)
+        if Player:DistanceFromCharacter(Target.Position) >= 60 then
+			return nil
+		end
 		
 		local Equipped = Player.Character and Player.Character:FindFirstChildOfClass("Tool")
 		local MasteryRequirements = Module.Inventory.MasteryRequirements
