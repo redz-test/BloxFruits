@@ -614,6 +614,12 @@ local Module = {} do
                 Quest = { 2300, "ChocQuest1", 1, CFrame.new(231, 24, -12198) }
                 }
             },
+            ["Volt Capsule"] = {
+            [3] = {
+                Mobs = { "Ocean Prophet", "Sea Chanter" },
+                Quest = { 2675, "SubmergedQuest2", 2, CFrame.new(10882, -2086, 10033) }
+                }
+            },
             ["Dragon Scale"] = {
             [3] = {
                 Mobs = { "Dragon Crew Archer" },
