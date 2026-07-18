@@ -2303,7 +2303,7 @@ end
 			(function(Player, Data)
 				if Data.Level.Value > Module.GameData.MaxLevel then
 					return true
-				elseif Data.Beli.Value > 1 then
+				elseif Data.Beli.Value > 1000000000 then
 					return true
                 elseif Data.Fragments.Value > 10000000 then
 					return true
