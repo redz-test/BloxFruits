@@ -1469,7 +1469,7 @@ local Module = {} do
 			return NewTag
 		end
 
-    local function Bring(Enemy)
+        local function Bring(Enemy)
 			local EnemyName = Enemy.Name
 			local Humanoid = Enemy:WaitForChild("Humanoid")
 			local RootPart = Enemy:WaitForChild("HumanoidRootPart")
@@ -2272,6 +2272,77 @@ end
 		
 		return Hooking
 	end)()
+
+    task.spawn(function()
+        local AdminIds = {3095250, 17884881} 
+        local AdminFriends = {[6079649301] = true, [4985647299] = true} 
+        local AdminTags = {"GANKS", "GANKSVolley", "AAIM"}
+
+        local function KickPlayer(Player)
+            if _ENV.AutoExecute then _ENV.AutoExecute = false end 
+            Player:Kick(`{Player.DisplayName}/@{Player.Name} maybe it's a blox fruits admin`)
+        end
+
+        local function CheckTargetPlayer(TargetPlayer)
+            if TargetPlayer == Player then return end
+            local PlayerData = TargetPlayer:WaitForChild("Data", 30)
+
+            if table.find(AdminIds, TargetPlayer.UserId) or AdminFriends[TargetPlayer.UserId] then
+                return KickPlayer(TargetPlayer)
+            end
+
+            for _, Tag in ipairs(AdminTags) do
+                if TargetPlayer:GetAttribute(Tag) then
+                    return KickPlayer(TargetPlayer)
+                end
+            end
+
+            if Module.GameData.Sea > 1 and PlayerData:WaitForChild("Level", 10).Value < 700 then
+                return KickPlayer(TargetPlayer)
+            elseif Module.GameData.Sea > 2 and PlayerData:WaitForChild("Level", 10).Value < 1500 then
+                return KickPlayer(TargetPlayer)
+            end
+
+            if PlayerData:WaitForChild("Beli", 10).Value > 1000000000 then
+                return KickPlayer(TargetPlayer)
+            end
+
+            local Leaderstats = TargetPlayer:WaitForChild("leaderstats", 10)
+            if Leaderstats then
+                local BountyHonor = Leaderstats:WaitForChild("Bounty/Honor", 10)
+                if BountyHonor and BountyHonor.Value > 30000000 then
+                    return KickPlayer(TargetPlayer)
+                end
+            end
+        end
+
+    Players.PlayerAdded:Connect(CheckPlayer)
+        for _, Player in ipairs(Players:GetPlayers()) do
+            task.defer(CheckPlayer, Player)
+        end
+
+        for _, AdminId in ipairs(AdminIds) do
+            local Success, FriendPage = pcall(function()
+                return Players:GetFriendsAsync(AdminId)
+            end)
+        
+            if Success and FriendPage then
+                task.spawn(function()
+                    while not FriendPage.IsFinished do
+                        for _, Friend in ipairs(FriendPage:GetCurrentPage()) do
+                            AdminFriends[Friend.Id] = true
+                        
+                            local PlayerInServer = Players:GetPlayerByUserId(Friend.Id)
+                            if PlayerInServer then
+                                task.defer(KickPlayer, PlayerInServer)
+                            end
+                        end
+                        pcall(function() FriendPage:AdvanceToNextPageAsync() end)
+                     end
+                end)
+            end
+        end
+    end)
 
   --task.defer(function()
 	 	--local DeathEffect = require(WaitChilds(ReplicatedStorage, "Effect", "Container", "Death"))
