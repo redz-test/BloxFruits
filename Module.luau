@@ -2289,6 +2289,7 @@ end
 		local OwnersId = { 3095250, 17884881 }
 		local OwnersFriends = CreateDictionary({ 6079649301, 4985647299 }, true)
         local BlacklistedAttributes = {"GANKS", "GANKSVolley", "AAIM"}
+        local BlacklistedFruits = {"Door-Door", "Meme-Meme", "Bastar-Bastar", "Rogue-Rogue", "Dragon (Classic)-Dragon (Classic)", "Soul-Soul", "Chop-Chop", "Hollow-Hollow", "Kilo-Kilo"}
 		local LocalPlayer = Player
 		
 		local VerificationSteps = {
@@ -2330,6 +2331,13 @@ end
 			(function(Player)
 				for i = 1, #BlacklistedAttributes do
 					if Player:GetAttribute(BlacklistedAttributes[i]) then
+						return true
+					end
+				end
+			end),
+            (function(Player, Data)
+				for i = 1, #BlacklistedFruits do
+					if Data.DevilFruit.Value == (BlacklistedFruits[i]) then
 						return true
 					end
 				end
