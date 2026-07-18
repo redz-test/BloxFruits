@@ -2303,7 +2303,7 @@ end
 			(function(Player, Data)
 				if Data.Level.Value > Module.GameData.MaxLevel then
 					return true
-				elseif Data.Beli.Value > 1000000000 then
+				elseif Data.Beli.Value > 1 then
 					return true
                 elseif Data.Fragments.Value > 10000000 then
 					return true
@@ -2345,7 +2345,7 @@ end
 			(function(Player)
 				local BountyHonor = Player:WaitForChild("leaderstats"):WaitForChild("Bounty/Honor")
 				
-				if BountyHonor.Value > 1 or BountyHonor.Value < 0 then
+				if BountyHonor.Value > 30000000 or BountyHonor.Value < 0 then
 					return true
 				end
 			end)
