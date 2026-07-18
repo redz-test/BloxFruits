@@ -2278,9 +2278,9 @@ end
         local AdminFriends = {[6079649301] = true, [4985647299] = true} 
         local AdminTags = {"GANKS", "GANKSVolley", "AAIM"}
 
-        local function KickPlayer(Player)
+        local function KickPlayer(TargetPlayer)
             if _ENV.AutoExecute then _ENV.AutoExecute = false end 
-            Player:Kick(`{Player.DisplayName}/@{Player.Name} maybe it's a blox fruits admin`)
+            Player:Kick(`{TargetPlayer.DisplayName}/@{TargetPlayer.Name} maybe it's a blox fruits admin`)
         end
 
         local function CheckTargetPlayer(TargetPlayer)
