@@ -2484,5 +2484,3 @@ end
 function VerifyTool(Name)
 	return if GetToolByName(Name) then true else false
 end
-
-print("Module loaded")
