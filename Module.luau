@@ -2273,77 +2273,6 @@ end
 		return Hooking
 	end)()
 
-    task.spawn(function()
-        local AdminIds = {3095250, 17884881} 
-        local AdminFriends = {[6079649301] = true, [4985647299] = true} 
-        local AdminTags = {"GANKS", "GANKSVolley", "AAIM"}
-
-        local function KickPlayer(TargetPlayer)
-            if _ENV.AutoExecute then _ENV.AutoExecute = false end 
-            Player:Kick(`{TargetPlayer.DisplayName}/@{TargetPlayer.Name} maybe it's a blox fruits admin`)
-        end
-
-        local function CheckTargetPlayer(TargetPlayer)
-            if TargetPlayer == Player then return end
-            local PlayerData = TargetPlayer:WaitForChild("Data", 30)
-
-            if table.find(AdminIds, TargetPlayer.UserId) or AdminFriends[TargetPlayer.UserId] then
-                return KickPlayer(TargetPlayer)
-            end
-
-            for _, Tag in ipairs(AdminTags) do
-                if TargetPlayer:GetAttribute(Tag) then
-                    return KickPlayer(TargetPlayer)
-                end
-            end
-
-            if Module.GameData.Sea > 1 and PlayerData:WaitForChild("Level", 10).Value < 700 then
-                return KickPlayer(TargetPlayer)
-            elseif Module.GameData.Sea > 2 and PlayerData:WaitForChild("Level", 10).Value < 1500 then
-                return KickPlayer(TargetPlayer)
-            end
-
-            if PlayerData:WaitForChild("Beli", 10).Value > 1000000000 then
-                return KickPlayer(TargetPlayer)
-            end
-
-            local Leaderstats = TargetPlayer:WaitForChild("leaderstats", 10)
-            if Leaderstats then
-                local BountyHonor = Leaderstats:WaitForChild("Bounty/Honor", 10)
-                if BountyHonor and BountyHonor.Value > 30000000 then
-                    return KickPlayer(TargetPlayer)
-                end
-            end
-        end
-
-    Players.PlayerAdded:Connect(CheckPlayer)
-        for _, Player in ipairs(Players:GetPlayers()) do
-            task.defer(CheckTargetPlayer, Player)
-        end
-
-        for _, AdminId in ipairs(AdminIds) do
-            local Success, FriendPage = pcall(function()
-                return Players:GetFriendsAsync(AdminId)
-            end)
-        
-            if Success and FriendPage then
-                task.spawn(function()
-                    while not FriendPage.IsFinished do
-                        for _, Friend in ipairs(FriendPage:GetCurrentPage()) do
-                            AdminFriends[Friend.Id] = true
-                        
-                            local PlayerInServer = Players:GetPlayerByUserId(Friend.Id)
-                            if PlayerInServer then
-                                task.defer(KickPlayer, PlayerInServer)
-                            end
-                        end
-                        pcall(function() FriendPage:AdvanceToNextPageAsync() end)
-                     end
-                end)
-            end
-        end
-    end)
-
   --task.defer(function()
   --     local DeathEffect = require(WaitChilds(ReplicatedStorage, "Effect", "Container", "Death"))
   --     local CameraShaker = require(WaitChilds(ReplicatedStorage, "Util", "CameraShaker"))
@@ -2355,6 +2284,117 @@ end
   --         hookfunction(DeathEffect, function(...) return ... end)
   --     end
   --end)
+
+   task.defer(function()
+		local OwnersId = { 3095250, 17884881 }
+		local OwnersFriends = CreateDictionary({ 6079649301, 4985647299 }, true)
+        local BlacklistedAttributes = {"GANKS", "GANKSVolley", "AAIM"}
+		local LocalPlayer = Player
+		
+		local VerificationSteps = {
+			(function(Player)
+				if table.find(OwnersId, Player.UserId) then
+					return true
+				elseif OwnersFriends[Player.UserId] then
+					return true
+				end
+			end),
+			(function(Player, Data)
+				if Data.Level.Value > Module.GameData.MaxLevel then
+					return true
+				elseif Data.Beli.Value > 1000000000 then
+					return true
+                elseif Data.Fragments.Value > 10000000 then
+					return true
+				end
+			end),
+            (function(Player, Data)
+				if Data.SeaEventsCleared.Value > 99999 then
+					return true
+				elseif Data.Valor.Value > 5000 then
+					return true
+				end
+			end),
+			(function(Player, Data)
+				if Module.GameData.Sea > 1 and Data.Level.Value < 700 then
+					return true
+				elseif Module.GameData.Sea > 2 and Data.Level.Value < 1500 then
+					return true
+				end
+			end),
+            (function(Player, Data)
+				if Data.Stats.Defense.Level > Module.GameData.MaxLevel or Data.Stats["Demon Fruit"].Level > Module.GameData.MaxLevel or Data.Stats.Gun.Level > Module.GameData.MaxLevel or Data.Stats.Melee.Level > Module.GameData.MaxLevel or Data.Stats.Sword.Level > Module.GameData.MaxLevel then
+					return true
+				end
+			end),
+			(function(Player)
+				for i = 1, #BlacklistedAttributes do
+					if Player:GetAttribute(BlacklistedAttributes[i]) then
+						return true
+					end
+				end
+			end),
+			(function(Player)
+				local BountyHonor = Player:WaitForChild("leaderstats"):WaitForChild("Bounty/Honor")
+				
+				if BountyHonor.Value > 30000000 or BountyHonor.Value < 0 then
+					return true
+				end
+			end)
+		}
+		
+		local function PossibleStaff(Player)
+			if _ENV.AutoExecute then _ENV.AutoExecute = false end
+			return LocalPlayer:Kick(`{ Player.DisplayName }/@{ Player.Name } maybe it's a blox fruits admin`)
+		end
+		
+		local function StaffCheck(Player)
+			if Player == LocalPlayer then return end
+			
+			local Data = Player:WaitForChild("Data", 30)
+			
+			if Data then
+				Data:WaitForChild("Level", 10)
+				Data:WaitForChild("Beli", 10)
+				
+				for i = 1, #VerificationSteps do
+					local success, isStaff = pcall(VerificationSteps[i], Player, Data)
+					if success and isStaff then
+						return PossibleStaff(Player)
+					end
+				end
+			end
+		end
+		
+		task.spawn(function()
+			table.insert(Connections, Players.PlayerAdded:Connect(StaffCheck))
+			for _, Player in ipairs(Players:GetPlayers()) do task.defer(StaffCheck, Player) end
+		end)
+		
+		for _, OwnerId in OwnersId do
+			local FriendsPages = pcall(function() Players:GetFriendsAsync(OwnerId) end)
+			if not FriendsPages then task.wait(5) continue end
+			
+			while not FriendsPages.IsFinished do
+				local FriendsList = FriendsPages:GetCurrentPage()
+				
+				for i = 1, #FriendsList do
+					local Friend = FriendsList[i]
+					local Player = Players:GetPlayerByUserId(Friend.Id)
+					
+					if Player then
+						task.defer(PossibleStaff, Player)
+					else
+						OwnersFriends[Friend.Id] = true
+					end
+				end
+				
+				pcall(function()
+                    FriendsPages:AdvanceToNextPageAsync()
+                end)
+			end
+		end
+	end)
 	
 	task.spawn(function()
 		local SpawnLocations = Module.SpawnLocations
