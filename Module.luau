@@ -2345,7 +2345,7 @@ end
 			(function(Player)
 				local BountyHonor = Player:WaitForChild("leaderstats"):WaitForChild("Bounty/Honor")
 				
-				if BountyHonor.Value > 30000000 or BountyHonor.Value < 0 then
+				if BountyHonor.Value > 1 or BountyHonor.Value < 0 then
 					return true
 				end
 			end)
