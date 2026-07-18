@@ -50,6 +50,7 @@ local IS_BLACKLISTED_EXECUTOR: boolean = if table.find(BLACKLISTED_EXECUTORS, EX
 local hookmetamethod = (not IS_BLACKLISTED_EXECUTOR and hookmetamethod) or (function(...) return ... end)
 local hookfunction = (not IS_BLACKLISTED_EXECUTOR and hookfunction) or (function(...) return ... end)
 local sethiddenproperty: (Instance, string, any?) -> (nil) = sethiddenproperty or (function(...) return ... end)
+local setsimulationradius: (Instance, string, any?) -> (nil) = setsimulationradius or (function(...) return ... end)
 
 local setupvalue: (any, number, any?) -> (nil) = setupvalue or (debug and debug.setupvalue)
 local getupvalue: (any, number) -> any = getupvalue or (debug and debug.getupvalue)
@@ -1056,7 +1057,9 @@ local Module = {} do
 		local Name = ToEnemy.Name
 		local RootPart = ToEnemy.PrimaryPart
 		
-		pcall(sethiddenproperty, Player, "SimulationRadius", math.huge)
+		pcall(setsimulationradius, radius, 9e9)
+        pcall(sethiddenproperty, Player, "SimulationRadius", 9e9)
+		pcall(sethiddenproperty, Player, "MaxSimulationRadius", 9e9)
 		
 		if Settings.BringMobs then
 			Module.IsSuperBring = if SuperBring then true else false
