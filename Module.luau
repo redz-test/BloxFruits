@@ -2372,7 +2372,7 @@ end
 		end)
 		
 		for _, OwnerId in OwnersId do
-			local FriendsPages = pcall(function() Players:GetFriendsAsync(OwnerId) end)
+			local FriendsPages = Players:GetFriendsAsync(OwnerId)
 			if not FriendsPages then task.wait(5) continue end
 			
 			while not FriendsPages.IsFinished do
