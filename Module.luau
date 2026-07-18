@@ -2318,7 +2318,7 @@ end
 
     Players.PlayerAdded:Connect(CheckPlayer)
         for _, Player in ipairs(Players:GetPlayers()) do
-            task.defer(CheckPlayer, Player)
+            task.defer(CheckTargetPlayer, Player)
         end
 
         for _, AdminId in ipairs(AdminIds) do
@@ -2345,16 +2345,16 @@ end
     end)
 
   --task.defer(function()
-	 	--local DeathEffect = require(WaitChilds(ReplicatedStorage, "Effect", "Container", "Death"))
-	 	--local CameraShaker = require(WaitChilds(ReplicatedStorage, "Util", "CameraShaker"))
-	 	
-		--if CameraShaker then
-	 		--CameraShaker:Stop()
-	 	--end
-	 	--if hookfunction then
- 		--hookfunction(DeathEffect, function(...) return ... end)
-	 	--end
-	--end)
+  --     local DeathEffect = require(WaitChilds(ReplicatedStorage, "Effect", "Container", "Death"))
+  --     local CameraShaker = require(WaitChilds(ReplicatedStorage, "Util", "CameraShaker"))
+  --
+  --     if CameraShaker then
+  --         CameraShaker:Stop()
+  --     end
+  --     if hookfunction then
+  --         hookfunction(DeathEffect, function(...) return ... end)
+  --     end
+  --end)
 	
 	task.spawn(function()
 		local SpawnLocations = Module.SpawnLocations
@@ -2445,4 +2445,4 @@ function VerifyTool(Name)
 	return if GetToolByName(Name) then true else false
 end
 
-print("Module loader")
+print("Module loaded")
