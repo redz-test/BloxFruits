@@ -2324,7 +2324,7 @@ end
 				end
 			end),
             (function(Player, Data)
-				if Data.Stats.Defense.Level > Module.GameData.MaxLevel or Data.Stats["Demon Fruit"].Level > Module.GameData.MaxLevel or Data.Stats.Gun.Level > Module.GameData.MaxLevel or Data.Stats.Melee.Level > Module.GameData.MaxLevel or Data.Stats.Sword.Level > Module.GameData.MaxLevel then
+				if Data.Stats.Defense.Level.Value > Module.GameData.MaxLevel or Data.Stats["Demon Fruit"].Level.Value > Module.GameData.MaxLevel or Data.Stats.Gun.Level.Value > Module.GameData.MaxLevel.Value or Data.Stats.Melee.Level.Value > Module.GameData.MaxLevel or Data.Stats.Sword.Level.Value > Module.GameData.MaxLevel then
 					return true
 				end
 			end),
