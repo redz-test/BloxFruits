@@ -503,6 +503,10 @@ local Module = {} do
 				Position = CFrame.new(-710, 382, -11150),
 				Quest = {"IceCreamIslandQuest", CFrame.new(-818, 66, -10964)}
 			},
+            ["Soul Reaper"] = {
+				NoQuest = true,
+				Position = CFrame.new(-9519, 316, 6756)
+			},
 			["Longma"] = {
 				NoQuest = true,
 				Position = CFrame.new(-10218, 333, -9444)
