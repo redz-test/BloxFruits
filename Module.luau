@@ -1640,7 +1640,7 @@ end
 			
 			Overheat = {
 				["Dragonstorm"] = {
-					MaxOverheat = math.huge,
+					MaxOverheat = 3,
 					Cooldown = 0,
 					TotalOverheat = 0,
 					Distance = 400,
