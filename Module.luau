@@ -51,6 +51,7 @@ local hookmetamethod = (not IS_BLACKLISTED_EXECUTOR and hookmetamethod) or (func
 local hookfunction = (not IS_BLACKLISTED_EXECUTOR and hookfunction) or (function(...) return ... end)
 local sethiddenproperty: (Instance, string, any?) -> (nil) = sethiddenproperty or (function(...) return ... end)
 local setsimulationradius: (Instance, string, any?) -> (nil) = setsimulationradius or (function(...) return ... end)
+local require: (Instance, string, any?) -> (nil) = require or (function(...) return ... end)
 
 local setupvalue: (any, number, any?) -> (nil) = setupvalue or (debug and debug.setupvalue)
 local getupvalue: (any, number) -> any = getupvalue or (debug and debug.getupvalue)
