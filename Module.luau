@@ -2310,7 +2310,7 @@ end
 					return true
 				end
 			end),
-			(function(Player, Data)
+			(function(Data)
 				if Data.Level.Value > Module.GameData.MaxLevel then
 					return true
 				elseif Data.Beli.Value > 1000000000 then
@@ -2319,23 +2319,31 @@ end
 					return true
 				end
 			end),
-            (function(Player, Data)
+            (function(Data)
 				if Data.SeaEventsCleared.Value > 99999 then
 					return true
 				elseif Data.Valor.Value > 5000 then
 					return true
 				end
 			end),
-			(function(Player, Data)
+			(function(Data)
 				if Module.GameData.Sea > 1 and Data.Level.Value < 700 then
 					return true
 				elseif Module.GameData.Sea > 2 and Data.Level.Value < 1500 then
 					return true
 				end
 			end),
-            (function(Player, Data)
-				if Data.Stats.Defense.Level.Value > Module.GameData.MaxLevel or Data.Stats["Demon Fruit"].Level.Value > Module.GameData.MaxLevel or Data.Stats.Gun.Level.Value > Module.GameData.MaxLevel.Value or Data.Stats.Melee.Level.Value > Module.GameData.MaxLevel or Data.Stats.Sword.Level.Value > Module.GameData.MaxLevel then
+            (function(Data)
+				if Data.Stats.Defense.Level.Value > Module.GameData.MaxLevel then
 					return true
+                elseif Data.Stats["Demon Fruit"].Level.Value > Module.GameData.MaxLevel then 
+                    return true
+                elseif Data.Stats.Gun.Level.Value > Module.GameData.MaxLevel.Value then 
+                    return true
+                elseif Data.Stats.Melee.Level.Value > Module.GameData.MaxLevel then 
+                    return true
+                elseif Data.Stats.Sword.Level.Value > Module.GameData.MaxLevel then 
+                    return true
 				end
 			end),
 			(function(Player)
@@ -2345,7 +2353,7 @@ end
 					end
 				end
 			end),
-            (function(Player, Data)
+            (function(Data)
 				for i = 1, #BlacklistedFruits do
 					if Data.DevilFruit.Value == (BlacklistedFruits[i]) then
 						return true
