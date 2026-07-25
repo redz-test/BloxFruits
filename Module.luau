@@ -552,8 +552,8 @@ local Module = {} do
                 Quest = { 725, "Area1Quest", 2, CFrame.new(-427, 73, 1835) }
                 },
             [3] = {
-                Mobs = { "Jungle Pirate" },
-                Quest = { 1900, "DeepForestIsland2", 1, CFrame.new(-12682, 391, -9901) }
+                Mobs = { "Forest Pirate" },
+                Quest = { 1825, "DeepForestIsland", 1, CFrame.new(-13232, 332, -7628) }
                 }
             },
             ["Magma Ore"] = {
