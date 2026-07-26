@@ -1888,29 +1888,23 @@ end
 			if ShootType == "Normal" or ShootType == "Overheat" then
 				if ShootType == "Overheat" then
 					local Data = self.Overheat[Equipped.Name]
-					
-					if Data.Shooting then
-						return nil
-					end
-					
 					local Target = self:GetClosestEnemy(Character, Data.Distance or 100)
 					
 					if Target then
-						Data.Shooting = true
+						self.Debounce = tick() + 9e9
 						
-						while Equipped and Equipped.Parent == Player.Character and Data.TotalOverheat < Data.MaxOverheat do
-							if Target and Target.Parent and IsAlive(Target.Parent) then
-								Equipped:SetAttribute("LocalTotalShots", (Equipped:GetAttribute("LocalTotalShots") or 0) + 1)
-								GunValidator:FireServer(self:GetValidator2())
-								RE_ShootGunEvent:FireServer(Target.Position, { Target })
-								Data.TotalOverheat += task.wait(Data.Cooldown)
-							else
+						while Target.Parent and IsAlive(Target.Parent) and Equipped and Equipped.Parent == Player.Character do
+							if Player:DistanceFromCharacter(Target.Position) > (Data.Distance or 100) then
 								break
 							end
+							
+							Equipped:SetAttribute("LocalTotalShots", (Equipped:GetAttribute("LocalTotalShots") or 0) + 1)
+							GunValidator:FireServer(self:GetValidator2())
+							RE_ShootGunEvent:FireServer(Target.Position, { Target })
+							task.wait()
 						end
 						
-						Data.TotalOverheat = 0
-					    Data.Shooting = false
+						self.Debounce = 0
 					end
 				else
 					local Hits = self:GetGunHits(Character, 120)
@@ -1953,6 +1947,8 @@ end
 			local Character = Player.Character
 			local Humanoid = Character.Humanoid
 			
+			if not Humanoid.RootPart then return end
+			
 			local Equipped = Character:FindFirstChildOfClass("Tool")
 			local ToolTip = Equipped and Equipped.ToolTip
 			local ToolName = Equipped and Equipped.Name
@@ -1982,7 +1978,7 @@ end
 					end
 
 				elseif ToolTip == "Gun" then
-					if SUCCESS_SHOOT and SHOOT_FUNCTION then
+					if SUCCESS_SHOOT and SHOOT_FUNCTION and Settings.AutoShoot then
 						return self:UseGunShoot(Character, Equipped)
 					end
 				else
