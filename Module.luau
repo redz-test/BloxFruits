@@ -2046,7 +2046,6 @@ end
 		
 		table.insert(Connections, Stepped:Connect(function()
 			if not Settings.AutoClick or (tick() - Module.AttackCooldown) <= 1 then return end
-			if not IsAlive(Player.Character) then return end
 			
 			local self = FastAttack;
 			local Character = Player.Character;
