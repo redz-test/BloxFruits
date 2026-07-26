@@ -1909,11 +1909,8 @@ end
 							end
 						end
 						
-						while Data.TotalOverheat > 0 do
-							Data.TotalOverheat = math.clamp(Data.TotalOverheat - task.wait(), 0, Data.MaxOverheat)
-						end
-						
-						Data.Shooting = false
+						Data.TotalOverheat = 0
+					    Data.Shooting = false
 					end
 				else
 					local Hits = self:GetGunHits(Character, 120)
