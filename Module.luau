@@ -2159,6 +2159,19 @@ end
 				end
 			end
 		end
+
+        function Hooking:EnableBypass()
+			if not _ENV.enabled_bypass then
+				_ENV.enabled_bypass = true
+				
+				local old_newindex; old_newindex = hookmetamethod(Player, "__newindex", function(self, index, value)
+					if tostring(self) == "Humanoid" and index == "WalkSpeed" then
+						return old_newindex(self, "WalkSpeed", _ENV.WalkSpeedBypass or value)
+					end
+					return old_newindex(self, index, value)
+				end)
+			end
+		end
 		
 		function Hooking.UpdateClosests()
 			local SmoothDebounce = Settings.SmoothMode and 0.5 or 0.25
