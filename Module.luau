@@ -2349,7 +2349,7 @@ end
 					return true
                 elseif Data.Stats["Demon Fruit"].Level.Value > Module.GameData.MaxLevel then 
                     return true
-                elseif Data.Stats.Gun.Level.Value > Module.GameData.MaxLevel.Value then 
+                elseif Data.Stats.Gun.Level.Value > Module.GameData.MaxLevel then 
                     return true
                 elseif Data.Stats.Melee.Level.Value > Module.GameData.MaxLevel then 
                     return true
