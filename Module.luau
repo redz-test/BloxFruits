@@ -1909,8 +1909,11 @@ end
 							end
 						end
 						
-						Data.TotalOverheat = 0
-                        Data.Shooting = false
+						while Data.TotalOverheat > 0 do
+							Data.TotalOverheat = math.clamp(Data.TotalOverheat - task.wait(), 0, Data.MaxOverheat)
+						end
+						
+						Data.Shooting = false
 					end
 				else
 					local Hits = self:GetGunHits(Character, 120)
@@ -2159,19 +2162,6 @@ end
 				end
 			end
 		end
-
-        function Hooking:EnableBypass()
-			if not _ENV.enabled_bypass then
-				_ENV.enabled_bypass = true
-				
-				local old_newindex; old_newindex = hookmetamethod(Player, "__newindex", function(self, index, value)
-					if tostring(self) == "Humanoid" and index == "WalkSpeed" then
-						return old_newindex(self, "WalkSpeed", _ENV.WalkSpeedBypass or value)
-					end
-					return old_newindex(self, index, value)
-				end)
-			end
-		end
 		
 		function Hooking.UpdateClosests()
 			local SmoothDebounce = Settings.SmoothMode and 0.5 or 0.25
@@ -2349,7 +2339,7 @@ end
 					return true
                 elseif Data.Stats["Demon Fruit"].Level.Value > Module.GameData.MaxLevel then 
                     return true
-                elseif Data.Stats.Gun.Level.Value > Module.GameData.MaxLevel then 
+                elseif Data.Stats.Gun.Level.Value > Module.GameData.MaxLevel.Value then 
                     return true
                 elseif Data.Stats.Melee.Level.Value > Module.GameData.MaxLevel then 
                     return true
