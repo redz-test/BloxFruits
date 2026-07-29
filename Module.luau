@@ -1584,7 +1584,7 @@ local Module = {} do
 		
 		task.spawn(function()
 			table.insert(Connections, CommE.OnClientEvent:Connect(OnClientEvent))
-			for _, item in ipairs(Module.FireRemote("getInventory")) do Inventory:UpdateItem(item) end
+			for _, item in ipairs(Module.FireRemote("getInventoryWeapons")) do Inventory:UpdateItem(item) end
 		end)
 		
 		return Inventory
