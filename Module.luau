@@ -1673,7 +1673,7 @@ end
 		end)
 		
 		local HIT_FUNCTION; task.defer(function()			
-			if getsenv then
+			if getsenv and not IS_BLACKLISTED_EXECUTOR then
 					HIT_FUNCTION = (getmenv or getsenv)(Net)._G.SendHitsToServer
 				end
 		end)
