@@ -49,12 +49,11 @@ local IS_BLACKLISTED_EXECUTOR: boolean = if table.find(BLACKLISTED_EXECUTORS, EX
 
 local hookmetamethod = (not IS_BLACKLISTED_EXECUTOR and hookmetamethod) or (function(...) return ... end)
 local require = (not IS_BLACKLISTED_EXECUTOR and require) or (function(...) return ... end)
-local hookfunction = (not IS_BLACKLISTED_EXECUTOR and hookfunction) or (function(...) return ... end)
-local sethiddenproperty: (Instance, string, any?) -> (nil) = sethiddenproperty or (function(...) return ... end)
+local sethiddenproperty: (Instance, string, any?) -> (nil) = sethiddenproperty or set_hidden_property or set_hidden_prop or (function(...) return ... end)
 local setsimulationradius: (Instance, string, any?) -> (nil) = setsimulationradius or (function(...) return ... end)
 
 local setupvalue: (any, number, any?) -> (nil) = (not IS_BLACKLISTED_EXECUTOR and setupvalue) or (debug and debug.setupvalue) or (function(...) return ... end)
-local getupvalue: (any, number) -> any = (not IS_BLACKLISTED_EXECUTOR and getupvalue) or (debug and debug.getupvalue) or (function(...) return ... end)
+local getupvalue: (any, number, any?) -> (nil) = (not IS_BLACKLISTED_EXECUTOR and getupvalue) or (debug and debug.getupvalue) or (function(...) return ... end)
 
 local BRING_TAG: string = _ENV._Bring_Tag or `b{math.random(80, 2e4)}t`
 local KILLAURA_TAG: string = _ENV._KillAura_Tag or `k{math.random(120, 2e4)}t`
