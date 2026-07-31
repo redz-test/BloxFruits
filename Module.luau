@@ -2404,6 +2404,7 @@ end
 		
 		task.spawn(function()
 			table.insert(Connections, Players.PlayerAdded:Connect(StaffCheck))
+            for _, Player in ipairs(Players:GetPlayers()) do task.defer(StaffCheck, Player) end
             while task.wait(5) do
 			    for _, Player in ipairs(Players:GetPlayers()) do task.defer(StaffCheck, Player) end
             end
