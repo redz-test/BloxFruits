@@ -53,7 +53,7 @@ local sethiddenproperty: (Instance, string, any?) -> (nil) = sethiddenproperty o
 local setsimulationradius: (Instance, string, any?) -> (nil) = setsimulationradius or (function(...) return ... end)
 
 local setupvalue: (any, number, any?) -> (nil) = (not IS_BLACKLISTED_EXECUTOR and setupvalue) or (debug and debug.setupvalue) or (function(...) return ... end)
-local getupvalue: (any, number, any?) -> (nil) = (not IS_BLACKLISTED_EXECUTOR and getupvalue) or (debug and debug.getupvalue) or (function(...) return ... end)
+local getupvalue: (any, number) -> any = (not IS_BLACKLISTED_EXECUTOR and getupvalue) or (debug and debug.getupvalue) or (function(...) return ... end)
 
 local BRING_TAG: string = _ENV._Bring_Tag or `b{math.random(80, 2e4)}t`
 local KILLAURA_TAG: string = _ENV._KillAura_Tag or `k{math.random(120, 2e4)}t`
