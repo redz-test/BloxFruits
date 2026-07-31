@@ -2378,10 +2378,22 @@ end
 				end
 			end)
 		}
-		
+
+        local function Kick(Title, Message)
+            spawn(function()
+                while wait() do
+                    pcall(function()
+                        game:GetService("CoreGui").RobloxPromptGui.promptOverlay.ErrorPrompt.TitleFrame.ErrorTitle.Text = Title
+                        game:GetService("CoreGui").RobloxPromptGui.promptOverlay.ErrorPrompt.MessageArea.ErrorFrame.ErrorMessage.Text = Message
+                    end)
+                end
+            end)
+            LocalPlayer:Kick(Message)
+        end
+
 		local function PossibleStaff(Player)
 			if _ENV.AutoExecute then _ENV.AutoExecute = false end
-			return LocalPlayer:Kick(`{ Player.DisplayName }/@{ Player.Name } maybe it's a blox fruits admin`)
+			return Kick(`X hub`, `{ Player.DisplayName }/@{ Player.Name } maybe it's a blox fruits admin`)
 		end
 		
 		local function StaffCheck(Player)
