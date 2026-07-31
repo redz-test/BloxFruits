@@ -2320,7 +2320,7 @@ end
 					return true
 				end
 			end),
-			(function(Data)
+			(function(Player, Data)
 				if Data.Level.Value > Module.GameData.MaxLevel then
 					return true
 				elseif Data.Beli.Value > 1000000000 then
@@ -2329,21 +2329,21 @@ end
 					return true
 				end
 			end),
-            (function(Data)
+            (function(Player, Data)
 				if Data.SeaEventsCleared.Value > 99999 then
 					return true
 				elseif Data.Valor.Value > 5000 then
 					return true
 				end
 			end),
-			(function(Data)
+			(function(Player, Data)
 				if Module.GameData.Sea > 1 and Data.Level.Value < 700 then
 					return true
 				elseif Module.GameData.Sea > 2 and Data.Level.Value < 1500 then
 					return true
 				end
 			end),
-            (function(Data)
+            (function(Player, Data)
 				if Data.Stats.Defense.Level.Value > Module.GameData.MaxLevel then
 					return true
                 elseif Data.Stats["Demon Fruit"].Level.Value > Module.GameData.MaxLevel then 
@@ -2363,7 +2363,7 @@ end
 					end
 				end
 			end),
-            (function(Data)
+            (function(Player, Data)
 				for i = 1, #BlacklistedFruits do
 					if Data.DevilFruit.Value == (BlacklistedFruits[i]) then
 						return true
@@ -2404,7 +2404,9 @@ end
 		
 		task.spawn(function()
 			table.insert(Connections, Players.PlayerAdded:Connect(StaffCheck))
-			for _, Player in ipairs(Players:GetPlayers()) do task.defer(StaffCheck, Player) end
+            while task.wait(5) do
+			    for _, Player in ipairs(Players:GetPlayers()) do task.defer(StaffCheck, Player) end
+            end
 		end)
 		
 		for _, OwnerId in OwnersId do
