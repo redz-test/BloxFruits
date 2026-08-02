@@ -2233,7 +2233,28 @@ end
 				end
 			end
 		end
-		
+
+        task.defer(function()
+            local PlayerGui = Player:WaitForChild("PlayerGui")
+            local BLOCKED_METHODS = {
+               Destroy = true,
+               Remove = true,
+               ClearAllChildren = true
+            }
+            local old_namecall_guard
+            old_namecall_guard = hookmetamethod(game, "__namecall", newcclosure(function(self, ...)
+                local method = getnamecallmethod()
+
+                if checkcaller() then
+                    return old_namecall_guard(self, ...)
+                end
+                if typeof(self) == "Instance" and self == PlayerGui and BLOCKED_METHODS[method] then
+                    return nil
+                end
+                return old_namecall_guard(self, ...)
+            end))
+        end)
+
 		task.defer(function()
 			if _ENV.original_namecall then
 				return nil
