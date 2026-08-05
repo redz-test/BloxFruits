@@ -251,11 +251,12 @@ local Module = {} do
 		Enemies = {}, -- setmetatable({}, CreateNewClear()),
 		Progress = {},
 		Bring = {},
+        Inventory = {},
 		Tools = {}
 	}
 	
 	Module.GameData = {
-		Sea =  detectSea(game.PlaceId),
+		Sea = detectSea(game.PlaceId),
 		SeasName = { "Main", "Dressrosa", "Zou" },
 		MaxMastery = 600,
 		MaxLevel = game.Workspace:GetAttribute("LEVEL_CAP")
@@ -1535,59 +1536,109 @@ local Module = {} do
 	end)()
 	
 	Module.Inventory = (function()
-		local Inventory = {
-			Unlocked = setmetatable({}, { __index = function() return false end }),
-			Mastery = setmetatable({}, { __index = function() return 0 end }),
-			Count = setmetatable({}, { __index = function() return 0 end }),
-			MasteryRequirements = {},
-			Items = {},
-		}
+        local Inventory = {
+            Unlocked = setmetatable({}, { __index = function() return false end }),
+            Mastery = setmetatable({}, { __index = function() return 0 end }),
+            Count = setmetatable({}, { __index = function() return 0 end }),
+            MasteryRequirements = {},
+            Items = {},
+        }
+    
+        local function getInventory()
+            local ItemReplicationService = require(ReplicatedStorage:WaitForChild("ItemReplicationService"))
+            local ItemsId = require(ReplicatedStorage:WaitForChild("Economy"):WaitForChild("ItemId"))
+        
+            local RawData = ItemReplicationService:GetItems()
+		    local Items = Cached.Inventory
+        
+            for _, pack in ipairs(RawData) do
+                local id = pack.ItemId
+                if id then
+                    local success, info = pcall(function() return ItemsId.getDataFromId(id):unwrap() end)
+                    if success and info then
+                        local ItemName = info.StorageKey or info.Name
+                    
+                        if not Items[ItemName] then
+                            Items[ItemName] = {
+                                Name = ItemName,
+                                Type = info.Type,
+                                ItemId = id,
+                                Count = 0,
+                                Owned = false
+                            }
+                        end
+                    
+                        local slot = Items[ItemName]
+                    
+                        if pack.Key == "Quantity" then
+                            slot.Count = tonumber(pack.Value) or 1
+                            slot.Owned = true
+                        elseif pack.Key == "IsOwned" and pack.Value == true then
+                            slot.Owned = true
+                            if slot.Count == 0 then slot.Count = 1 end
+                        elseif pack.Key == "Mastery" then
+                            slot.Mastery = tonumber(pack.Value) or 0
+                        end
+                    end
+                end
+            end
+        
+            local result = {}
+            for _, item in pairs(Items) do
+                if item.Owned then
+                    table.insert(result, item)
+                end
+            end
+        
+            return result
+        end
+    
+        function Inventory:UpdateItem(item)
+	        if type(item) == "table" and item.Name then
+		        if item.Type == "Wear" then item.Type = "Accessory" end
 		
-		function Inventory:UpdateItem(item)
-			if type(item) == "table" then
-				if item.Type == "Wear" then
-					item.Type = "Accessory"
-				end
-				
-				local Name = item.Name
-				
-				self.Items[Name] = item
-				
-				if not self.Unlocked[Name] then self.Unlocked[Name] = true end
-				if item.Count then self.Count[Name] = item.Count end
-				if item.Mastery then self.Mastery[Name] = item.Mastery end
-				if item.MasteryRequirements then self.MasteryRequirements[Name] = item.MasteryRequirements end
-			end
-		end
+		        local Name = item.Name
 		
-		function Inventory:RemoveItem(ItemName)
-			if type(ItemName) == "string" then
-				self.Unlocked[ItemName] = nil
-				self.Mastery[ItemName] = nil
-				self.Count[ItemName] = nil
-				self.Items[ItemName] = nil
-			end
-		end
+		        self.Items[Name] = item
+		        self.Unlocked[Name] = (item.Owned ~= nil) and item.Owned or true
 		
-		local function OnClientEvent(Method, ...)
-			if Method == "ItemChanged" then
-				Inventory:UpdateItem(...)
-			elseif Method == "ItemAdded" then
-				Inventory:UpdateItem(...)
-			elseif Method == "ItemRemoved" then
-				Inventory:RemoveItem(...)
-			elseif Method == "Notify" then
-				Module.Signals.Notify:Fire(...)
-			end
-		end
-		
-		task.spawn(function()
-			table.insert(Connections, CommE.OnClientEvent:Connect(OnClientEvent))
-			for _, item in ipairs(Module.FireRemote("getInventoryWeapons")) do Inventory:UpdateItem(item) end
-		end)
-		
-		return Inventory
-	end)()
+		        if item.Count ~= nil then self.Count[Name] = tonumber(item.Count) or item.Count end
+		        if item.Mastery ~= nil then self.Mastery[Name] = tonumber(item.Mastery) or item.Mastery end
+		       if item.MasteryRequirements ~= nil then self.MasteryRequirements[Name] = item.MasteryRequirements end
+	       end
+        end
+    
+        function Inventory:RemoveItem(ItemName)
+            if type(ItemName) == "string" then
+                self.Unlocked[ItemName] = nil
+                self.Mastery[ItemName] = nil
+                self.Count[ItemName] = nil
+                self.Items[ItemName] = nil
+            end
+        end
+    
+        local function OnClientEvent(Method, ...)
+            if Method == "ItemChanged" then
+                Inventory:UpdateItem(...)
+            elseif Method == "ItemAdded" then
+                Inventory:UpdateItem(...)
+            elseif Method == "ItemRemoved" then
+                Inventory:RemoveItem(...)
+            elseif Method == "Notify" then
+                Module.Signals.Notify:Fire(...)
+            end
+        end
+    
+        task.spawn(function()
+            table.insert(Connections, CommE.OnClientEvent:Connect(OnClientEvent))
+
+            for _, item in ipairs(getInventory()) do 
+                Inventory:UpdateItem(item) 
+            end
+        end)
+    
+        return Inventory
+    end)()
 
    do
     local SkillCooldown = {}
