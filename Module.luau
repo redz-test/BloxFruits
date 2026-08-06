@@ -906,40 +906,39 @@ local Module = {} do
 
     function Module.UseSkills(Target: any?, Skills: table?): (nil)
         if Player:DistanceFromCharacter(Target.Position) >= 60 then
-			return nil
-		end
-		
-		local Equipped = Player.Character and Player.Character:FindFirstChildOfClass("Tool")
-		local MasteryRequirements = Module.Inventory.MasteryRequirements
-		
-		if Equipped then
-			local Level = Equipped:GetAttribute("Level") or 0
-			local Mastery = MasteryRequirements[Equipped.Name]
-			
-			if Mastery == nil and Equipped:FindFirstChild("Data") then
-				local Success, Requirements = pcall(require, Equipped.Data)
-				
-				if Success and type(Requirements) == "table" then
-					MasteryRequirements[Equipped.Name] = Requirements.Lvl or false
-				else
-					MasteryRequirements[Equipped.Name] = false
-				end
-			end
-			
-			for Skill, Enabled in Skills do
-				if Mastery and not Mastery[Skill] then continue end
-				if Mastery and Level < Mastery[Skill] then continue end
-				
-				local Debounce = Module.Debounce.Skills[Skill]
-				
-				if Enabled and (not Debounce or (tick() - Debounce) >= HIDDEN_SETTINGS.SKILL_COOLDOWN) then
-					VirtualInputManager:SendKeyEvent(true, Skill, false, game)
-					VirtualInputManager:SendKeyEvent(false, Skill, false, game)
-					Module.Debounce.Skills[Skill] = tick()
-				end
-			end
-		end
-	end
+            return nil
+        end
+        
+        local Equipped = Player.Character and Player.Character:FindFirstChildOfClass("Tool")
+        
+        if Equipped then
+            local Level = Equipped:GetAttribute("Level") or 0
+            
+            local Data = Equipped:FindFirstChild("Data")
+            local Requirements = false
+            
+            if Data then
+                local Success, RequirementsData = pcall(require, Data)
+                if Success and type(RequirementsData) == "table" then
+                    Requirements = RequirementsData.Lvl or false
+                end
+            end
+            
+            for Skill, Enabled in Skills do
+                if Requirements and Requirements[Skill] and Level < Requirements[Skill] then 
+                    continue 
+                end
+                
+                local Debounce = Module.Debounce.Skills[Skill]
+                
+                if Enabled and (not Debounce or (tick() - Debounce) >= HIDDEN_SETTINGS.SKILL_COOLDOWN) then
+                    VirtualInputManager:SendKeyEvent(true, Skill, false, game)
+                    VirtualInputManager:SendKeyEvent(false, Skill, false, game)
+                    Module.Debounce.Skills[Skill] = tick()
+                end
+            end
+        end
+    end
 
 	function Module.Rejoin(): (nil)
 		TeleportService:TeleportToPlaceInstance(game.PlaceId, game.JobId, player)
@@ -1538,9 +1537,7 @@ local Module = {} do
 	Module.Inventory = (function()
         local Inventory = {
             Unlocked = setmetatable({}, { __index = function() return false end }),
-            Mastery = setmetatable({}, { __index = function() return 0 end }),
             Count = setmetatable({}, { __index = function() return 0 end }),
-            MasteryRequirements = {},
             Items = {},
         }
     
@@ -1552,32 +1549,30 @@ local Module = {} do
 		    local Items = Cached.Inventory
         
             for _, pack in ipairs(RawData) do
-                local id = pack.ItemId
-                if id then
-                    local success, info = pcall(function() return ItemsId.getDataFromId(id):unwrap() end)
-                    if success and info then
-                        local ItemName = info.StorageKey or info.Name
+                local Id = pack.ItemId
+                if Id then
+                    local Success, Info = pcall(function() return ItemsId.getDataFromId(Id):unwrap() end)
+                    if Success and Info then
+                        local ItemName = Info.StorageKey or Info.Name
                     
                         if not Items[ItemName] then
                             Items[ItemName] = {
                                 Name = ItemName,
-                                Type = info.Type,
-                                ItemId = id,
+                                Type = Info.Type,
+                                ItemId = Id,
                                 Count = 0,
                                 Owned = false
                             }
                         end
                     
-                        local slot = Items[ItemName]
+                        local Slot = Items[ItemName]
                     
                         if pack.Key == "Quantity" then
-                            slot.Count = tonumber(pack.Value) or 1
-                            slot.Owned = true
+                            Slot.Count = tonumber(pack.Value) or 1
+                            Slot.Owned = true
                         elseif pack.Key == "IsOwned" and pack.Value == true then
-                            slot.Owned = true
-                            if slot.Count == 0 then slot.Count = 1 end
-                        elseif pack.Key == "Mastery" then
-                            slot.Mastery = tonumber(pack.Value) or 0
+                            Slot.Owned = true
+                            if Slot.Count == 0 then Slot.Count = 1 end
                         end
                     end
                 end
@@ -1603,15 +1598,12 @@ local Module = {} do
 		        self.Unlocked[Name] = (item.Owned ~= nil) and item.Owned or true
 		
 		        if item.Count ~= nil then self.Count[Name] = tonumber(item.Count) or item.Count end
-		        if item.Mastery ~= nil then self.Mastery[Name] = tonumber(item.Mastery) or item.Mastery end
-		       if item.MasteryRequirements ~= nil then self.MasteryRequirements[Name] = item.MasteryRequirements end
-	       end
+	        end
         end
     
         function Inventory:RemoveItem(ItemName)
             if type(ItemName) == "string" then
                 self.Unlocked[ItemName] = nil
-                self.Mastery[ItemName] = nil
                 self.Count[ItemName] = nil
                 self.Items[ItemName] = nil
             end
