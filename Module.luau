@@ -1537,8 +1537,9 @@ local Module = {} do
 	Module.Inventory = (function()
         local Inventory = {
             Unlocked = setmetatable({}, { __index = function() return false end }),
+            Mastery = setmetatable({}, { __index = function() return 0 end }),
             Count = setmetatable({}, { __index = function() return 0 end }),
-            Items = {},
+            Items = {}
         }
     
         local function getInventory()
@@ -1598,6 +1599,7 @@ local Module = {} do
 		        self.Unlocked[Name] = (item.Owned ~= nil) and item.Owned or true
 		
 		        if item.Count ~= nil then self.Count[Name] = tonumber(item.Count) or item.Count end
+                if item.Mastery ~= nil then self.Mastery[Name] = tonumber(item.Mastery) or item.Mastery end
 	        end
         end
     
