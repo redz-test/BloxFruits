@@ -1510,7 +1510,9 @@ local Module = {} do
 			local Humanoid = Enemy:FindFirstChild("Humanoid")
 			local RootPart = Enemy:FindFirstChild("HumanoidRootPart")
 			
-			pcall(sethiddenproperty, Player, "SimulationRadius", math.huge)
+			pcall(setsimulationradius, 9e9, 9e9)
+            pcall(sethiddenproperty, Player, "SimulationRadius", 9e9)
+		    pcall(sethiddenproperty, Player, "MaxSimulationRadius", 9e9)
 			
 			if Humanoid and RootPart then
 				RootPart.CanCollide = false
