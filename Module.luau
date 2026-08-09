@@ -1897,29 +1897,29 @@ end
 		end
 		
 		function FastAttack:GetValidator2()
-			local v1 = getupvalue(SHOOT_FUNCTION, 15) -- v40, 15
-			local v2 = getupvalue(SHOOT_FUNCTION, 13) -- v41, 13
-			local v3 = getupvalue(SHOOT_FUNCTION, 16) -- v42, 16
-			local v4 = getupvalue(SHOOT_FUNCTION, 17) -- v43, 17
-			local v5 = getupvalue(SHOOT_FUNCTION, 14) -- v44, 14
-			local v6 = getupvalue(SHOOT_FUNCTION, 12) -- v45, 12
-			local v7 = getupvalue(SHOOT_FUNCTION, 18) -- v46, 18
+			local v1 = getupvalue(SHOOT_FUNCTION, 16) -- v23
+			local v2 = getupvalue(SHOOT_FUNCTION, 14) -- v24
+			local v3 = getupvalue(SHOOT_FUNCTION, 17) -- v25
+			local v4 = getupvalue(SHOOT_FUNCTION, 18) -- v26
+			local v5 = getupvalue(SHOOT_FUNCTION, 15) -- v27
+			local v6 = getupvalue(SHOOT_FUNCTION, 13) -- v28 (число, а не Instance!)
+			local v7 = getupvalue(SHOOT_FUNCTION, 19) -- v29 (счётчик)
 			
-			local v8 = v6 * v2									-- v133
-			local v9 = (v5 * v2 + v6 * v1) % v3 -- v134
+			local v8 = v6 * v2
+			local v9 = (v5 * v2 + v6 * v1) % v3
 			
 			v9 = (v9 * v3 + v8) % v4
 			v5 = math.floor(v9 / v3)
 			v6 = v9 - v5 * v3
 			v7 = v7 + 1
 			
-			setupvalue(SHOOT_FUNCTION, 15, v1) -- v40, 15
-			setupvalue(SHOOT_FUNCTION, 13, v2) -- v41, 13
-			setupvalue(SHOOT_FUNCTION, 16, v3) -- v42, 16
-			setupvalue(SHOOT_FUNCTION, 17, v4) -- v43, 17
-			setupvalue(SHOOT_FUNCTION, 14, v5) -- v44, 14
-			setupvalue(SHOOT_FUNCTION, 12, v6) -- v45, 12
-			setupvalue(SHOOT_FUNCTION, 18, v7) -- v46, 18
+			setupvalue(SHOOT_FUNCTION, 16, v1)
+			setupvalue(SHOOT_FUNCTION, 14, v2)
+			setupvalue(SHOOT_FUNCTION, 17, v3)
+			setupvalue(SHOOT_FUNCTION, 18, v4)
+			setupvalue(SHOOT_FUNCTION, 15, v5)
+			setupvalue(SHOOT_FUNCTION, 13, v6)
+			setupvalue(SHOOT_FUNCTION, 19, v7)
 			
 			return math.floor(v9 / v4 * 16777215), v7
 		end
