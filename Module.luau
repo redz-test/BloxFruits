@@ -1902,8 +1902,8 @@ end
 			local v3 = getupvalue(SHOOT_FUNCTION, 17) -- v25
 			local v4 = getupvalue(SHOOT_FUNCTION, 18) -- v26
 			local v5 = getupvalue(SHOOT_FUNCTION, 15) -- v27
-			local v6 = getupvalue(SHOOT_FUNCTION, 13) -- v28 (число, а не Instance!)
-			local v7 = getupvalue(SHOOT_FUNCTION, 19) -- v29 (счётчик)
+			local v6 = getupvalue(SHOOT_FUNCTION, 13) -- v28
+			local v7 = getupvalue(SHOOT_FUNCTION, 19) -- v29
 			
 			local v8 = v6 * v2
 			local v9 = (v5 * v2 + v6 * v1) % v3
