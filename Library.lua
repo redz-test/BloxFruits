@@ -1468,174 +1468,67 @@ function redzlib:GetIcon(index)
 end
 
 function redzlib:SetTheme(NewTheme)
-	if not VerifyTheme(NewTheme) then return end
+	local SelectedTheme = redzlib.Themes[NewTheme]
+	if not SelectedTheme then return end
 		
 	redzlib.Save.Theme = NewTheme
-	SaveJson("redz library V7.json", redzlib.Save)
-	Theme = redzlib.Themes[NewTheme]
+	pcall(function() SaveJson("redz library V7.json", redzlib.Save) end)
+	Theme = SelectedTheme
 
-	
 	pcall(function()
-		if Comnection and type(Comnection.FireConnection) == "function" then
-			Comnection:FireConnection("ThemeChanged", NewTheme)
+		if Connection and type(Connection.FireConnection) == "function" then
+			Connection:FireConnection("ThemeChanged", NewTheme)
 		end
 	end)
-		
-	local function safeSetProperty(inst, propName, value)
-		if not inst then return false end
-		
-		local ok, err = pcall(function()
-			inst[propName] = value
-		end)
-		return ok, err
-	end
 
-	local function convertToColorSequence(v)
+	for _, ElementData in ipairs(redzlib.Instances) do
+		local UI = ElementData.Instance
 		
-		if typeof(v) == "ColorSequence" then
-			return v
-		end
-		
-		if typeof(v) == "Color3" then
-			return ColorSequence.new({ ColorSequenceKeypoint.new(0, v), ColorSequenceKeypoint.new(1, v) })
-		end
-		
-		return nil
-	end
+		if not UI then continue end
 
-	
-	table.foreach(redzlib.Instances, function(_, Val)
-		
-		if type(Val) ~= "table" then return end
-		local inst = Val.Instance
-		if not inst or not inst.Parent then return end
+		local Types = type(ElementData.Type) == "table" and ElementData.Type or {ElementData.Type}
 
-		local typesList = {}
-		if type(Val.Type) == "string" then
-			typesList[1] = Val.Type
-		elseif type(Val.Type) == "table" then
-			for _, t in ipairs(Val.Type) do
-				if type(t) == "string" then table.insert(typesList, t) end
-			end
-		end
-
-		if type(GetColor) == "function" then
-			
-			local ok, res = pcall(function() return GetColor(inst) end)
-			if ok and type(res) == "string" then
-				propName = res
-			end
-		end
-		
-		for _, t in ipairs(typesList) do
-			if t == "Gradient" then
-				
-				local themeVal = Theme["Color Hub 1"]
-				local cs = convertToColorSequence(themeVal)
-				if cs then
+		for _, UIType in ipairs(Types) do
+			pcall(function()
+				if UIType == "Gradient" and UI:IsA("UIGradient") then
+					local color = SelectedTheme["Color Hub 1"]
+					UI.Color = typeof(color) == "ColorSequence" and color or ColorSequence.new(color)
 					
-					if inst:IsA("UIGradient") or inst:IsA("Gradient") or inst:FindFirstChild("Color") or inst.Color then
-						
-						pcall(function()
-							
-							if typeof(inst.Color) == "ColorSequence" then
-								inst.Color = cs
-							else
-								
-								inst.Color = cs
-							end
-						end)
+				elseif UIType == "Frame" or UIType == "Hub2" then
+					UI.BackgroundColor3 = SelectedTheme["Color Hub 2"]
+					
+				elseif UIType == "Stroke" and UI:IsA("UIStroke") then
+					UI.Color = SelectedTheme["Color Stroke"]
+					
+				elseif UIType == "Theme" then
+					if UI:IsA("ImageLabel") or UI:IsA("ImageButton") then
+						UI.ImageColor3 = SelectedTheme["Color Theme"]
 					else
-						safeSetProperty(inst, "Color", cs)
+						UI.BackgroundColor3 = SelectedTheme["Color Theme"]
+					end
+					
+				elseif UIType == "ScrollBar" and UI:IsA("ScrollingFrame") then
+					UI.ScrollBarImageColor3 = SelectedTheme["Color Theme"]
+					
+				elseif UIType == "Text" then
+					if UI:IsA("ImageLabel") or UI:IsA("ImageButton") then
+						UI.ImageColor3 = SelectedTheme["Color Text"]
+					else
+						UI.TextColor3 = SelectedTheme["Color Text"]
+					end
+					
+				elseif UIType == "DarkText" then
+					if UI:IsA("ImageLabel") or UI:IsA("ImageButton") then
+						UI.ImageColor3 = SelectedTheme["Color Dark Text"]
+					else
+						UI.TextColor3 = SelectedTheme["Color Dark Text"]
 					end
 				end
-
-			elseif t == "Frame" then
-				local themeVal = Theme["Color Hub 2"]
-				
-				pcall(function()
-					if typeof(inst.BackgroundColor3) == "Color3" then
-						inst.BackgroundColor3 = themeVal
-					else
-						safeSetProperty(inst, "BackgroundColor3", themeVal)
-					end
-				end)
-
-			elseif t == "Stroke" then
-				local themeVal = Theme["Color Stroke"]
-				if propName and type(propName) == "string" then
-					safeSetProperty(inst, propName, themeVal)
-				else
-					
-					pcall(function()
-						if inst:IsA("UIStroke") then
-							inst.Color = themeVal
-						else
-							
-							inst.Color = themeVal
-						end
-					end)
-				end
-
-			elseif t == "Theme" or t == "ScrollBar" then
-				local themeVal = Theme["Color Theme"]
-				if propName and type(propName) == "string" then
-					safeSetProperty(inst, propName, themeVal)
-				else
-					pcall(function()
-						if typeof(inst.BackgroundColor3) == "Color3" then
-							inst.BackgroundColor3 = themeVal
-						elseif typeof(inst.ImageColor3) == "Color3" then
-							inst.ImageColor3 = themeVal
-						elseif inst:IsA("ScrollingFrame") and inst:FindFirstChild("ScrollBar") then
-							
-						else
-							
-							if rawget(inst, "BackgroundColor3") ~= nil then inst.BackgroundColor3 = themeVal end
-							if rawget(inst, "ImageColor3") ~= nil then inst.ImageColor3 = themeVal end
-						end
-					end)
-				end
-
-			elseif t == "Text" then
-				local themeVal = Theme["Color Text"]
-				if propName and type(propName) == "string" then
-					safeSetProperty(inst, propName, themeVal)
-				else
-					pcall(function()
-						if typeof(inst.TextColor3) == "Color3" then
-							inst.TextColor3 = themeVal
-						else
-							safeSetProperty(inst, "TextColor3", themeVal)
-						end
-					end)
-				end
-
-			elseif t == "DarkText" then
-				local themeVal = Theme["Color Dark Text"]
-				if propName and type(propName) == "string" then
-					safeSetProperty(inst, propName, themeVal)
-				else
-					pcall(function()
-						if typeof(inst.TextColor3) == "Color3" then
-							inst.TextColor3 = themeVal
-						else
-							safeSetProperty(inst, "TextColor3", themeVal)
-						end
-					end)
-				end
-			else
-				pcall(function()
-					if Theme["Color Text"] and rawget(inst, "TextColor3") ~= nil then inst.TextColor3 = Theme["Color Text"] end
-					if Theme["Color Hub 2"] and rawget(inst, "BackgroundColor3") ~= nil then inst.BackgroundColor3 = Theme["Color Hub 2"] end
-					if Theme["Color Theme"] and rawget(inst, "ImageColor3") ~= nil then inst.ImageColor3 = Theme["Color Theme"] end
-				end)
-			end
+			end)
 		end
-	end)
+	end
 end
-
-
+	
 function redzlib:SetScale(NewScale)
 	NewScale = ViewportSize.Y / math.clamp(NewScale, 300, 2000)
 	UIScale, ScreenGui.Scale.Scale = NewScale, NewScale
