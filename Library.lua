@@ -1346,9 +1346,9 @@ AddEle("Gradient", function(parent, props, ...)
 	return New
 end)
 
-local function ButtonFrame(InstanceObj, TitleText, DescriptionText, HolderSize)
+local function ButtonFrame(Instance, Title, Description, HolderSize)
 	local TitleL = InsertTheme(Create("TextLabel", {
-		Font = Enum.Font.GothamMedium,
+		Font = Enum.Font.BuilderSansMedium, 
 		TextColor3 = Theme["Color Text"],
 		Size = UDim2.new(1, -20),
 		AutomaticSize = "Y",
@@ -1363,7 +1363,7 @@ local function ButtonFrame(InstanceObj, TitleText, DescriptionText, HolderSize)
 	}), "Text")
 	
 	local DescL = InsertTheme(Create("TextLabel", {
-		Font = Enum.Font.Gotham,
+		Font = Enum.Font.BuilderSans, 
 		TextColor3 = Theme["Color Dark Text"],
 		Size = UDim2.new(1, -20),
 		AutomaticSize = "Y",
@@ -1373,10 +1373,10 @@ local function ButtonFrame(InstanceObj, TitleText, DescriptionText, HolderSize)
 		TextSize = 8,
 		TextXAlignment = "Left",
 		Text = "",
-		RichText = false 
+		RichText = false
 	}), "DarkText")
 
-	local Frame = Make("Button", InstanceObj, {
+	local Frame = Make("Button", Instance, {
 		Size = UDim2.new(1, 0, 0, 25),
 		AutomaticSize = "Y",
 		Name = "Option"
@@ -1403,13 +1403,13 @@ local function ButtonFrame(InstanceObj, TitleText, DescriptionText, HolderSize)
 		DescL,
 	})
 	
-	local LabelController = {}
-	function LabelController:SetTitle(NewTitle)
+	local Label = {}
+	function Label:SetTitle(NewTitle)
 		if type(NewTitle) == "string" and NewTitle:gsub(" ", ""):len() > 0 then
 			TitleL.Text = NewTitle
 		end
 	end
-	function LabelController:SetDesc(NewDesc)
+	function Label:SetDesc(NewDesc)
 		if type(NewDesc) == "string" and NewDesc:gsub(" ", ""):len() > 0 then
 			DescL.Visible = true
 			DescL.Text = NewDesc
@@ -1423,9 +1423,9 @@ local function ButtonFrame(InstanceObj, TitleText, DescriptionText, HolderSize)
 		end
 	end
 	
-	LabelController:SetTitle(TitleText)
-	LabelController:SetDesc(DescriptionText)
-	return Frame, LabelController
+	Label:SetTitle(Title)
+	Label:SetDesc(Description)
+	return Frame, Label
 end
 
 local function GetColor(Instance)
@@ -1701,7 +1701,7 @@ function redzlib:MakeWindow(Configs)
 		TextSize = 12,
 		TextColor3 = Theme["Color Text"],
 		BackgroundTransparency = 1,
-		Font = Enum.Font.GothamBold,
+		Font = Enum.Font.BuilderSansBold, 
 		Name = "Title"
 	}, {
 		InsertTheme(Create("TextLabel", {
@@ -1714,8 +1714,8 @@ function redzlib:MakeWindow(Configs)
 			BackgroundTransparency = 1,
 			TextXAlignment = "Left",
 			TextYAlignment = "Bottom",
-			TextSize = 8,
-			Font = Enum.Font.GothamMedium,
+			TextSize = 8, 
+			Font = Enum.Font.BuilderSansMedium, 
 			Name = "SubTitle"
 		}), "DarkText")
 	}), "Text")
