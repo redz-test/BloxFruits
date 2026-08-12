@@ -1,5 +1,6 @@
 local UserInputService = game:GetService("UserInputService")
 local TweenService = game:GetService("TweenService")
+local TextService = game:GetService("TextService")
 local HttpService = game:GetService("HttpService")
 local Players = game:GetService("Players")
 
@@ -94,18 +95,6 @@ local redzlib = {
 			["Color Text"] = Color3.fromRGB(243, 243, 243),
 			["Color Dark Text"] = Color3.fromRGB(180, 180, 180)
 		},
-		Purple = {
-			["Color Hub 1"] = ColorSequence.new({
-				ColorSequenceKeypoint.new(0.00, Color3.fromRGB(27.5, 25, 30)),
-				ColorSequenceKeypoint.new(0.50, Color3.fromRGB(32.5, 32.5, 32.5)),
-				ColorSequenceKeypoint.new(1.00, Color3.fromRGB(27.5, 25, 30))
-			}),
-			["Color Hub 2"] = Color3.fromRGB(30, 30, 30),
-			["Color Stroke"] = Color3.fromRGB(40, 40, 40),
-			["Color Theme"] = Color3.fromRGB(150, 0, 255),
-			["Color Text"] = Color3.fromRGB(240, 240, 240),
-			["Color Dark Text"] = Color3.fromRGB(180, 180, 180)
-		},
         White = {
 			["Color Hub 1"] = ColorSequence.new({
 				ColorSequenceKeypoint.new(0.00, Color3.fromRGB(25, 25, 25)),
@@ -116,6 +105,18 @@ local redzlib = {
 			["Color Stroke"] = Color3.fromRGB(40, 40, 40),
 			["Color Theme"] = Color3.fromRGB(255, 255, 255),
 			["Color Text"] = Color3.fromRGB(243, 243, 243),
+			["Color Dark Text"] = Color3.fromRGB(180, 180, 180)
+		},
+		Purple = {
+			["Color Hub 1"] = ColorSequence.new({
+				ColorSequenceKeypoint.new(0.00, Color3.fromRGB(27.5, 25, 30)),
+				ColorSequenceKeypoint.new(0.50, Color3.fromRGB(32.5, 32.5, 32.5)),
+				ColorSequenceKeypoint.new(1.00, Color3.fromRGB(27.5, 25, 30))
+			}),
+			["Color Hub 2"] = Color3.fromRGB(30, 30, 30),
+			["Color Stroke"] = Color3.fromRGB(40, 40, 40),
+			["Color Theme"] = Color3.fromRGB(150, 0, 255),
+			["Color Text"] = Color3.fromRGB(240, 240, 240),
 			["Color Dark Text"] = Color3.fromRGB(180, 180, 180)
 		}
 	},
@@ -1348,7 +1349,7 @@ end)
 
 local function ButtonFrame(Instance, Title, Description, HolderSize)
 	local TitleL = InsertTheme(Create("TextLabel", {
-		Font = Enum.Font.BuilderSansMedium, 
+		Font = Enum.Font.GothamMedium,
 		TextColor3 = Theme["Color Text"],
 		Size = UDim2.new(1, -20),
 		AutomaticSize = "Y",
@@ -1359,11 +1360,11 @@ local function ButtonFrame(Instance, Title, Description, HolderSize)
 		TextSize = 10,
 		TextXAlignment = "Left",
 		Text = "",
-		RichText = false
+		RichText = true
 	}), "Text")
 	
 	local DescL = InsertTheme(Create("TextLabel", {
-		Font = Enum.Font.BuilderSans, 
+		Font = Enum.Font.Gotham,
 		TextColor3 = Theme["Color Dark Text"],
 		Size = UDim2.new(1, -20),
 		AutomaticSize = "Y",
@@ -1373,17 +1374,16 @@ local function ButtonFrame(Instance, Title, Description, HolderSize)
 		TextSize = 8,
 		TextXAlignment = "Left",
 		Text = "",
-		RichText = false
+		RichText = true
 	}), "DarkText")
 
 	local Frame = Make("Button", Instance, {
 		Size = UDim2.new(1, 0, 0, 25),
 		AutomaticSize = "Y",
 		Name = "Option"
-	})
-	Make("Corner", Frame, UDim.new(0, 6))
+	})Make("Corner", Frame, UDim.new(0, 6))
 	
-	local LabelHolder = Create("Frame", Frame, {
+	LabelHolder = Create("Frame", Frame, {
 		AutomaticSize = "Y",
 		BackgroundTransparency = 1,
 		Size = HolderSize,
@@ -1701,7 +1701,7 @@ function redzlib:MakeWindow(Configs)
 		TextSize = 12,
 		TextColor3 = Theme["Color Text"],
 		BackgroundTransparency = 1,
-		Font = Enum.Font.BuilderSansBold, 
+		Font = Enum.Font.GothamBold,
 		Name = "Title"
 	}, {
 		InsertTheme(Create("TextLabel", {
@@ -1714,8 +1714,8 @@ function redzlib:MakeWindow(Configs)
 			BackgroundTransparency = 1,
 			TextXAlignment = "Left",
 			TextYAlignment = "Bottom",
-			TextSize = 8, 
-			Font = Enum.Font.BuilderSansMedium, 
+			TextSize = 8,
+			Font = Enum.Font.GothamMedium,
 			Name = "SubTitle"
 		}), "DarkText")
 	}), "Text")
@@ -1988,324 +1988,325 @@ function redzlib:MakeWindow(Configs)
 		end
 	end
 
-    function Window:Notify(Configs)
-		local NotificationsHolder = ScreenGui:FindFirstChild("NotificationsHolder")
-		if not NotificationsHolder:FindFirstChild("NotifyLayout") then
-			Create("UIListLayout", NotificationsHolder, {
-				Name = "NotifyLayout",
-				HorizontalAlignment = Enum.HorizontalAlignment.Right,
-				VerticalAlignment = Enum.VerticalAlignment.Bottom,
-				SortOrder = Enum.SortOrder.LayoutOrder,
-				Padding = UDim.new(0, 10)
-			})
-		end
+local ActiveNotifications = {}
 
-		local TitleText = Configs.Title or "Notification"
-		local ContentText = Configs.Content or "This is a Notification"
-		local Duration = Configs.Duration or 5
-		local IconAsset = Configs.Image or ""
- 
-		IconAsset = redzlib:GetIcon(IconAsset)
-		if type(IconAsset) ~= "string" or not IconAsset:find("rbxassetid://") or #IconAsset:gsub("rbxassetid://", "") < 6 then
-			IconAsset = ""
-		end
+function Window:Notify(Configs)
+    local Title = Configs.Title or "Notification"
+    local Content = Configs.Content or "This is a Notification"
+    local Image = Configs.Image or ""
+    local Duration = Configs.Duration or 5
 
-		local HasIcon = IconAsset ~= ""
-		local LeftOffset = HasIcon and 50 or 15
+	Image = redzlib:GetIcon(Image)
+	  if not Image:find("rbxassetid://") or Image:gsub("rbxassetid://", ""):len() < 6 then
+		  Image = ""
+	  end
+    
+    local leftOffset = (Image ~= "" ) and (10 + 32 + 8) or 15
+    local rightPad = (Image ~= "" ) and 62 or 20
+    local maxTextWidth = math.max(10, 280 - leftOffset - rightPad)
 
-		local function FormatTime(Seconds)
-			Seconds = math.max(0, math.floor(Seconds + 0.0001))
-			local Hours = math.floor(Seconds / 3600)
-			local Minutes = math.floor((Seconds % 3600) / 60)
-			local Secs = Seconds % 60
-			
-			if Hours > 0 then return string.format("%dh %dm %ds", Hours, Minutes, Secs)
-			elseif Minutes > 0 then return string.format("%dm %ds", Minutes, Secs)
-			else return string.format("%ds", Secs) end
-		end
+    local neededHeight = math.ceil(8 + math.max(1, math.ceil(TextService:GetTextSize(tostring(Title), 16, Enum.Font.GothamBold, Vector2.new(maxTextWidth, math.huge)).Y / math.max(1, TextService:GetTextSize("Ay", 16, Enum.Font.GothamBold, Vector2.new(1000, 1000)).Y))) * TextService:GetTextSize("Ay", 16, Enum.Font.GothamBold, Vector2.new(1000, 1000)).Y + math.ceil(TextService:GetTextSize("Ay", 14, Enum.Font.Gotham, Vector2.new(1000, 1000)).Y * 0.25) + math.max(1, math.ceil(TextService:GetTextSize(tostring(Content), 14, Enum.Font.Gotham, Vector2.new(maxTextWidth, math.huge)).Y / math.max(1, TextService:GetTextSize("Ay", 14, Enum.Font.Gotham, Vector2.new(1000, 1000)).Y))) * TextService:GetTextSize("Ay", 14, Enum.Font.Gotham, Vector2.new(1000, 1000)).Y + 8)
+    if neededHeight < 60 then neededHeight = 60 end
+    
+	local function updatePositions()
+    local yOffset = 0
+    for i, v in ipairs(ActiveNotifications) do
+        
+        local h = 60
+        pcall(function()
+            if v and v.Size and v.Size.Y and typeof(v.Size.Y.Offset) == "number" then
+                h = v.Size.Y.Offset
+            end
+        end)
+        local y = -yOffset
+        CreateTween({v, "Position", UDim2.new(1, -10, 1, y), 0.25})
+        yOffset = yOffset + h + 10
+    end
+end
 
-		local OuterHolder = Create("Frame", NotificationsHolder, {
-			Size = UDim2.fromOffset(280, 60),
-			BackgroundTransparency = 1,
-			AutomaticSize = Enum.AutomaticSize.Y
-		})
+    local function formatTimeSeconds(totalSeconds)
+        totalSeconds = math.max(0, math.floor(totalSeconds + 0.0001))
 
-		local NotificationFrame = InsertTheme(Create("Frame", OuterHolder, {
-			Size = UDim2.new(1, 0, 0, 60),
-			Position = UDim2.fromScale(2, 0),
-			BackgroundTransparency = 0.1,
-			BackgroundColor3 = Theme["Color Hub 2"],
-			BorderSizePixel = 0,
-			AutomaticSize = Enum.AutomaticSize.Y
-		}), "Hub2")
-		
-		Make("Corner", NotificationFrame)
-		Make("Gradient", NotificationFrame, {Rotation = 45})
+        if math.floor(totalSeconds / 3600) > 0 then
+            if math.floor((totalSeconds % 3600) / 60) > 0 then
+                return string.format("%dh %dm %ds", math.floor(totalSeconds / 3600), math.floor((totalSeconds % 3600) / 60), totalSeconds % 60)
+            else
+                return string.format("%dh %dm %ds", math.floor(totalSeconds / 3600), math.floor((totalSeconds % 3600) / 60), totalSeconds % 60) 
+            end
+        elseif math.floor((totalSeconds % 3600) / 60) > 0 then
+           return string.format("%dm %ds", math.floor((totalSeconds % 3600) / 60), totalSeconds % 60)
+        else
+            return string.format("%ds", totalSeconds % 60)
+        end
+    end
 
-		Create("UISizeConstraint", NotificationFrame, {
-			MinSize = Vector2.new(280, 60)
-		})
+    local Notif = InsertTheme(Create("Frame", NotificationsHolder, {
+        Size = UDim2.fromOffset(280, neededHeight),
+        Position = UDim2.new(1, 300, 1, 0),
+        BackgroundTransparency = 0.1,
+        BackgroundColor3 = Theme["Color Hub 2"],
+        BorderSizePixel = 0
+    }), "Hub2")
+    Make("Corner", Notif)
+    Make("Gradient", Notif, {Rotation = 45})
+    
+    if Image ~= "" then
+        Create("ImageLabel", Notif, {
+            Image = Image,
+            Size = UDim2.fromOffset(32, 32),
+            Position = UDim2.new(0, 10, 0.5, -32/2),
+            BackgroundTransparency = 1
+        })
+    end
+    
+    local TitleLabel = InsertTheme(Create("TextLabel", Notif, {
+        Text = Title,
+        Font = Enum.Font.GothamBold,
+        TextSize = 16,
+        TextColor3 = Theme["Color Text"],
+        BackgroundTransparency = 1,
+        Position = UDim2.fromOffset(leftOffset, 8),
+        Size = UDim2.fromOffset(maxTextWidth, math.ceil(math.max(1, math.ceil(TextService:GetTextSize(tostring(Title), 16, Enum.Font.GothamBold, Vector2.new(maxTextWidth, math.huge)).Y / math.max(1, TextService:GetTextSize("Ay", 16, Enum.Font.GothamBold, Vector2.new(1000, 1000)).Y))) * TextService:GetTextSize("Ay", 16, Enum.Font.GothamBold, Vector2.new(1000, 1000)).Y)),
+        TextXAlignment = Enum.TextXAlignment.Left,
+        TextYAlignment = Enum.TextYAlignment.Top,
+        TextWrapped = true
+    }), "Text")
 
-		if HasIcon then
-			Create("ImageLabel", NotificationFrame, {
-				Image = IconAsset,
-				Size = UDim2.fromOffset(32, 32),
-				Position = UDim2.new(0, 10, 0, 14),
-				BackgroundTransparency = 1
-			})
-		end
+    local ContentLabel = InsertTheme(Create("TextLabel", Notif, {
+        Text = Content,
+        Font = Enum.Font.Gotham,
+        TextSize = 14,
+        TextColor3 = Theme["Color Dark Text"],
+        BackgroundTransparency = 1,
+        Position = UDim2.fromOffset(leftOffset, 8 + math.max(1, math.ceil(TextService:GetTextSize(tostring(Title), 16, Enum.Font.GothamBold, Vector2.new(maxTextWidth, math.huge)).Y / math.max(1, TextService:GetTextSize("Ay", 16, Enum.Font.GothamBold, Vector2.new(1000, 1000)).Y))) * TextService:GetTextSize("Ay", 16, Enum.Font.GothamBold, Vector2.new(1000, 1000)).Y + math.ceil(TextService:GetTextSize("Ay", 14, Enum.Font.Gotham, Vector2.new(1000, 1000)).Y * 0.25)),
+        Size = UDim2.fromOffset(maxTextWidth, math.ceil(math.max(1, math.ceil(TextService:GetTextSize(tostring(Content), 14, Enum.Font.Gotham, Vector2.new(maxTextWidth, math.huge)).Y / math.max(1, TextService:GetTextSize("Ay", 14, Enum.Font.Gotham, Vector2.new(1000, 1000)).Y))) * TextService:GetTextSize("Ay", 14, Enum.Font.Gotham, Vector2.new(1000, 1000)).Y)),
+        TextXAlignment = Enum.TextXAlignment.Left,
+        TextYAlignment = Enum.TextYAlignment.Top,
+        TextWrapped = true
+    }), "DarkText")
 
-		local TextContainer = Create("Frame", NotificationFrame, {
-			Size = UDim2.new(1, -(LeftOffset + 62), 0, 0),
-			Position = UDim2.fromOffset(LeftOffset, 8),
-			BackgroundTransparency = 1,
-			AutomaticSize = Enum.AutomaticSize.Y
-		}, {
-			Create("UIListLayout", {
-				SortOrder = Enum.SortOrder.LayoutOrder,
-				Padding = UDim.new(0, 4)
-			}),
-			Create("UIPadding", {
-				PaddingBottom = UDim.new(0, 8)
-			})
-		})
+    local TimerLabel = InsertTheme(Create("TextLabel", Notif, {
+        Text = formatTimeSeconds(Duration),
+        Font = Enum.Font.Gotham,
+        TextSize = 14,
+        TextColor3 = Theme["Color Dark Text"],
+        BackgroundTransparency = 1,
+        Position = UDim2.fromOffset(280 - 62, 6),
+        Size = UDim2.fromOffset(44, 18),
+        TextXAlignment = Enum.TextXAlignment.Right
+    }), "DarkText")
 
-		local TitleLabel = InsertTheme(Create("TextLabel", TextContainer, {
-			Text = TitleText,
-			Font = Enum.Font.GothamBold,
-			TextSize = 16,
-			TextColor3 = Theme["Color Text"],
-			BackgroundTransparency = 1,
-			Size = UDim2.fromScale(1, 0),
-			AutomaticSize = Enum.AutomaticSize.Y,
-			TextXAlignment = Enum.TextXAlignment.Left,
-			TextWrapped = true,
-			LayoutOrder = 1
-		}), "Text")
+    Notif.AnchorPoint = Vector2.new(1, 1)
+    table.insert(ActiveNotifications, 1, Notif)
+    
+    updatePositions()
 
-		local ContentLabel = InsertTheme(Create("TextLabel", TextContainer, {
-			Text = ContentText,
-			Font = Enum.Font.Gotham,
-			TextSize = 14,
-			TextColor3 = Theme["Color Dark Text"],
-			BackgroundTransparency = 1,
-			Size = UDim2.fromScale(1, 0),
-			AutomaticSize = Enum.AutomaticSize.Y,
-			TextXAlignment = Enum.TextXAlignment.Left,
-			TextWrapped = true,
-			LayoutOrder = 2
-		}), "DarkText")
+    local targetY = Notif.Position.Y.Offset
+    CreateTween({Notif, "Position", UDim2.new(1, -10, 1, targetY), 0.40})
 
-		local TimerLabel = InsertTheme(Create("TextLabel", NotificationFrame, {
-			Text = FormatTime(Duration),
-			Font = Enum.Font.Gotham,
-			TextSize = 14,
-			TextColor3 = Theme["Color Dark Text"],
-			BackgroundTransparency = 1,
-			Position = UDim2.new(1, -20, 0, 8),
-			AnchorPoint = Vector2.new(1, 0),
-			Size = UDim2.fromOffset(44, 18),
-			TextXAlignment = Enum.TextXAlignment.Right
-		}), "DarkText")
+    task.spawn(function()
+        local endTime = tick() + Duration + 1
+        while true do
+            if not TimerLabel or not TimerLabel.Parent then break end
+            local remain = math.max(0, endTime - tick())
+            pcall(function() TimerLabel.Text = formatTimeSeconds(remain) end)
+            if remain <= 0 then break end
+            task.wait()
+        end
 
-		CreateTween({NotificationFrame, "Position", UDim2.fromScale(0, 0), 0.40})
+        if not Notif or not Notif.Parent then return end
+        CreateTween({Notif, "Transparency", 1, 0.35})
+        for _, child in ipairs(Notif:GetDescendants()) do
+            if child:IsA("TextLabel") then
+                CreateTween({child, "TextTransparency", 1, 0.35})
+            elseif child:IsA("ImageLabel") then
+                CreateTween({child, "ImageTransparency", 1, 0.35})
+            end
+        end
+        task.wait(0.35)
 
-		task.spawn(function()
-			local EndTime = tick() + Duration + 1
-			while true do
-				if not TimerLabel or not TimerLabel.Parent then break end
-				local Remaining = math.max(0, EndTime - tick())
-				pcall(function() TimerLabel.Text = FormatTime(Remaining) end)
-				if Remaining <= 0 then break end
-				task.wait()
-			end
+        local idx = table.find(ActiveNotifications, Notif)
+        if idx then table.remove(ActiveNotifications, idx) end
+        if Notif and Notif.Parent then Notif:Destroy() end
+        updatePositions()
+    end)
+end
 
-			if not NotificationFrame or not NotificationFrame.Parent then return end
-			
-			CreateTween({NotificationFrame, "BackgroundTransparency", 1, 0.35})
-			for _, Child in ipairs(NotificationFrame:GetDescendants()) do
-				if Child:IsA("TextLabel") then
-					CreateTween({Child, "TextTransparency", 1, 0.35})
-				elseif Child:IsA("ImageLabel") then
-					CreateTween({Child, "ImageTransparency", 1, 0.35})
-				end
-			end
-			
-			task.wait(0.35)
 
-			if OuterHolder and OuterHolder.Parent then 
-				OuterHolder:Destroy() 
-			end
-		end)
-	end
+	function Window:Dialog(Configs)
+    if MainFrame:FindFirstChild("Dialog") then return end
 
-    function Window:Dialog(Configs)
-		if MainFrame:FindFirstChild("Dialog") or WaitClick then return end
-		
-		if Minimized then 
-			Window:MinimizeBtn()
-			task.wait(0.3)
-		end
+    if Minimized then Window:MinimizeBtn() end
 
-		local DTitle = Configs[1] or Configs.Title or "Dialog"
-		local DText = Configs[2] or Configs.Text or "This is a Dialog"
-		local DOptions = Configs[3] or Configs.Options or {}
+    local DTitle = Configs[1] or Configs.Title or "Dialog"
+    local DText = Configs[2] or Configs.Text or "This is a Dialog"
+    local DOptions = Configs[3] or Configs.Options or {}
 
-		local Screen = InsertTheme(Create("TextButton", MainFrame, {
-			Name = "Dialog",
-			Size = UDim2.new(1, 0, 1, 0),
-			Position = UDim2.fromScale(0.5, 0.5),
-			AnchorPoint = Vector2.new(0.5, 0.5),
-			BackgroundTransparency = 1, 
-			AutoButtonColor = false,
-			Text = "",
-			BackgroundColor3 = Theme["Color Stroke"],
-		}), "Stroke")
+    local Screen = InsertTheme(Create("TextButton", MainFrame, {
+        Name = "Dialog",
+        Size = UDim2.new(1, 0, 1, 0),
+        Position = UDim2.fromScale(0.5, 0.5),
+        AnchorPoint = Vector2.new(0.5, 0.5),
 
-		MainCorner:Clone().Parent = Screen
+        BackgroundTransparency = 1, 
+        AutoButtonColor = false,
+        Text = "",
+        BackgroundColor3 = Theme["Color Stroke"],
+    }), "Stroke")
 
-		local Frame = Create("Frame", {
-			Name = "Template",
-			Active = true,
-			Size = UDim2.fromOffset(310, 190),
-			Position = UDim2.fromScale(0.5, 0.5),
-			AnchorPoint = Vector2.new(0.5, 0.5),
-			BackgroundTransparency = 0,
-			BackgroundColor3 = Theme["Color Hub 3"],
-		})
+    MainCorner:Clone().Parent = Screen
 
-		local corner = Make("Corner", Frame)
-		corner.CornerRadius = UDim.new(0, 6)
-		Make("Gradient", Frame, { Rotation = 45 })
+    local originalSize = UDim2.new(0.35, 60, 0.20, 80)
+    local openSize = UDim2.new(
+        originalSize.X.Scale * 1.2, originalSize.X.Offset,
+        originalSize.Y.Scale * 1.2, originalSize.Y.Offset
+    )
 
-		local TitleLabel = Create("TextLabel", Frame, {
-			Name = "Title",
-			Size = UDim2.new(1, -20, 0, 20),
-			Position = UDim2.new(0.5, 0, 0, 28),
-			AnchorPoint = Vector2.new(0.5, 0),
-			BackgroundTransparency = 1,
-			TextTruncate = Enum.TextTruncate.AtEnd,
-			Text = DTitle,
-			TextSize = 15,
-			Font = Enum.Font.GothamBlack,
-			TextColor3 = Color3.fromRGB(255, 255, 255),
-			TextXAlignment = Enum.TextXAlignment.Center,
-			TextYAlignment = Enum.TextYAlignment.Center,
-			TextTransparency = 0,
-		})
+    local Frame = Create("Frame", {
+        Name = "Template",
+        Active = true,
+        Size = openSize,
+        Position = UDim2.fromScale(0.5, 0.5),
+        AnchorPoint = Vector2.new(0.5, 0.5),
+        BackgroundTransparency = 0,
+        BackgroundColor3 = Theme["Color Hub 3"],
+    })
 
-		local DescLabel = Create("TextLabel", Frame, {
-			Name = "Description",
-			Position = UDim2.new(0.5, 0, 0, 46),
-			Size = UDim2.new(1, -20, 0, 0),
-			AnchorPoint = Vector2.new(0.5, 0),
-			BackgroundTransparency = 1,
-			TextWrapped = true,
-			AutomaticSize = Enum.AutomaticSize.Y,
-			Text = DText,
-			TextSize = 11,
-			Font = Enum.Font.GothamMedium,
-			TextColor3 = Color3.fromRGB(175, 175, 175),
-			TextXAlignment = Enum.TextXAlignment.Center,
-			TextYAlignment = Enum.TextYAlignment.Top,
-			TextTransparency = 0,
-		})
+    local corner = Make("Corner", Frame)
+    corner.CornerRadius = UDim.new(0, 6)
+    Make("Gradient", Frame, { Rotation = 45 })
 
-		local ButtonsHolder = Create("Frame", Frame, {
-			Name = "Options",
-			Size = UDim2.new(1, -20, 0.15, 18),
-			Position = UDim2.new(0.5, 0, 1, -10),
-			AnchorPoint = Vector2.new(0.5, 1),
-			BackgroundTransparency = 1,
-		}, {
-			Create("UIPadding", {
-				PaddingLeft = UDim.new(0, 10),
-				PaddingRight = UDim.new(0, 10),
-				PaddingBottom = UDim.new(0, 30),
-				PaddingTop = UDim.new(0, 30),
-			}),
-			Create("UIListLayout", {
-				HorizontalAlignment = Enum.HorizontalAlignment.Right,
-				VerticalAlignment = Enum.VerticalAlignment.Center,
-				FillDirection = Enum.FillDirection.Horizontal,
-				Padding = UDim.new(0, 10),
-			}),
-		})
+    local TitleLabel = Create("TextLabel", Frame, {
+        Name = "Title",
+        Size = UDim2.new(1, -20, 0, 20),
+        Position = UDim2.new(0.5, 0, 0, 28),
+        AnchorPoint = Vector2.new(0.5, 0),
 
-		Frame.Parent = Screen
+        BackgroundTransparency = 1,
+        TextTruncate = Enum.TextTruncate.AtEnd,
 
-		CreateTween({Frame, "Size", UDim2.fromOffset(260, 160), 0.3})
-		CreateTween({Screen, "BackgroundTransparency", 0.6, 0.3}) 
-		CreateTween({Frame, "BackgroundTransparency", 0, 0.15})
+        Text = DTitle,
+        TextSize = 15,
+        Font = Enum.Font.GothamBlack,
+        TextColor3 = Color3.fromRGB(255, 255, 255),
+        TextXAlignment = Enum.TextXAlignment.Center,
+        TextYAlignment = Enum.TextYAlignment.Center,
+        TextTransparency = 0,
+    })
 
-		local Dialog = {}
-		local closed = false
-		local closing = false
+    local DescLabel = Create("TextLabel", Frame, {
+        Name = "Description",
+        Position = UDim2.new(0.5, 0, 0, 46),
+        Size = UDim2.new(1, -20, 0, 0),
+        AnchorPoint = Vector2.new(0.5, 0),
 
-		function Dialog:Button(Config)
-			if closed then return end
+        BackgroundTransparency = 1,
+        TextWrapped = true,
+        AutomaticSize = Enum.AutomaticSize.Y,
 
-			local Name = Config[1] or Config.Name or Config.Title or ""
-			local Callback = Config[2] or Config.Callback or function() end
+        Text = DText,
+        TextSize = 11,
+        Font = Enum.Font.GothamMedium,
+        TextColor3 = Color3.fromRGB(175, 175, 175),
+        TextXAlignment = Enum.TextXAlignment.Center,
+        TextYAlignment = Enum.TextYAlignment.Top,
+        TextTransparency = 0,
+    })
 
-			local Button = Make("Button", ButtonsHolder)
-			Make("Corner", Button).CornerRadius = UDim.new(1, 0)
+    local ButtonsHolder = Create("Frame", Frame, {
+        Name = "Options",
+        Size = UDim2.new(1, -20, 0.15, 18),
+        Position = UDim2.new(0.5, 0, 1, -10),
+        AnchorPoint = Vector2.new(0.5, 1),
+        BackgroundTransparency = 1,
+    }, {
+        Create("UIPadding", {
+            PaddingLeft = UDim.new(0, 10),
+            PaddingRight = UDim.new(0, 10),
+            PaddingBottom = UDim.new(0, 30),
+            PaddingTop = UDim.new(0, 30),
+        }),
+        Create("UIListLayout", {
+            HorizontalAlignment = Enum.HorizontalAlignment.Right,
+            VerticalAlignment = Enum.VerticalAlignment.Center,
+            FillDirection = Enum.FillDirection.Horizontal,
+            Padding = UDim.new(0, 10),
+        }),
+    })
 
-			SetProps(Button, {
-				AutoButtonColor = false,
-				Size = UDim2.fromScale(0.2, 1),
-				BackgroundTransparency = 1,
-				Text = Name,
-				TextSize = 10,
-				Font = Enum.Font.GothamMedium,
-				TextColor3 = Color3.fromRGB(200, 200, 200),
-			})
+    Frame.Parent = Screen
 
-			local TweenIn = CreateTween({Button, "BackgroundTransparency", 0, 0.3})
-			local TweenOut = CreateTween({Button, "BackgroundTransparency", 1, 0.3})
+    CreateTween({Frame, "Size", originalSize, 0.3})
+    CreateTween({Screen, "Transparency", 0.6, 0.3}) 
+    CreateTween({Frame, "Transparency", 0, 0.15})
 
-			Button.MouseEnter:Connect(function() TweenIn:Play() end)
-			Button.MouseLeave:Connect(function() TweenOut:Play() end)
+    local Dialog = {}
+    local closed  = false
+    local closing = false
 
-			Button.Activated:Connect(function()
-				Dialog:Close()
-				Callback()
-			end)
-		end
+    function Dialog:Button(Config)
+        if closed then return end
 
-		function Dialog:Close(Anim)
-			if closed or closing then return end
-			closing = true
+        local Name = Config[1] or Config.Name or Config.Title or ""
+        local Callback = Config[2] or Config.Callback or function() end
 
-			local SizeTween = CreateTween({Frame, "Size", UDim2.fromOffset(310, 190), 0.1})
-			SizeTween:Play()
+        local Button = Make("Button", ButtonsHolder)
+        Make("Corner", Button).CornerRadius = UDim.new(1, 0)
 
-			local function destroy()
-				closed = true
-				Screen:Destroy()
-			end
+        SetProps(Button, {
+            AutoButtonColor = false,
+            Size = UDim2.fromScale(0.2, 1),
+            BackgroundTransparency = 1,
 
-			if Anim then
-				destroy()
-			else
-				SizeTween.Completed:Connect(destroy)
-				CreateTween({Screen, "BackgroundTransparency", 1, 0.1})
-				CreateTween({Frame, "BackgroundTransparency", 1, 0.1})
-			end
-		end
+            Text = Name,
+            TextSize = 10,
+            Font = Enum.Font.GothamMedium,
+            TextColor3 = Color3.fromRGB(200, 200, 200),
+        })
 
-		for _, Button in ipairs(DOptions) do
-			Dialog:Button(Button)
-		end
-		
-		return Dialog
-	end
-		
+        local tweenIn  = CreateTween({Button, "BackgroundTransparency", 0, 0.3})
+        local tweenOut = CreateTween({Button, "BackgroundTransparency", 1, 0.3})
+
+        Button.MouseEnter:Connect(function() tweenIn:Play() end)
+        Button.MouseLeave:Connect(function() tweenOut:Play() end)
+
+        Button.Activated:Connect(function()
+            Dialog:Close()
+            Callback()
+        end)
+    end
+
+    function Dialog:Close(noAnim)
+        if closed or closing then return end
+        closing = true
+
+        local sizeTween = CreateTween({Frame, "Size", openSize, 0.1})
+        sizeTween:Play()
+
+        local function destroy()
+            closed = true
+            Screen:Destroy()
+        end
+
+        if noAnim then
+            destroy()
+        else
+            sizeTween.Completed:Connect(destroy)
+            CreateTween({Screen, "Transparency", 1, 0.1})
+            CreateTween({Frame, "Transparency", 1, 0.1})
+        end
+    end
+
+    for _, btn in ipairs(DOptions) do
+        Dialog:Button(btn)
+    end
+    return Dialog
+end
 	function Window:SelectTab(TabSelect)
 		if type(TabSelect) == "number" then
 			redzlib.Tabs[TabSelect].func:Enable()
 		else
-			for _, Tab in pairs(redzlib.Tabs) do
+			for _,Tab in pairs(redzlib.Tabs) do
 				if Tab.Cont == TabSelect.Cont then
 					Tab.func:Enable()
 				end
