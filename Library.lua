@@ -32,31 +32,6 @@
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 local
 a
 =
@@ -14469,7 +14444,7 @@ Enum
 .
 Font
 .
-GothamMedium
+Gotham
 ,
 Text
 =
