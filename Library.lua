@@ -1,3447 +1,22361 @@
-local UserInputService = game:GetService("UserInputService")
-local TweenService = game:GetService("TweenService")
-local TextService = game:GetService("TextService")
-local HttpService = game:GetService("HttpService")
-local Players = game:GetService("Players")
 
-local Player = Players.LocalPlayer
-local PlayerMouse = Player:GetMouse()
 
-local CoreGui = (gethui and gethui()) or game:GetService("CoreGui")
 
-local redzlib = {
-	Themes = {
-		Default = {
-			["Color Hub 1"] = ColorSequence.new({
-				ColorSequenceKeypoint.new(0.00, Color3.fromRGB(25, 25, 25)),
-				ColorSequenceKeypoint.new(0.50, Color3.fromRGB(32.5, 32.5, 32.5)),
-				ColorSequenceKeypoint.new(1.00, Color3.fromRGB(25, 25, 25))
-			}),
-			["Color Hub 2"] = Color3.fromRGB(30, 30, 30),
-			["Color Stroke"] = Color3.fromRGB(40, 40, 40),
-			["Color Theme"] = Color3.fromRGB(88, 101, 242),
-			["Color Text"] = Color3.fromRGB(243, 243, 243),
-			["Color Dark Text"] = Color3.fromRGB(180, 180, 180)
-		},
-		Dark = {
-			["Color Hub 1"] = ColorSequence.new({
-				ColorSequenceKeypoint.new(0.00, Color3.fromRGB(40, 40, 40)),
-				ColorSequenceKeypoint.new(0.50, Color3.fromRGB(47.5, 47.5, 47.5)),
-				ColorSequenceKeypoint.new(1.00, Color3.fromRGB(40, 40, 40))
-			}),
-			["Color Hub 2"] = Color3.fromRGB(45, 45, 45),
-			["Color Stroke"] = Color3.fromRGB(65, 65, 65),
-			["Color Theme"] = Color3.fromRGB(65, 150, 255),
-			["Color Text"] = Color3.fromRGB(245, 245, 245),
-			["Color Dark Text"] = Color3.fromRGB(190, 190, 190)
-		},
-        Red = {
-			["Color Hub 1"] = ColorSequence.new({
-				ColorSequenceKeypoint.new(0.00, Color3.fromRGB(25, 25, 25)),
-				ColorSequenceKeypoint.new(0.50, Color3.fromRGB(32.5, 32.5, 32.5)),
-				ColorSequenceKeypoint.new(1.00, Color3.fromRGB(25, 25, 25))
-			}),
-			["Color Hub 2"] = Color3.fromRGB(30, 30, 30),
-			["Color Stroke"] = Color3.fromRGB(40, 40, 40),
-			["Color Theme"] = Color3.fromRGB(255, 0, 0),
-			["Color Text"] = Color3.fromRGB(243, 243, 243),
-			["Color Dark Text"] = Color3.fromRGB(180, 180, 180)
-		},
-        Yellow = {
-			["Color Hub 1"] = ColorSequence.new({
-				ColorSequenceKeypoint.new(0.00, Color3.fromRGB(25, 25, 25)),
-				ColorSequenceKeypoint.new(0.50, Color3.fromRGB(32.5, 32.5, 32.5)),
-				ColorSequenceKeypoint.new(1.00, Color3.fromRGB(25, 25, 25))
-			}),
-			["Color Hub 2"] = Color3.fromRGB(30, 30, 30),
-			["Color Stroke"] = Color3.fromRGB(40, 40, 40),
-			["Color Theme"] = Color3.fromRGB(255, 255, 0),
-			["Color Text"] = Color3.fromRGB(243, 243, 243),
-			["Color Dark Text"] = Color3.fromRGB(180, 180, 180)
-		},
-        Green = {
-			["Color Hub 1"] = ColorSequence.new({
-				ColorSequenceKeypoint.new(0.00, Color3.fromRGB(25, 25, 25)),
-				ColorSequenceKeypoint.new(0.50, Color3.fromRGB(32.5, 32.5, 32.5)),
-				ColorSequenceKeypoint.new(1.00, Color3.fromRGB(25, 25, 25))
-			}),
-			["Color Hub 2"] = Color3.fromRGB(30, 30, 30),
-			["Color Stroke"] = Color3.fromRGB(40, 40, 40),
-			["Color Theme"] = Color3.fromRGB(31, 255, 49),
-			["Color Text"] = Color3.fromRGB(243, 243, 243),
-			["Color Dark Text"] = Color3.fromRGB(180, 180, 180)
-		},
-		Orange = {
-			["Color Hub 1"] = ColorSequence.new({
-				ColorSequenceKeypoint.new(0.00, Color3.fromRGB(25, 25, 25)),
-				ColorSequenceKeypoint.new(0.50, Color3.fromRGB(32.5, 32.5, 32.5)),
-				ColorSequenceKeypoint.new(1.00, Color3.fromRGB(25, 25, 25))
-			}),
-			["Color Hub 2"] = Color3.fromRGB(30, 30, 30),
-			["Color Stroke"] = Color3.fromRGB(40, 40, 40),
-			["Color Theme"] = Color3.fromRGB(170, 85, 0),
-			["Color Text"] = Color3.fromRGB(243, 243, 243),
-			["Color Dark Text"] = Color3.fromRGB(180, 180, 180)
-		},
-        Blue = {
-			["Color Hub 1"] = ColorSequence.new({
-				ColorSequenceKeypoint.new(0.00, Color3.fromRGB(25, 25, 25)),
-				ColorSequenceKeypoint.new(0.50, Color3.fromRGB(32.5, 32.5, 32.5)),
-				ColorSequenceKeypoint.new(1.00, Color3.fromRGB(25, 25, 25))
-			}),
-			["Color Hub 2"] = Color3.fromRGB(30, 30, 30),
-			["Color Stroke"] = Color3.fromRGB(40, 40, 40),
-			["Color Theme"] = Color3.fromRGB(0, 255, 255),
-			["Color Text"] = Color3.fromRGB(243, 243, 243),
-			["Color Dark Text"] = Color3.fromRGB(180, 180, 180)
-		},
-        White = {
-			["Color Hub 1"] = ColorSequence.new({
-				ColorSequenceKeypoint.new(0.00, Color3.fromRGB(25, 25, 25)),
-				ColorSequenceKeypoint.new(0.50, Color3.fromRGB(32.5, 32.5, 32.5)),
-				ColorSequenceKeypoint.new(1.00, Color3.fromRGB(25, 25, 25))
-			}),
-			["Color Hub 2"] = Color3.fromRGB(30, 30, 30),
-			["Color Stroke"] = Color3.fromRGB(40, 40, 40),
-			["Color Theme"] = Color3.fromRGB(255, 255, 255),
-			["Color Text"] = Color3.fromRGB(243, 243, 243),
-			["Color Dark Text"] = Color3.fromRGB(180, 180, 180)
-		},
-		Purple = {
-			["Color Hub 1"] = ColorSequence.new({
-				ColorSequenceKeypoint.new(0.00, Color3.fromRGB(27.5, 25, 30)),
-				ColorSequenceKeypoint.new(0.50, Color3.fromRGB(32.5, 32.5, 32.5)),
-				ColorSequenceKeypoint.new(1.00, Color3.fromRGB(27.5, 25, 30))
-			}),
-			["Color Hub 2"] = Color3.fromRGB(30, 30, 30),
-			["Color Stroke"] = Color3.fromRGB(40, 40, 40),
-			["Color Theme"] = Color3.fromRGB(150, 0, 255),
-			["Color Text"] = Color3.fromRGB(240, 240, 240),
-			["Color Dark Text"] = Color3.fromRGB(180, 180, 180)
-		}
-	},
-	Info = {
-		Version = "1.1.0"
-	},
-	Save = {
-		UISize = {550, 380},
-		TabSize = 160,
-		Theme = "Default"
-	},
-	Settings = {},
-	Connection = {},
-	Instances = {},
-	Elements = {},
-	Options = {},
-	Flags = {},
-	Tabs = {},
-	Icons = (function()
 
-		return {
-			["accessibility"] = "rbxassetid://10709751939",
-			["activity"] = "rbxassetid://10709752035",
-			["airvent"] = "rbxassetid://10709752131",
-			["airplay"] = "rbxassetid://10709752254",
-			["alarmcheck"] = "rbxassetid://10709752405",
-			["alarmclock"] = "rbxassetid://10709752630",
-			["alarmclockoff"] = "rbxassetid://10709752508",
-			["alarmminus"] = "rbxassetid://10709752732",
-			["alarmplus"] = "rbxassetid://10709752825",
-			["album"] = "rbxassetid://10709752906",
-			["alertcircle"] = "rbxassetid://10709752996",
-			["alertoctagon"] = "rbxassetid://10709753064",
-			["alerttriangle"] = "rbxassetid://10709753149",
-			["aligncenter"] = "rbxassetid://10709753570",
-			["aligncenterhorizontal"] = "rbxassetid://10709753272",
-			["aligncentervertical"] = "rbxassetid://10709753421",
-			["alignendhorizontal"] = "rbxassetid://10709753692",
-			["alignendvertical"] = "rbxassetid://10709753808",
-			["alignhorizontaldistributecenter"] = "rbxassetid://10747779791",
-			["alignhorizontaldistributeend"] = "rbxassetid://10747784534",
-			["alignhorizontaldistributestart"] = "rbxassetid://10709754118",
-			["alignhorizontaljustifycenter"] = "rbxassetid://10709754204",
-			["alignhorizontaljustifyend"] = "rbxassetid://10709754317",
-			["alignhorizontaljustifystart"] = "rbxassetid://10709754436",
-			["alignhorizontalspacearound"] = "rbxassetid://10709754590",
-			["alignhorizontalspacebetween"] = "rbxassetid://10709754749",
-			["alignjustify"] = "rbxassetid://10709759610",
-			["alignleft"] = "rbxassetid://10709759764",
-			["alignright"] = "rbxassetid://10709759895",
-			["alignstarthorizontal"] = "rbxassetid://10709760051",
-			["alignstartvertical"] = "rbxassetid://10709760244",
-			["alignverticaldistributecenter"] = "rbxassetid://10709760351",
-			["alignverticaldistributeend"] = "rbxassetid://10709760434",
-			["alignverticaldistributestart"] = "rbxassetid://10709760612",
-			["alignverticaljustifycenter"] = "rbxassetid://10709760814",
-			["alignverticaljustifyend"] = "rbxassetid://10709761003",
-			["alignverticaljustifystart"] = "rbxassetid://10709761176",
-			["alignverticalspacearound"] = "rbxassetid://10709761324",
-			["alignverticalspacebetween"] = "rbxassetid://10709761434",
-			["anchor"] = "rbxassetid://10709761530",
-			["angry"] = "rbxassetid://10709761629",
-			["annoyed"] = "rbxassetid://10709761722",
-			["aperture"] = "rbxassetid://10709761813",
-			["apple"] = "rbxassetid://10709761889",
-			["archive"] = "rbxassetid://10709762233",
-			["archiverestore"] = "rbxassetid://10709762058",
-			["armchair"] = "rbxassetid://10709762327",
-			["arrowbigdown"] = "rbxassetid://10747796644",
-			["arrowbigleft"] = "rbxassetid://10709762574",
-			["arrowbigright"] = "rbxassetid://10709762727",
-			["arrowbigup"] = "rbxassetid://10709762879",
-			["arrowdown"] = "rbxassetid://10709767827",
-			["arrowdowncircle"] = "rbxassetid://10709763034",
-			["arrowdownleft"] = "rbxassetid://10709767656",
-			["arrowdownright"] = "rbxassetid://10709767750",
-			["arrowleft"] = "rbxassetid://10709768114",
-			["arrowleftcircle"] = "rbxassetid://10709767936",
-			["arrowleftright"] = "rbxassetid://10709768019",
-			["arrowright"] = "rbxassetid://10709768347",
-			["arrowrightcircle"] = "rbxassetid://10709768226",
-			["arrowup"] = "rbxassetid://10709768939",
-			["arrowupcircle"] = "rbxassetid://10709768432",
-			["arrowupdown"] = "rbxassetid://10709768538",
-			["arrowupleft"] = "rbxassetid://10709768661",
-			["arrowupright"] = "rbxassetid://10709768787",
-			["asterisk"] = "rbxassetid://10709769095",
-			["atsign"] = "rbxassetid://10709769286",
-			["award"] = "rbxassetid://10709769406",
-			["axe"] = "rbxassetid://10709769508",
-			["axis3d"] = "rbxassetid://10709769598",
-			["baby"] = "rbxassetid://10709769732",
-			["backpack"] = "rbxassetid://10709769841",
-			["baggageclaim"] = "rbxassetid://10709769935",
-			["banana"] = "rbxassetid://10709770005",
-			["banknote"] = "rbxassetid://10709770178",
-			["barchart"] = "rbxassetid://10709773755",
-			["barchart2"] = "rbxassetid://10709770317",
-			["barchart3"] = "rbxassetid://10709770431",
-			["barchart4"] = "rbxassetid://10709770560",
-			["barcharthorizontal"] = "rbxassetid://10709773669",
-			["barcode"] = "rbxassetid://10747360675",
-			["baseline"] = "rbxassetid://10709773863",
-			["bath"] = "rbxassetid://10709773963",
-			["battery"] = "rbxassetid://10709774640",
-			["batterycharging"] = "rbxassetid://10709774068",
-			["batteryfull"] = "rbxassetid://10709774206",
-			["batterylow"] = "rbxassetid://10709774370",
-			["batterymedium"] = "rbxassetid://10709774513",
-			["beaker"] = "rbxassetid://10709774756",
-			["bed"] = "rbxassetid://10709775036",
-			["beddouble"] = "rbxassetid://10709774864",
-			["bedsingle"] = "rbxassetid://10709774968",
-			["beer"] = "rbxassetid://10709775167",
-			["bell"] = "rbxassetid://10709775704",
-			["bellminus"] = "rbxassetid://10709775241",
-			["belloff"] = "rbxassetid://10709775320",
-			["bellplus"] = "rbxassetid://10709775448",
-			["bellring"] = "rbxassetid://10709775560",
-			["bike"] = "rbxassetid://10709775894",
-			["binary"] = "rbxassetid://10709776050",
-			["bitcoin"] = "rbxassetid://10709776126",
-			["bluetooth"] = "rbxassetid://10709776655",
-			["bluetoothconnected"] = "rbxassetid://10709776240",
-			["bluetoothoff"] = "rbxassetid://10709776344",
-			["bluetoothsearching"] = "rbxassetid://10709776501",
-			["bold"] = "rbxassetid://10747813908",
-			["bomb"] = "rbxassetid://10709781460",
-			["bone"] = "rbxassetid://10709781605",
-			["book"] = "rbxassetid://10709781824",
-			["bookopen"] = "rbxassetid://10709781717",
-			["bookmark"] = "rbxassetid://10709782154",
-			["bookmarkminus"] = "rbxassetid://10709781919",
-			["bookmarkplus"] = "rbxassetid://10709782044",
-			["bot"] = "rbxassetid://10709782230",
-			["box"] = "rbxassetid://10709782497",
-			["boxselect"] = "rbxassetid://10709782342",
-			["boxes"] = "rbxassetid://10709782582",
-			["briefcase"] = "rbxassetid://10709782662",
-			["brush"] = "rbxassetid://10709782758",
-			["bug"] = "rbxassetid://10709782845",
-			["building"] = "rbxassetid://10709783051",
-			["building2"] = "rbxassetid://10709782939",
-			["bus"] = "rbxassetid://10709783137",
-			["cake"] = "rbxassetid://10709783217",
-			["calculator"] = "rbxassetid://10709783311",
-			["calendar"] = "rbxassetid://10709789505",
-			["calendarcheck"] = "rbxassetid://10709783474",
-			["calendarcheck2"] = "rbxassetid://10709783392",
-			["calendarclock"] = "rbxassetid://10709783577",
-			["calendardays"] = "rbxassetid://10709783673",
-			["calendarheart"] = "rbxassetid://10709783835",
-			["calendarminus"] = "rbxassetid://10709783959",
-			["calendaroff"] = "rbxassetid://10709788784",
-			["calendarplus"] = "rbxassetid://10709788937",
-			["calendarrange"] = "rbxassetid://10709789053",
-			["calendarsearch"] = "rbxassetid://10709789200",
-			["calendarx"] = "rbxassetid://10709789407",
-			["calendarx2"] = "rbxassetid://10709789329",
-			["camera"] = "rbxassetid://10709789686",
-			["cameraoff"] = "rbxassetid://10747822677",
-			["car"] = "rbxassetid://10709789810",
-			["carrot"] = "rbxassetid://10709789960",
-			["cast"] = "rbxassetid://10709790097",
-			["charge"] = "rbxassetid://10709790202",
-			["check"] = "rbxassetid://10709790644",
-			["checkcircle"] = "rbxassetid://10709790387",
-			["checkcircle2"] = "rbxassetid://10709790298",
-			["checksquare"] = "rbxassetid://10709790537",
-			["chefhat"] = "rbxassetid://10709790757",
-			["cherry"] = "rbxassetid://10709790875",
-			["chevrondown"] = "rbxassetid://10709790948",
-			["chevronfirst"] = "rbxassetid://10709791015",
-			["chevronlast"] = "rbxassetid://10709791130",
-			["chevronleft"] = "rbxassetid://10709791281",
-			["chevronright"] = "rbxassetid://10709791437",
-			["chevronup"] = "rbxassetid://10709791523",
-			["chevronsdown"] = "rbxassetid://10709796864",
-			["chevronsdownup"] = "rbxassetid://10709791632",
-			["chevronsleft"] = "rbxassetid://10709797151",
-			["chevronsleftright"] = "rbxassetid://10709797006",
-			["chevronsright"] = "rbxassetid://10709797382",
-			["chevronsrightleft"] = "rbxassetid://10709797274",
-			["chevronsup"] = "rbxassetid://10709797622",
-			["chevronsupdown"] = "rbxassetid://10709797508",
-			["chrome"] = "rbxassetid://10709797725",
-			["circle"] = "rbxassetid://10709798174",
-			["circledot"] = "rbxassetid://10709797837",
-			["circleellipsis"] = "rbxassetid://10709797985",
-			["circleslashed"] = "rbxassetid://10709798100",
-			["citrus"] = "rbxassetid://10709798276",
-			["clapperboard"] = "rbxassetid://10709798350",
-			["clipboard"] = "rbxassetid://10709799288",
-			["clipboardcheck"] = "rbxassetid://10709798443",
-			["clipboardcopy"] = "rbxassetid://10709798574",
-			["clipboardedit"] = "rbxassetid://10709798682",
-			["clipboardlist"] = "rbxassetid://10709798792",
-			["clipboardsignature"] = "rbxassetid://10709798890",
-			["clipboardtype"] = "rbxassetid://10709798999",
-			["clipboardx"] = "rbxassetid://10709799124",
-			["clock"] = "rbxassetid://10709805144",
-			["clock1"] = "rbxassetid://10709799535",
-			["clock10"] = "rbxassetid://10709799718",
-			["clock11"] = "rbxassetid://10709799818",
-			["clock12"] = "rbxassetid://10709799962",
-			["clock2"] = "rbxassetid://10709803876",
-			["clock3"] = "rbxassetid://10709803989",
-			["clock4"] = "rbxassetid://10709804164",
-			["clock5"] = "rbxassetid://10709804291",
-			["clock6"] = "rbxassetid://10709804435",
-			["clock7"] = "rbxassetid://10709804599",
-			["clock8"] = "rbxassetid://10709804784",
-			["clock9"] = "rbxassetid://10709804996",
-			["cloud"] = "rbxassetid://10709806740",
-			["cloudcog"] = "rbxassetid://10709805262",
-			["clouddrizzle"] = "rbxassetid://10709805371",
-			["cloudfog"] = "rbxassetid://10709805477",
-			["cloudhail"] = "rbxassetid://10709805596",
-			["cloudlightning"] = "rbxassetid://10709805727",
-			["cloudmoon"] = "rbxassetid://10709805942",
-			["cloudmoonrain"] = "rbxassetid://10709805838",
-			["cloudoff"] = "rbxassetid://10709806060",
-			["cloudrain"] = "rbxassetid://10709806277",
-			["cloudrainwind"] = "rbxassetid://10709806166",
-			["cloudsnow"] = "rbxassetid://10709806374",
-			["cloudsun"] = "rbxassetid://10709806631",
-			["cloudsunrain"] = "rbxassetid://10709806475",
-			["cloudy"] = "rbxassetid://10709806859",
-			["clover"] = "rbxassetid://10709806995",
-			["code"] = "rbxassetid://10709810463",
-			["code2"] = "rbxassetid://10709807111",
-			["codepen"] = "rbxassetid://10709810534",
-			["codesandbox"] = "rbxassetid://10709810676",
-			["coffee"] = "rbxassetid://10709810814",
-			["cog"] = "rbxassetid://10709810948",
-			["coins"] = "rbxassetid://10709811110",
-			["columns"] = "rbxassetid://10709811261",
-			["command"] = "rbxassetid://10709811365",
-			["compass"] = "rbxassetid://10709811445",
-			["component"] = "rbxassetid://10709811595",
-			["conciergebell"] = "rbxassetid://10709811706",
-			["connection"] = "rbxassetid://10747361219",
-			["contact"] = "rbxassetid://10709811834",
-			["contrast"] = "rbxassetid://10709811939",
-			["cookie"] = "rbxassetid://10709812067",
-			["copy"] = "rbxassetid://10709812159",
-			["copyleft"] = "rbxassetid://10709812251",
-			["copyright"] = "rbxassetid://10709812311",
-			["cornerdownleft"] = "rbxassetid://10709812396",
-			["cornerdownright"] = "rbxassetid://10709812485",
-			["cornerleftdown"] = "rbxassetid://10709812632",
-			["cornerleftup"] = "rbxassetid://10709812784",
-			["cornerrightdown"] = "rbxassetid://10709812939",
-			["cornerrightup"] = "rbxassetid://10709813094",
-			["cornerupleft"] = "rbxassetid://10709813185",
-			["cornerupright"] = "rbxassetid://10709813281",
-			["cpu"] = "rbxassetid://10709813383",
-			["croissant"] = "rbxassetid://10709818125",
-			["crop"] = "rbxassetid://10709818245",
-			["cross"] = "rbxassetid://10709818399",
-			["crosshair"] = "rbxassetid://10709818534",
-			["crown"] = "rbxassetid://10709818626",
-			["cupsoda"] = "rbxassetid://10709818763",
-			["curlybraces"] = "rbxassetid://10709818847",
-			["currency"] = "rbxassetid://10709818931",
-			["database"] = "rbxassetid://10709818996",
-			["delete"] = "rbxassetid://10709819059",
-			["diamond"] = "rbxassetid://10709819149",
-			["dice1"] = "rbxassetid://10709819266",
-			["dice2"] = "rbxassetid://10709819361",
-			["dice3"] = "rbxassetid://10709819508",
-			["dice4"] = "rbxassetid://10709819670",
-			["dice5"] = "rbxassetid://10709819801",
-			["dice6"] = "rbxassetid://10709819896",
-			["dices"] = "rbxassetid://10723343321",
-			["diff"] = "rbxassetid://10723343416",
-			["disc"] = "rbxassetid://10723343537",
-			["divide"] = "rbxassetid://10723343805",
-			["dividecircle"] = "rbxassetid://10723343636",
-			["dividesquare"] = "rbxassetid://10723343737",
-			["dollarsign"] = "rbxassetid://10723343958",
-			["download"] = "rbxassetid://10723344270",
-			["downloadcloud"] = "rbxassetid://10723344088",
-			["droplet"] = "rbxassetid://10723344432",
-			["droplets"] = "rbxassetid://10734883356",
-			["drumstick"] = "rbxassetid://10723344737",
-			["edit"] = "rbxassetid://10734883598",
-			["edit2"] = "rbxassetid://10723344885",
-			["edit3"] = "rbxassetid://10723345088",
-			["egg"] = "rbxassetid://10723345518",
-			["eggfried"] = "rbxassetid://10723345347",
-			["electricity"] = "rbxassetid://10723345749",
-			["electricityoff"] = "rbxassetid://10723345643",
-			["equal"] = "rbxassetid://10723345990",
-			["equalnot"] = "rbxassetid://10723345866",
-			["eraser"] = "rbxassetid://10723346158",
-			["euro"] = "rbxassetid://10723346372",
-			["expand"] = "rbxassetid://10723346553",
-			["externallink"] = "rbxassetid://10723346684",
-			["eye"] = "rbxassetid://10723346959",
-			["eyeoff"] = "rbxassetid://10723346871",
-			["factory"] = "rbxassetid://10723347051",
-			["fan"] = "rbxassetid://10723354359",
-			["fastforward"] = "rbxassetid://10723354521",
-			["feather"] = "rbxassetid://10723354671",
-			["figma"] = "rbxassetid://10723354801",
-			["file"] = "rbxassetid://10723374641",
-			["filearchive"] = "rbxassetid://10723354921",
-			["fileaudio"] = "rbxassetid://10723355148",
-			["fileaudio2"] = "rbxassetid://10723355026",
-			["fileaxis3d"] = "rbxassetid://10723355272",
-			["filebadge"] = "rbxassetid://10723355622",
-			["filebadge2"] = "rbxassetid://10723355451",
-			["filebarchart"] = "rbxassetid://10723355887",
-			["filebarchart2"] = "rbxassetid://10723355746",
-			["filebox"] = "rbxassetid://10723355989",
-			["filecheck"] = "rbxassetid://10723356210",
-			["filecheck2"] = "rbxassetid://10723356100",
-			["fileclock"] = "rbxassetid://10723356329",
-			["filecode"] = "rbxassetid://10723356507",
-			["filecog"] = "rbxassetid://10723356830",
-			["filecog2"] = "rbxassetid://10723356676",
-			["filediff"] = "rbxassetid://10723357039",
-			["filedigit"] = "rbxassetid://10723357151",
-			["filedown"] = "rbxassetid://10723357322",
-			["fileedit"] = "rbxassetid://10723357495",
-			["fileheart"] = "rbxassetid://10723357637",
-			["fileimage"] = "rbxassetid://10723357790",
-			["fileinput"] = "rbxassetid://10723357933",
-			["filejson"] = "rbxassetid://10723364435",
-			["filejson2"] = "rbxassetid://10723364361",
-			["filekey"] = "rbxassetid://10723364605",
-			["filekey2"] = "rbxassetid://10723364515",
-			["filelinechart"] = "rbxassetid://10723364725",
-			["filelock"] = "rbxassetid://10723364957",
-			["filelock2"] = "rbxassetid://10723364861",
-			["fileminus"] = "rbxassetid://10723365254",
-			["fileminus2"] = "rbxassetid://10723365086",
-			["fileoutput"] = "rbxassetid://10723365457",
-			["filepiechart"] = "rbxassetid://10723365598",
-			["fileplus"] = "rbxassetid://10723365877",
-			["fileplus2"] = "rbxassetid://10723365766",
-			["filequestion"] = "rbxassetid://10723365987",
-			["filescan"] = "rbxassetid://10723366167",
-			["filesearch"] = "rbxassetid://10723366550",
-			["filesearch2"] = "rbxassetid://10723366340",
-			["filesignature"] = "rbxassetid://10723366741",
-			["filespreadsheet"] = "rbxassetid://10723366962",
-			["filesymlink"] = "rbxassetid://10723367098",
-			["fileterminal"] = "rbxassetid://10723367244",
-			["filetext"] = "rbxassetid://10723367380",
-			["filetype"] = "rbxassetid://10723367606",
-			["filetype2"] = "rbxassetid://10723367509",
-			["fileup"] = "rbxassetid://10723367734",
-			["filevideo"] = "rbxassetid://10723373884",
-			["filevideo2"] = "rbxassetid://10723367834",
-			["filevolume"] = "rbxassetid://10723374172",
-			["filevolume2"] = "rbxassetid://10723374030",
-			["filewarning"] = "rbxassetid://10723374276",
-			["filex"] = "rbxassetid://10723374544",
-			["filex2"] = "rbxassetid://10723374378",
-			["files"] = "rbxassetid://10723374759",
-			["film"] = "rbxassetid://10723374981",
-			["filter"] = "rbxassetid://10723375128",
-			["fingerprint"] = "rbxassetid://10723375250",
-			["flag"] = "rbxassetid://10723375890",
-			["flagoff"] = "rbxassetid://10723375443",
-			["flagtriangleleft"] = "rbxassetid://10723375608",
-			["flagtriangleright"] = "rbxassetid://10723375727",
-			["flame"] = "rbxassetid://10723376114",
-			["flashlight"] = "rbxassetid://10723376471",
-			["flashlightoff"] = "rbxassetid://10723376365",
-			["flaskconical"] = "rbxassetid://10734883986",
-			["flaskround"] = "rbxassetid://10723376614",
-			["fliphorizontal"] = "rbxassetid://10723376884",
-			["fliphorizontal2"] = "rbxassetid://10723376745",
-			["flipvertical"] = "rbxassetid://10723377138",
-			["flipvertical2"] = "rbxassetid://10723377026",
-			["flower"] = "rbxassetid://10747830374",
-			["flower2"] = "rbxassetid://10723377305",
-			["fish"] = "rbxassetid://127664059821666",
-			["focus"] = "rbxassetid://10723377537",
-			["folder"] = "rbxassetid://10723387563",
-			["folderarchive"] = "rbxassetid://10723384478",
-			["foldercheck"] = "rbxassetid://10723384605",
-			["folderclock"] = "rbxassetid://10723384731",
-			["folderclosed"] = "rbxassetid://10723384893",
-			["foldercog"] = "rbxassetid://10723385213",
-			["foldercog2"] = "rbxassetid://10723385036",
-			["folderdown"] = "rbxassetid://10723385338",
-			["folderedit"] = "rbxassetid://10723385445",
-			["folderheart"] = "rbxassetid://10723385545",
-			["folderinput"] = "rbxassetid://10723385721",
-			["folderkey"] = "rbxassetid://10723385848",
-			["folderlock"] = "rbxassetid://10723386005",
-			["folderminus"] = "rbxassetid://10723386127",
-			["folderopen"] = "rbxassetid://10723386277",
-			["folderoutput"] = "rbxassetid://10723386386",
-			["folderplus"] = "rbxassetid://10723386531",
-			["foldersearch"] = "rbxassetid://10723386787",
-			["foldersearch2"] = "rbxassetid://10723386674",
-			["foldersymlink"] = "rbxassetid://10723386930",
-			["foldertree"] = "rbxassetid://10723387085",
-			["folderup"] = "rbxassetid://10723387265",
-			["folderx"] = "rbxassetid://10723387448",
-			["folders"] = "rbxassetid://10723387721",
-			["forminput"] = "rbxassetid://10723387841",
-			["forward"] = "rbxassetid://10723388016",
-			["frame"] = "rbxassetid://10723394389",
-			["framer"] = "rbxassetid://10723394565",
-			["frown"] = "rbxassetid://10723394681",
-			["fuel"] = "rbxassetid://10723394846",
-			["functionsquare"] = "rbxassetid://10723395041",
-			["gamepad"] = "rbxassetid://10723395457",
-			["gamepad2"] = "rbxassetid://10723395215",
-			["gauge"] = "rbxassetid://10723395708",
-			["gavel"] = "rbxassetid://10723395896",
-			["gem"] = "rbxassetid://10723396000",
-			["ghost"] = "rbxassetid://10723396107",
-			["gift"] = "rbxassetid://10723396402",
-			["giftcard"] = "rbxassetid://10723396225",
-			["gitbranch"] = "rbxassetid://10723396676",
-			["gitbranchplus"] = "rbxassetid://10723396542",
-			["gitcommit"] = "rbxassetid://10723396812",
-			["gitcompare"] = "rbxassetid://10723396954",
-			["gitfork"] = "rbxassetid://10723397049",
-			["gitmerge"] = "rbxassetid://10723397165",
-			["gitpullrequest"] = "rbxassetid://10723397431",
-			["gitpullrequestclosed"] = "rbxassetid://10723397268",
-			["gitpullrequestdraft"] = "rbxassetid://10734884302",
-			["glass"] = "rbxassetid://10723397788",
-			["glass2"] = "rbxassetid://10723397529",
-			["glasswater"] = "rbxassetid://10723397678",
-			["glasses"] = "rbxassetid://10723397895",
-			["globe"] = "rbxassetid://10723404337",
-			["globe2"] = "rbxassetid://10723398002",
-			["grab"] = "rbxassetid://10723404472",
-			["graduationcap"] = "rbxassetid://10723404691",
-			["grape"] = "rbxassetid://10723404822",
-			["grid"] = "rbxassetid://10723404936",
-			["griphorizontal"] = "rbxassetid://10723405089",
-			["gripvertical"] = "rbxassetid://10723405236",
-			["hammer"] = "rbxassetid://10723405360",
-			["hand"] = "rbxassetid://10723405649",
-			["handmetal"] = "rbxassetid://10723405508",
-			["harddrive"] = "rbxassetid://10723405749",
-			["hardhat"] = "rbxassetid://10723405859",
-			["hash"] = "rbxassetid://10723405975",
-			["haze"] = "rbxassetid://10723406078",
-			["headphones"] = "rbxassetid://10723406165",
-			["heart"] = "rbxassetid://10723406885",
-			["heartcrack"] = "rbxassetid://10723406299",
-			["hearthandshake"] = "rbxassetid://10723406480",
-			["heartoff"] = "rbxassetid://10723406662",
-			["heartpulse"] = "rbxassetid://10723406795",
-			["helpcircle"] = "rbxassetid://10723406988",
-			["hexagon"] = "rbxassetid://10723407092",
-			["highlighter"] = "rbxassetid://10723407192",
-			["history"] = "rbxassetid://10723407335",
-			["home"] = "rbxassetid://10723407389",
-			["hourglass"] = "rbxassetid://10723407498",
-			["icecream"] = "rbxassetid://10723414308",
-			["image"] = "rbxassetid://10723415040",
-			["imageminus"] = "rbxassetid://10723414487",
-			["imageoff"] = "rbxassetid://10723414677",
-			["imageplus"] = "rbxassetid://10723414827",
-			["import"] = "rbxassetid://10723415205",
-			["inbox"] = "rbxassetid://10723415335",
-			["indent"] = "rbxassetid://10723415494",
-			["indianrupee"] = "rbxassetid://10723415642",
-			["infinity"] = "rbxassetid://10723415766",
-			["info"] = "rbxassetid://10723415903",
-			["inspect"] = "rbxassetid://10723416057",
-			["italic"] = "rbxassetid://10723416195",
-			["japaneseyen"] = "rbxassetid://10723416363",
-			["joystick"] = "rbxassetid://10723416527",
-			["key"] = "rbxassetid://10723416652",
-			["keyboard"] = "rbxassetid://10723416765",
-			["lamp"] = "rbxassetid://10723417513",
-			["lampceiling"] = "rbxassetid://10723416922",
-			["lampdesk"] = "rbxassetid://10723417016",
-			["lampfloor"] = "rbxassetid://10723417131",
-			["lampwalldown"] = "rbxassetid://10723417240",
-			["lampwallup"] = "rbxassetid://10723417356",
-			["landmark"] = "rbxassetid://10723417608",
-			["languages"] = "rbxassetid://10723417703",
-			["laptop"] = "rbxassetid://10723423881",
-			["laptop2"] = "rbxassetid://10723417797",
-			["lasso"] = "rbxassetid://10723424235",
-			["lassoselect"] = "rbxassetid://10723424058",
-			["laugh"] = "rbxassetid://10723424372",
-			["layers"] = "rbxassetid://10723424505",
-			["layout"] = "rbxassetid://10723425376",
-			["layoutdashboard"] = "rbxassetid://10723424646",
-			["layoutgrid"] = "rbxassetid://10723424838",
-			["layoutlist"] = "rbxassetid://10723424963",
-			["layouttemplate"] = "rbxassetid://10723425187",
-			["leaf"] = "rbxassetid://10723425539",
-			["library"] = "rbxassetid://10723425615",
-			["lifebuoy"] = "rbxassetid://10723425685",
-			["lightbulb"] = "rbxassetid://10723425852",
-			["lightbulboff"] = "rbxassetid://10723425762",
-			["linechart"] = "rbxassetid://10723426393",
-			["link"] = "rbxassetid://10723426722",
-			["link2"] = "rbxassetid://10723426595",
-			["link2off"] = "rbxassetid://10723426513",
-			["list"] = "rbxassetid://10723433811",
-			["listchecks"] = "rbxassetid://10734884548",
-			["listend"] = "rbxassetid://10723426886",
-			["listminus"] = "rbxassetid://10723426986",
-			["listmusic"] = "rbxassetid://10723427081",
-			["listordered"] = "rbxassetid://10723427199",
-			["listplus"] = "rbxassetid://10723427334",
-			["liststart"] = "rbxassetid://10723427494",
-			["listvideo"] = "rbxassetid://10723427619",
-			["listx"] = "rbxassetid://10723433655",
-			["loader"] = "rbxassetid://10723434070",
-			["loader2"] = "rbxassetid://10723433935",
-			["locate"] = "rbxassetid://10723434557",
-			["locatefixed"] = "rbxassetid://10723434236",
-			["locateoff"] = "rbxassetid://10723434379",
-			["lock"] = "rbxassetid://10723434711",
-			["login"] = "rbxassetid://10723434830",
-			["logout"] = "rbxassetid://10723434906",
-			["luggage"] = "rbxassetid://10723434993",
-			["magnet"] = "rbxassetid://10723435069",
-			["mail"] = "rbxassetid://10734885430",
-			["mailcheck"] = "rbxassetid://10723435182",
-			["mailminus"] = "rbxassetid://10723435261",
-			["mailopen"] = "rbxassetid://10723435342",
-			["mailplus"] = "rbxassetid://10723435443",
-			["mailquestion"] = "rbxassetid://10723435515",
-			["mailsearch"] = "rbxassetid://10734884739",
-			["mailwarning"] = "rbxassetid://10734885015",
-			["mailx"] = "rbxassetid://10734885247",
-			["mails"] = "rbxassetid://10734885614",
-			["map"] = "rbxassetid://10734886202",
-			["mappin"] = "rbxassetid://10734886004",
-			["mappinoff"] = "rbxassetid://10734885803",
-			["maximize"] = "rbxassetid://10734886735",
-			["maximize2"] = "rbxassetid://10734886496",
-			["medal"] = "rbxassetid://10734887072",
-			["megaphone"] = "rbxassetid://10734887454",
-			["megaphoneoff"] = "rbxassetid://10734887311",
-			["meh"] = "rbxassetid://10734887603",
-			["menu"] = "rbxassetid://10734887784",
-			["messagecircle"] = "rbxassetid://10734888000",
-			["messagesquare"] = "rbxassetid://10734888228",
-			["mic"] = "rbxassetid://10734888864",
-			["mic2"] = "rbxassetid://10734888430",
-			["micoff"] = "rbxassetid://10734888646",
-			["microscope"] = "rbxassetid://10734889106",
-			["microwave"] = "rbxassetid://10734895076",
-			["milestone"] = "rbxassetid://10734895310",
-			["minimize"] = "rbxassetid://10734895698",
-			["minimize2"] = "rbxassetid://10734895530",
-			["minus"] = "rbxassetid://10734896206",
-			["minuscircle"] = "rbxassetid://10734895856",
-			["minussquare"] = "rbxassetid://10734896029",
-			["monitor"] = "rbxassetid://10734896881",
-			["monitoroff"] = "rbxassetid://10734896360",
-			["monitorspeaker"] = "rbxassetid://10734896512",
-			["moon"] = "rbxassetid://10734897102",
-			["morehorizontal"] = "rbxassetid://10734897250",
-			["morevertical"] = "rbxassetid://10734897387",
-			["mountain"] = "rbxassetid://10734897956",
-			["mountainsnow"] = "rbxassetid://10734897665",
-			["mouse"] = "rbxassetid://10734898592",
-			["mousepointer"] = "rbxassetid://10734898476",
-			["mousepointer2"] = "rbxassetid://10734898194",
-			["mousepointerclick"] = "rbxassetid://10734898355",
-			["move"] = "rbxassetid://10734900011",
-			["move3d"] = "rbxassetid://10734898756",
-			["movediagonal"] = "rbxassetid://10734899164",
-			["movediagonal2"] = "rbxassetid://10734898934",
-			["movehorizontal"] = "rbxassetid://10734899414",
-			["movevertical"] = "rbxassetid://10734899821",
-			["music"] = "rbxassetid://10734905958",
-			["music2"] = "rbxassetid://10734900215",
-			["music3"] = "rbxassetid://10734905665",
-			["music4"] = "rbxassetid://10734905823",
-			["navigation"] = "rbxassetid://10734906744",
-			["navigation2"] = "rbxassetid://10734906332",
-			["navigation2off"] = "rbxassetid://10734906144",
-			["navigationoff"] = "rbxassetid://10734906580",
-			["network"] = "rbxassetid://10734906975",
-			["newspaper"] = "rbxassetid://10734907168",
-			["octagon"] = "rbxassetid://10734907361",
-			["option"] = "rbxassetid://10734907649",
-			["outdent"] = "rbxassetid://10734907933",
-			["package"] = "rbxassetid://10734909540",
-			["package2"] = "rbxassetid://10734908151",
-			["packagecheck"] = "rbxassetid://10734908384",
-			["packageminus"] = "rbxassetid://10734908626",
-			["packageopen"] = "rbxassetid://10734908793",
-			["packageplus"] = "rbxassetid://10734909016",
-			["packagesearch"] = "rbxassetid://10734909196",
-			["packagex"] = "rbxassetid://10734909375",
-			["paintbucket"] = "rbxassetid://10734909847",
-			["paintbrush"] = "rbxassetid://10734910187",
-			["paintbrush2"] = "rbxassetid://10734910030",
-			["palette"] = "rbxassetid://10734910430",
-			["palmtree"] = "rbxassetid://10734910680",
-			["paperclip"] = "rbxassetid://10734910927",
-			["partypopper"] = "rbxassetid://10734918735",
-			["pause"] = "rbxassetid://10734919336",
-			["pausecircle"] = "rbxassetid://10735024209",
-			["pauseoctagon"] = "rbxassetid://10734919143",
-			["pentool"] = "rbxassetid://10734919503",
-			["pencil"] = "rbxassetid://10734919691",
-			["percent"] = "rbxassetid://10734919919",
-			["personstanding"] = "rbxassetid://10734920149",
-			["phone"] = "rbxassetid://10734921524",
-			["phonecall"] = "rbxassetid://10734920305",
-			["phoneforwarded"] = "rbxassetid://10734920508",
-			["phoneincoming"] = "rbxassetid://10734920694",
-			["phonemissed"] = "rbxassetid://10734920845",
-			["phoneoff"] = "rbxassetid://10734921077",
-			["phoneoutgoing"] = "rbxassetid://10734921288",
-			["piechart"] = "rbxassetid://10734921727",
-			["piggybank"] = "rbxassetid://10734921935",
-			["pin"] = "rbxassetid://10734922324",
-			["pinoff"] = "rbxassetid://10734922180",
-			["pipette"] = "rbxassetid://10734922497",
-			["pizza"] = "rbxassetid://10734922774",
-			["plane"] = "rbxassetid://10734922971",
-			["play"] = "rbxassetid://10734923549",
-			["playcircle"] = "rbxassetid://10734923214",
-			["plus"] = "rbxassetid://10734924532",
-			["pluscircle"] = "rbxassetid://10734923868",
-			["plussquare"] = "rbxassetid://10734924219",
-			["podcast"] = "rbxassetid://10734929553",
-			["pointer"] = "rbxassetid://10734929723",
-			["poundsterling"] = "rbxassetid://10734929981",
-			["power"] = "rbxassetid://10734930466",
-			["poweroff"] = "rbxassetid://10734930257",
-			["printer"] = "rbxassetid://10734930632",
-			["puzzle"] = "rbxassetid://10734930886",
-			["quote"] = "rbxassetid://10734931234",
-			["radio"] = "rbxassetid://10734931596",
-			["radioreceiver"] = "rbxassetid://10734931402",
-			["rectanglehorizontal"] = "rbxassetid://10734931777",
-			["rectanglevertical"] = "rbxassetid://10734932081",
-			["recycle"] = "rbxassetid://10734932295",
-			["redo"] = "rbxassetid://10734932822",
-			["redo2"] = "rbxassetid://10734932586",
-			["refreshccw"] = "rbxassetid://10734933056",
-			["refreshcw"] = "rbxassetid://10734933222",
-			["refrigerator"] = "rbxassetid://10734933465",
-			["regex"] = "rbxassetid://10734933655",
-			["repeat"] = "rbxassetid://10734933966",
-			["repeat1"] = "rbxassetid://10734933826",
-			["reply"] = "rbxassetid://10734934252",
-			["replyall"] = "rbxassetid://10734934132",
-			["rewind"] = "rbxassetid://10734934347",
-			["rocket"] = "rbxassetid://10734934585",
-			["rockingchair"] = "rbxassetid://10734939942",
-			["rotate3d"] = "rbxassetid://10734940107",
-			["rotateccw"] = "rbxassetid://10734940376",
-			["rotatecw"] = "rbxassetid://10734940654",
-			["rss"] = "rbxassetid://10734940825",
-			["ruler"] = "rbxassetid://10734941018",
-			["russianruble"] = "rbxassetid://10734941199",
-			["sailboat"] = "rbxassetid://10734941354",
-			["save"] = "rbxassetid://10734941499",
-			["scale"] = "rbxassetid://10734941912",
-			["scale3d"] = "rbxassetid://10734941739",
-			["scaling"] = "rbxassetid://10734942072",
-			["scan"] = "rbxassetid://10734942565",
-			["scanface"] = "rbxassetid://10734942198",
-			["scanline"] = "rbxassetid://10734942351",
-			["scissors"] = "rbxassetid://10734942778",
-			["screenshare"] = "rbxassetid://10734943193",
-			["screenshareoff"] = "rbxassetid://10734942967",
-			["scroll"] = "rbxassetid://10734943448",
-			["search"] = "rbxassetid://10734943674",
-			["send"] = "rbxassetid://10734943902",
-			["separatorhorizontal"] = "rbxassetid://10734944115",
-			["separatorvertical"] = "rbxassetid://10734944326",
-			["server"] = "rbxassetid://10734949856",
-			["servercog"] = "rbxassetid://10734944444",
-			["servercrash"] = "rbxassetid://10734944554",
-			["serveroff"] = "rbxassetid://10734944668",
-			["settings"] = "rbxassetid://10734950309",
-			["settings2"] = "rbxassetid://10734950020",
-			["share"] = "rbxassetid://10734950813",
-			["share2"] = "rbxassetid://10734950553",
-			["sheet"] = "rbxassetid://10734951038",
-			["shield"] = "rbxassetid://10734951847",
-			["shieldalert"] = "rbxassetid://10734951173",
-			["shieldcheck"] = "rbxassetid://10734951367",
-			["shieldclose"] = "rbxassetid://10734951535",
-			["shieldoff"] = "rbxassetid://10734951684",
-			["shirt"] = "rbxassetid://10734952036",
-			["shoppingbag"] = "rbxassetid://10734952273",
-			["shoppingcart"] = "rbxassetid://10734952479",
-			["shovel"] = "rbxassetid://10734952773",
-			["showerhead"] = "rbxassetid://10734952942",
-			["shrink"] = "rbxassetid://10734953073",
-			["shrub"] = "rbxassetid://10734953241",
-			["shuffle"] = "rbxassetid://10734953451",
-			["sidebar"] = "rbxassetid://10734954301",
-			["sidebarclose"] = "rbxassetid://10734953715",
-			["sidebaropen"] = "rbxassetid://10734954000",
-			["sigma"] = "rbxassetid://10734954538",
-			["signal"] = "rbxassetid://10734961133",
-			["signalhigh"] = "rbxassetid://10734954807",
-			["signallow"] = "rbxassetid://10734955080",
-			["signalmedium"] = "rbxassetid://10734955336",
-			["signalzero"] = "rbxassetid://10734960878",
-			["siren"] = "rbxassetid://10734961284",
-			["skipback"] = "rbxassetid://10734961526",
-			["skipforward"] = "rbxassetid://10734961809",
-			["skull"] = "rbxassetid://10734962068",
-			["slack"] = "rbxassetid://10734962339",
-			["slash"] = "rbxassetid://10734962600",
-			["slice"] = "rbxassetid://10734963024",
-			["sliders"] = "rbxassetid://10734963400",
-			["slidershorizontal"] = "rbxassetid://10734963191",
-			["smartphone"] = "rbxassetid://10734963940",
-			["smartphonecharging"] = "rbxassetid://10734963671",
-			["smile"] = "rbxassetid://10734964441",
-			["smileplus"] = "rbxassetid://10734964188",
-			["snowflake"] = "rbxassetid://10734964600",
-			["sofa"] = "rbxassetid://10734964852",
-			["sortasc"] = "rbxassetid://10734965115",
-			["sortdesc"] = "rbxassetid://10734965287",
-			["speaker"] = "rbxassetid://10734965419",
-			["sprout"] = "rbxassetid://10734965572",
-			["square"] = "rbxassetid://10734965702",
-			["star"] = "rbxassetid://10734966248",
-			["starhalf"] = "rbxassetid://10734965897",
-			["staroff"] = "rbxassetid://10734966097",
-			["stethoscope"] = "rbxassetid://10734966384",
-			["sticker"] = "rbxassetid://10734972234",
-			["stickynote"] = "rbxassetid://10734972463",
-			["stopcircle"] = "rbxassetid://10734972621",
-			["stretchhorizontal"] = "rbxassetid://10734972862",
-			["stretchvertical"] = "rbxassetid://10734973130",
-			["strikethrough"] = "rbxassetid://10734973290",
-			["subscript"] = "rbxassetid://10734973457",
-			["sun"] = "rbxassetid://10734974297",
-			["sundim"] = "rbxassetid://10734973645",
-			["sunmedium"] = "rbxassetid://10734973778",
-			["sunmoon"] = "rbxassetid://10734973999",
-			["sunsnow"] = "rbxassetid://10734974130",
-			["sunrise"] = "rbxassetid://10734974522",
-			["sunset"] = "rbxassetid://10734974689",
-			["superscript"] = "rbxassetid://10734974850",
-			["swissfranc"] = "rbxassetid://10734975024",
-			["switchcamera"] = "rbxassetid://10734975214",
-			["sword"] = "rbxassetid://10734975486",
-			["swords"] = "rbxassetid://10734975692",
-			["syringe"] = "rbxassetid://10734975932",
-			["table"] = "rbxassetid://10734976230",
-			["table2"] = "rbxassetid://10734976097",
-			["tablet"] = "rbxassetid://10734976394",
-			["tag"] = "rbxassetid://10734976528",
-			["tags"] = "rbxassetid://10734976739",
-			["target"] = "rbxassetid://10734977012",
-			["tent"] = "rbxassetid://10734981750",
-			["terminal"] = "rbxassetid://10734982144",
-			["terminalsquare"] = "rbxassetid://10734981995",
-			["textcursor"] = "rbxassetid://10734982395",
-			["textcursorinput"] = "rbxassetid://10734982297",
-			["thermometer"] = "rbxassetid://10734983134",
-			["thermometersnowflake"] = "rbxassetid://10734982571",
-			["thermometersun"] = "rbxassetid://10734982771",
-			["thumbsdown"] = "rbxassetid://10734983359",
-			["thumbsup"] = "rbxassetid://10734983629",
-			["ticket"] = "rbxassetid://10734983868",
-			["timer"] = "rbxassetid://10734984606",
-			["timeroff"] = "rbxassetid://10734984138",
-			["timerreset"] = "rbxassetid://10734984355",
-			["toggleleft"] = "rbxassetid://10734984834",
-			["toggleright"] = "rbxassetid://10734985040",
-			["tornado"] = "rbxassetid://10734985247",
-			["toybrick"] = "rbxassetid://10747361919",
-			["train"] = "rbxassetid://10747362105",
-			["trash"] = "rbxassetid://10747362393",
-			["trash2"] = "rbxassetid://10747362241",
-			["treedeciduous"] = "rbxassetid://10747362534",
-			["treepine"] = "rbxassetid://10747362748",
-			["trees"] = "rbxassetid://10747363016",
-			["trendingdown"] = "rbxassetid://10747363205",
-			["trendingup"] = "rbxassetid://10747363465",
-			["triangle"] = "rbxassetid://10747363621",
-			["trophy"] = "rbxassetid://10747363809",
-			["truck"] = "rbxassetid://10747364031",
-			["tv"] = "rbxassetid://10747364593",
-			["tv2"] = "rbxassetid://10747364302",
-			["type"] = "rbxassetid://10747364761",
-			["umbrella"] = "rbxassetid://10747364971",
-			["underline"] = "rbxassetid://10747365191",
-			["undo"] = "rbxassetid://10747365484",
-			["undo2"] = "rbxassetid://10747365359",
-			["unlink"] = "rbxassetid://10747365771",
-			["unlink2"] = "rbxassetid://10747397871",
-			["unlock"] = "rbxassetid://10747366027",
-			["upload"] = "rbxassetid://10747366434",
-			["uploadcloud"] = "rbxassetid://10747366266",
-			["usb"] = "rbxassetid://10747366606",
-			["user"] = "rbxassetid://10747373176",
-			["usercheck"] = "rbxassetid://10747371901",
-			["usercog"] = "rbxassetid://10747372167",
-			["userminus"] = "rbxassetid://10747372346",
-			["userplus"] = "rbxassetid://10747372702",
-			["userx"] = "rbxassetid://10747372992",
-			["users"] = "rbxassetid://10747373426",
-			["utensils"] = "rbxassetid://10747373821",
-			["utensilscrossed"] = "rbxassetid://10747373629",
-			["venetianmask"] = "rbxassetid://10747374003",
-			["verified"] = "rbxassetid://10747374131",
-			["vibrate"] = "rbxassetid://10747374489",
-			["vibrateoff"] = "rbxassetid://10747374269",
-			["video"] = "rbxassetid://10747374938",
-			["videooff"] = "rbxassetid://10747374721",
-			["view"] = "rbxassetid://10747375132",
-			["voicemail"] = "rbxassetid://10747375281",
-			["volume"] = "rbxassetid://10747376008",
-			["volume1"] = "rbxassetid://10747375450",
-			["volume2"] = "rbxassetid://10747375679",
-			["volumex"] = "rbxassetid://10747375880",
-			["wallet"] = "rbxassetid://10747376205",
-			["wand"] = "rbxassetid://10747376565",
-			["wand2"] = "rbxassetid://10747376349",
-			["watch"] = "rbxassetid://10747376722",
-			["waves"] = "rbxassetid://10747376931",
-			["webcam"] = "rbxassetid://10747381992",
-			["wifi"] = "rbxassetid://10747382504",
-			["wifioff"] = "rbxassetid://10747382268",
-			["wind"] = "rbxassetid://10747382750",
-			["wraptext"] = "rbxassetid://10747383065",
-			["wrench"] = "rbxassetid://10747383470",
-			["x"] = "rbxassetid://10747384394",
-			["xcircle"] = "rbxassetid://10747383819",
-			["xoctagon"] = "rbxassetid://10747384037",
-			["xsquare"] = "rbxassetid://10747384217",
-			["zoomin"] = "rbxassetid://10747384552",
-			["zoomout"] = "rbxassetid://10747384679"
-		}
-	end)()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+local
+a
+=
+game
+:
+
+GetService(
+'UserInputService'
+)
+local
+b
+=
+game
+:
+
+GetService(
+'TweenService'
+)
+local
+c
+=
+game
+:
+
+GetService(
+'HttpService'
+)
+local
+d
+=
+game
+:
+
+GetService(
+'Players'
+)
+local
+e
+=
+d
+.
+LocalPlayer
+local
+f
+=
+e
+:
+
+GetMouse(
+)
+local
+g
+=
+(
+gethui
+and
+
+gethui(
+)
+)
+or
+game
+:
+
+GetService(
+'CoreGui'
+)
+local
+h
+=
+{
+Themes
+=
+{
+Default
+=
+{
+[
+'Color Hub 1'
+]
+=
+ColorSequence
+.
+
+new(
+{
+ColorSequenceKeypoint
+.
+
+new(
+0
+,
+Color3
+.
+
+fromRGB(
+25
+,
+25
+,
+25
+)
+)
+,
+ColorSequenceKeypoint
+.
+
+new(
+0.5
+,
+Color3
+.
+
+fromRGB(
+32.5
+,
+32.5
+,
+32.5
+)
+)
+,
+ColorSequenceKeypoint
+.
+
+new(
+1
+,
+Color3
+.
+
+fromRGB(
+25
+,
+25
+,
+25
+)
+)
+}
+)
+,
+[
+'Color Hub 2'
+]
+=
+Color3
+.
+
+fromRGB(
+30
+,
+30
+,
+30
+)
+,
+[
+'Color Stroke'
+]
+=
+Color3
+.
+
+fromRGB(
+40
+,
+40
+,
+40
+)
+,
+[
+'Color Theme'
+]
+=
+Color3
+.
+
+fromRGB(
+88
+,
+101
+,
+242
+)
+,
+[
+'Color Text'
+]
+=
+Color3
+.
+
+fromRGB(
+243
+,
+243
+,
+243
+)
+,
+[
+'Color Dark Text'
+]
+=
+Color3
+.
+
+fromRGB(
+180
+,
+180
+,
+180
+)
+}
+,
+Dark
+=
+{
+[
+'Color Hub 1'
+]
+=
+ColorSequence
+.
+
+new(
+{
+ColorSequenceKeypoint
+.
+
+new(
+0
+,
+Color3
+.
+
+fromRGB(
+40
+,
+40
+,
+40
+)
+)
+,
+ColorSequenceKeypoint
+.
+
+new(
+0.5
+,
+Color3
+.
+
+fromRGB(
+47.5
+,
+47.5
+,
+47.5
+)
+)
+,
+ColorSequenceKeypoint
+.
+
+new(
+1
+,
+Color3
+.
+
+fromRGB(
+40
+,
+40
+,
+40
+)
+)
+}
+)
+,
+[
+'Color Hub 2'
+]
+=
+Color3
+.
+
+fromRGB(
+45
+,
+45
+,
+45
+)
+,
+[
+'Color Stroke'
+]
+=
+Color3
+.
+
+fromRGB(
+65
+,
+65
+,
+65
+)
+,
+[
+'Color Theme'
+]
+=
+Color3
+.
+
+fromRGB(
+65
+,
+150
+,
+255
+)
+,
+[
+'Color Text'
+]
+=
+Color3
+.
+
+fromRGB(
+245
+,
+245
+,
+245
+)
+,
+[
+'Color Dark Text'
+]
+=
+Color3
+.
+
+fromRGB(
+190
+,
+190
+,
+190
+)
+}
+,
+Red
+=
+{
+[
+'Color Hub 1'
+]
+=
+ColorSequence
+.
+
+new(
+{
+ColorSequenceKeypoint
+.
+
+new(
+0
+,
+Color3
+.
+
+fromRGB(
+25
+,
+25
+,
+25
+)
+)
+,
+ColorSequenceKeypoint
+.
+
+new(
+0.5
+,
+Color3
+.
+
+fromRGB(
+32.5
+,
+32.5
+,
+32.5
+)
+)
+,
+ColorSequenceKeypoint
+.
+
+new(
+1
+,
+Color3
+.
+
+fromRGB(
+25
+,
+25
+,
+25
+)
+)
+}
+)
+,
+[
+'Color Hub 2'
+]
+=
+Color3
+.
+
+fromRGB(
+30
+,
+30
+,
+30
+)
+,
+[
+'Color Stroke'
+]
+=
+Color3
+.
+
+fromRGB(
+40
+,
+40
+,
+40
+)
+,
+[
+'Color Theme'
+]
+=
+Color3
+.
+
+fromRGB(
+255
+,
+0
+,
+0
+)
+,
+[
+'Color Text'
+]
+=
+Color3
+.
+
+fromRGB(
+243
+,
+243
+,
+243
+)
+,
+[
+'Color Dark Text'
+]
+=
+Color3
+.
+
+fromRGB(
+180
+,
+180
+,
+180
+)
+}
+,
+Yellow
+=
+{
+[
+'Color Hub 1'
+]
+=
+ColorSequence
+.
+
+new(
+{
+ColorSequenceKeypoint
+.
+
+new(
+0
+,
+Color3
+.
+
+fromRGB(
+25
+,
+25
+,
+25
+)
+)
+,
+ColorSequenceKeypoint
+.
+
+new(
+0.5
+,
+Color3
+.
+
+fromRGB(
+32.5
+,
+32.5
+,
+32.5
+)
+)
+,
+ColorSequenceKeypoint
+.
+
+new(
+1
+,
+Color3
+.
+
+fromRGB(
+25
+,
+25
+,
+25
+)
+)
+}
+)
+,
+[
+'Color Hub 2'
+]
+=
+Color3
+.
+
+fromRGB(
+30
+,
+30
+,
+30
+)
+,
+[
+'Color Stroke'
+]
+=
+Color3
+.
+
+fromRGB(
+40
+,
+40
+,
+40
+)
+,
+[
+'Color Theme'
+]
+=
+Color3
+.
+
+fromRGB(
+255
+,
+255
+,
+0
+)
+,
+[
+'Color Text'
+]
+=
+Color3
+.
+
+fromRGB(
+243
+,
+243
+,
+243
+)
+,
+[
+'Color Dark Text'
+]
+=
+Color3
+.
+
+fromRGB(
+180
+,
+180
+,
+180
+)
+}
+,
+Green
+=
+{
+[
+'Color Hub 1'
+]
+=
+ColorSequence
+.
+
+new(
+{
+ColorSequenceKeypoint
+.
+
+new(
+0
+,
+Color3
+.
+
+fromRGB(
+25
+,
+25
+,
+25
+)
+)
+,
+ColorSequenceKeypoint
+.
+
+new(
+0.5
+,
+Color3
+.
+
+fromRGB(
+32.5
+,
+32.5
+,
+32.5
+)
+)
+,
+ColorSequenceKeypoint
+.
+
+new(
+1
+,
+Color3
+.
+
+fromRGB(
+25
+,
+25
+,
+25
+)
+)
+}
+)
+,
+[
+'Color Hub 2'
+]
+=
+Color3
+.
+
+fromRGB(
+30
+,
+30
+,
+30
+)
+,
+[
+'Color Stroke'
+]
+=
+Color3
+.
+
+fromRGB(
+40
+,
+40
+,
+40
+)
+,
+[
+'Color Theme'
+]
+=
+Color3
+.
+
+fromRGB(
+31
+,
+255
+,
+49
+)
+,
+[
+'Color Text'
+]
+=
+Color3
+.
+
+fromRGB(
+243
+,
+243
+,
+243
+)
+,
+[
+'Color Dark Text'
+]
+=
+Color3
+.
+
+fromRGB(
+180
+,
+180
+,
+180
+)
+}
+,
+Orange
+=
+{
+[
+'Color Hub 1'
+]
+=
+ColorSequence
+.
+
+new(
+{
+ColorSequenceKeypoint
+.
+
+new(
+0
+,
+Color3
+.
+
+fromRGB(
+25
+,
+25
+,
+25
+)
+)
+,
+ColorSequenceKeypoint
+.
+
+new(
+0.5
+,
+Color3
+.
+
+fromRGB(
+32.5
+,
+32.5
+,
+32.5
+)
+)
+,
+ColorSequenceKeypoint
+.
+
+new(
+1
+,
+Color3
+.
+
+fromRGB(
+25
+,
+25
+,
+25
+)
+)
+}
+)
+,
+[
+'Color Hub 2'
+]
+=
+Color3
+.
+
+fromRGB(
+30
+,
+30
+,
+30
+)
+,
+[
+'Color Stroke'
+]
+=
+Color3
+.
+
+fromRGB(
+40
+,
+40
+,
+40
+)
+,
+[
+'Color Theme'
+]
+=
+Color3
+.
+
+fromRGB(
+170
+,
+85
+,
+0
+)
+,
+[
+'Color Text'
+]
+=
+Color3
+.
+
+fromRGB(
+243
+,
+243
+,
+243
+)
+,
+[
+'Color Dark Text'
+]
+=
+Color3
+.
+
+fromRGB(
+180
+,
+180
+,
+180
+)
+}
+,
+Blue
+=
+{
+[
+'Color Hub 1'
+]
+=
+ColorSequence
+.
+
+new(
+{
+ColorSequenceKeypoint
+.
+
+new(
+0
+,
+Color3
+.
+
+fromRGB(
+25
+,
+25
+,
+25
+)
+)
+,
+ColorSequenceKeypoint
+.
+
+new(
+0.5
+,
+Color3
+.
+
+fromRGB(
+32.5
+,
+32.5
+,
+32.5
+)
+)
+,
+ColorSequenceKeypoint
+.
+
+new(
+1
+,
+Color3
+.
+
+fromRGB(
+25
+,
+25
+,
+25
+)
+)
+}
+)
+,
+[
+'Color Hub 2'
+]
+=
+Color3
+.
+
+fromRGB(
+30
+,
+30
+,
+30
+)
+,
+[
+'Color Stroke'
+]
+=
+Color3
+.
+
+fromRGB(
+40
+,
+40
+,
+40
+)
+,
+[
+'Color Theme'
+]
+=
+Color3
+.
+
+fromRGB(
+0
+,
+255
+,
+255
+)
+,
+[
+'Color Text'
+]
+=
+Color3
+.
+
+fromRGB(
+243
+,
+243
+,
+243
+)
+,
+[
+'Color Dark Text'
+]
+=
+Color3
+.
+
+fromRGB(
+180
+,
+180
+,
+180
+)
+}
+,
+Purple
+=
+{
+[
+'Color Hub 1'
+]
+=
+ColorSequence
+.
+
+new(
+{
+ColorSequenceKeypoint
+.
+
+new(
+0
+,
+Color3
+.
+
+fromRGB(
+27.5
+,
+25
+,
+30
+)
+)
+,
+ColorSequenceKeypoint
+.
+
+new(
+0.5
+,
+Color3
+.
+
+fromRGB(
+32.5
+,
+32.5
+,
+32.5
+)
+)
+,
+ColorSequenceKeypoint
+.
+
+new(
+1
+,
+Color3
+.
+
+fromRGB(
+27.5
+,
+25
+,
+30
+)
+)
+}
+)
+,
+[
+'Color Hub 2'
+]
+=
+Color3
+.
+
+fromRGB(
+30
+,
+30
+,
+30
+)
+,
+[
+'Color Stroke'
+]
+=
+Color3
+.
+
+fromRGB(
+40
+,
+40
+,
+40
+)
+,
+[
+'Color Theme'
+]
+=
+Color3
+.
+
+fromRGB(
+150
+,
+0
+,
+255
+)
+,
+[
+'Color Text'
+]
+=
+Color3
+.
+
+fromRGB(
+240
+,
+240
+,
+240
+)
+,
+[
+'Color Dark Text'
+]
+=
+Color3
+.
+
+fromRGB(
+180
+,
+180
+,
+180
+)
+}
+,
+White
+=
+{
+[
+'Color Hub 1'
+]
+=
+ColorSequence
+.
+
+new(
+{
+ColorSequenceKeypoint
+.
+
+new(
+0
+,
+Color3
+.
+
+fromRGB(
+25
+,
+25
+,
+25
+)
+)
+,
+ColorSequenceKeypoint
+.
+
+new(
+0.5
+,
+Color3
+.
+
+fromRGB(
+32.5
+,
+32.5
+,
+32.5
+)
+)
+,
+ColorSequenceKeypoint
+.
+
+new(
+1
+,
+Color3
+.
+
+fromRGB(
+25
+,
+25
+,
+25
+)
+)
+}
+)
+,
+[
+'Color Hub 2'
+]
+=
+Color3
+.
+
+fromRGB(
+30
+,
+30
+,
+30
+)
+,
+[
+'Color Stroke'
+]
+=
+Color3
+.
+
+fromRGB(
+40
+,
+40
+,
+40
+)
+,
+[
+'Color Theme'
+]
+=
+Color3
+.
+
+fromRGB(
+255
+,
+255
+,
+255
+)
+,
+[
+'Color Text'
+]
+=
+Color3
+.
+
+fromRGB(
+243
+,
+243
+,
+243
+)
+,
+[
+'Color Dark Text'
+]
+=
+Color3
+.
+
+fromRGB(
+180
+,
+180
+,
+180
+)
+}
+}
+,
+Info
+=
+{
+Version
+=
+'1.1.0'
+}
+,
+Save
+=
+{
+UISize
+=
+{
+550
+,
+380
+}
+,
+TabSize
+=
+160
+,
+Theme
+=
+'Default'
+}
+,
+Settings
+=
+{
+}
+,
+Connection
+=
+{
+}
+,
+Instances
+=
+{
+}
+,
+Elements
+=
+{
+}
+,
+Options
+=
+{
+}
+,
+Flags
+=
+{
+}
+,
+Tabs
+=
+{
+}
+,
+Icons
+=
+(
+function
+(
+)
+return
+{
+[
+'accessibility'
+]
+=
+'rbxassetid://10709751939'
+,
+[
+'activity'
+]
+=
+'rbxassetid://10709752035'
+,
+[
+'airvent'
+]
+=
+'rbxassetid://10709752131'
+,
+[
+'airplay'
+]
+=
+'rbxassetid://10709752254'
+,
+[
+'alarmcheck'
+]
+=
+'rbxassetid://10709752405'
+,
+[
+'alarmclock'
+]
+=
+'rbxassetid://10709752630'
+,
+[
+'alarmclockoff'
+]
+=
+'rbxassetid://10709752508'
+,
+[
+'alarmminus'
+]
+=
+'rbxassetid://10709752732'
+,
+[
+'alarmplus'
+]
+=
+'rbxassetid://10709752825'
+,
+[
+'album'
+]
+=
+'rbxassetid://10709752906'
+,
+[
+'alertcircle'
+]
+=
+'rbxassetid://10709752996'
+,
+[
+'alertoctagon'
+]
+=
+'rbxassetid://10709753064'
+,
+[
+'alerttriangle'
+]
+=
+'rbxassetid://10709753149'
+,
+[
+'aligncenter'
+]
+=
+'rbxassetid://10709753570'
+,
+[
+'aligncenterhorizontal'
+]
+=
+'rbxassetid://10709753272'
+,
+[
+'aligncentervertical'
+]
+=
+'rbxassetid://10709753421'
+,
+[
+'alignendhorizontal'
+]
+=
+'rbxassetid://10709753692'
+,
+[
+'alignendvertical'
+]
+=
+'rbxassetid://10709753808'
+,
+[
+'alignhorizontaldistributecenter'
+]
+=
+'rbxassetid://10747779791'
+,
+[
+'alignhorizontaldistributeend'
+]
+=
+'rbxassetid://10747784534'
+,
+[
+'alignhorizontaldistributestart'
+]
+=
+'rbxassetid://10709754118'
+,
+[
+'alignhorizontaljustifycenter'
+]
+=
+'rbxassetid://10709754204'
+,
+[
+'alignhorizontaljustifyend'
+]
+=
+'rbxassetid://10709754317'
+,
+[
+'alignhorizontaljustifystart'
+]
+=
+'rbxassetid://10709754436'
+,
+[
+'alignhorizontalspacearound'
+]
+=
+'rbxassetid://10709754590'
+,
+[
+'alignhorizontalspacebetween'
+]
+=
+'rbxassetid://10709754749'
+,
+[
+'alignjustify'
+]
+=
+'rbxassetid://10709759610'
+,
+[
+'alignleft'
+]
+=
+'rbxassetid://10709759764'
+,
+[
+'alignright'
+]
+=
+'rbxassetid://10709759895'
+,
+[
+'alignstarthorizontal'
+]
+=
+'rbxassetid://10709760051'
+,
+[
+'alignstartvertical'
+]
+=
+'rbxassetid://10709760244'
+,
+[
+'alignverticaldistributecenter'
+]
+=
+'rbxassetid://10709760351'
+,
+[
+'alignverticaldistributeend'
+]
+=
+'rbxassetid://10709760434'
+,
+[
+'alignverticaldistributestart'
+]
+=
+'rbxassetid://10709760612'
+,
+[
+'alignverticaljustifycenter'
+]
+=
+'rbxassetid://10709760814'
+,
+[
+'alignverticaljustifyend'
+]
+=
+'rbxassetid://10709761003'
+,
+[
+'alignverticaljustifystart'
+]
+=
+'rbxassetid://10709761176'
+,
+[
+'alignverticalspacearound'
+]
+=
+'rbxassetid://10709761324'
+,
+[
+'alignverticalspacebetween'
+]
+=
+'rbxassetid://10709761434'
+,
+[
+'anchor'
+]
+=
+'rbxassetid://10709761530'
+,
+[
+'angry'
+]
+=
+'rbxassetid://10709761629'
+,
+[
+'annoyed'
+]
+=
+'rbxassetid://10709761722'
+,
+[
+'aperture'
+]
+=
+'rbxassetid://10709761813'
+,
+[
+'apple'
+]
+=
+'rbxassetid://10709761889'
+,
+[
+'archive'
+]
+=
+'rbxassetid://10709762233'
+,
+[
+'archiverestore'
+]
+=
+'rbxassetid://10709762058'
+,
+[
+'armchair'
+]
+=
+'rbxassetid://10709762327'
+,
+[
+'arrowbigdown'
+]
+=
+'rbxassetid://10747796644'
+,
+[
+'arrowbigleft'
+]
+=
+'rbxassetid://10709762574'
+,
+[
+'arrowbigright'
+]
+=
+'rbxassetid://10709762727'
+,
+[
+'arrowbigup'
+]
+=
+'rbxassetid://10709762879'
+,
+[
+'arrowdown'
+]
+=
+'rbxassetid://10709767827'
+,
+[
+'arrowdowncircle'
+]
+=
+'rbxassetid://10709763034'
+,
+[
+'arrowdownleft'
+]
+=
+'rbxassetid://10709767656'
+,
+[
+'arrowdownright'
+]
+=
+'rbxassetid://10709767750'
+,
+[
+'arrowleft'
+]
+=
+'rbxassetid://10709768114'
+,
+[
+'arrowleftcircle'
+]
+=
+'rbxassetid://10709767936'
+,
+[
+'arrowleftright'
+]
+=
+'rbxassetid://10709768019'
+,
+[
+'arrowright'
+]
+=
+'rbxassetid://10709768347'
+,
+[
+'arrowrightcircle'
+]
+=
+'rbxassetid://10709768226'
+,
+[
+'arrowup'
+]
+=
+'rbxassetid://10709768939'
+,
+[
+'arrowupcircle'
+]
+=
+'rbxassetid://10709768432'
+,
+[
+'arrowupdown'
+]
+=
+'rbxassetid://10709768538'
+,
+[
+'arrowupleft'
+]
+=
+'rbxassetid://10709768661'
+,
+[
+'arrowupright'
+]
+=
+'rbxassetid://10709768787'
+,
+[
+'asterisk'
+]
+=
+'rbxassetid://10709769095'
+,
+[
+'atsign'
+]
+=
+'rbxassetid://10709769286'
+,
+[
+'award'
+]
+=
+'rbxassetid://10709769406'
+,
+[
+'axe'
+]
+=
+'rbxassetid://10709769508'
+,
+[
+'axis3d'
+]
+=
+'rbxassetid://10709769598'
+,
+[
+'baby'
+]
+=
+'rbxassetid://10709769732'
+,
+[
+'backpack'
+]
+=
+'rbxassetid://10709769841'
+,
+[
+'baggageclaim'
+]
+=
+'rbxassetid://10709769935'
+,
+[
+'banana'
+]
+=
+'rbxassetid://10709770005'
+,
+[
+'banknote'
+]
+=
+'rbxassetid://10709770178'
+,
+[
+'barchart'
+]
+=
+'rbxassetid://10709773755'
+,
+[
+'barchart2'
+]
+=
+'rbxassetid://10709770317'
+,
+[
+'barchart3'
+]
+=
+'rbxassetid://10709770431'
+,
+[
+'barchart4'
+]
+=
+'rbxassetid://10709770560'
+,
+[
+'barcharthorizontal'
+]
+=
+'rbxassetid://10709773669'
+,
+[
+'barcode'
+]
+=
+'rbxassetid://10747360675'
+,
+[
+'baseline'
+]
+=
+'rbxassetid://10709773863'
+,
+[
+'bath'
+]
+=
+'rbxassetid://10709773963'
+,
+[
+'battery'
+]
+=
+'rbxassetid://10709774640'
+,
+[
+'batterycharging'
+]
+=
+'rbxassetid://10709774068'
+,
+[
+'batteryfull'
+]
+=
+'rbxassetid://10709774206'
+,
+[
+'batterylow'
+]
+=
+'rbxassetid://10709774370'
+,
+[
+'batterymedium'
+]
+=
+'rbxassetid://10709774513'
+,
+[
+'beaker'
+]
+=
+'rbxassetid://10709774756'
+,
+[
+'bed'
+]
+=
+'rbxassetid://10709775036'
+,
+[
+'beddouble'
+]
+=
+'rbxassetid://10709774864'
+,
+[
+'bedsingle'
+]
+=
+'rbxassetid://10709774968'
+,
+[
+'beer'
+]
+=
+'rbxassetid://10709775167'
+,
+[
+'bell'
+]
+=
+'rbxassetid://10709775704'
+,
+[
+'bellminus'
+]
+=
+'rbxassetid://10709775241'
+,
+[
+'belloff'
+]
+=
+'rbxassetid://10709775320'
+,
+[
+'bellplus'
+]
+=
+'rbxassetid://10709775448'
+,
+[
+'bellring'
+]
+=
+'rbxassetid://10709775560'
+,
+[
+'bike'
+]
+=
+'rbxassetid://10709775894'
+,
+[
+'binary'
+]
+=
+'rbxassetid://10709776050'
+,
+[
+'bitcoin'
+]
+=
+'rbxassetid://10709776126'
+,
+[
+'bluetooth'
+]
+=
+'rbxassetid://10709776655'
+,
+[
+'bluetoothconnected'
+]
+=
+'rbxassetid://10709776240'
+,
+[
+'bluetoothoff'
+]
+=
+'rbxassetid://10709776344'
+,
+[
+'bluetoothsearching'
+]
+=
+'rbxassetid://10709776501'
+,
+[
+'bold'
+]
+=
+'rbxassetid://10747813908'
+,
+[
+'bomb'
+]
+=
+'rbxassetid://10709781460'
+,
+[
+'bone'
+]
+=
+'rbxassetid://10709781605'
+,
+[
+'book'
+]
+=
+'rbxassetid://10709781824'
+,
+[
+'bookopen'
+]
+=
+'rbxassetid://10709781717'
+,
+[
+'bookmark'
+]
+=
+'rbxassetid://10709782154'
+,
+[
+'bookmarkminus'
+]
+=
+'rbxassetid://10709781919'
+,
+[
+'bookmarkplus'
+]
+=
+'rbxassetid://10709782044'
+,
+[
+'bot'
+]
+=
+'rbxassetid://10709782230'
+,
+[
+'box'
+]
+=
+'rbxassetid://10709782497'
+,
+[
+'boxselect'
+]
+=
+'rbxassetid://10709782342'
+,
+[
+'boxes'
+]
+=
+'rbxassetid://10709782582'
+,
+[
+'briefcase'
+]
+=
+'rbxassetid://10709782662'
+,
+[
+'brush'
+]
+=
+'rbxassetid://10709782758'
+,
+[
+'bug'
+]
+=
+'rbxassetid://10709782845'
+,
+[
+'building'
+]
+=
+'rbxassetid://10709783051'
+,
+[
+'building2'
+]
+=
+'rbxassetid://10709782939'
+,
+[
+'bus'
+]
+=
+'rbxassetid://10709783137'
+,
+[
+'cake'
+]
+=
+'rbxassetid://10709783217'
+,
+[
+'calculator'
+]
+=
+'rbxassetid://10709783311'
+,
+[
+'calendar'
+]
+=
+'rbxassetid://10709789505'
+,
+[
+'calendarcheck'
+]
+=
+'rbxassetid://10709783474'
+,
+[
+'calendarcheck2'
+]
+=
+'rbxassetid://10709783392'
+,
+[
+'calendarclock'
+]
+=
+'rbxassetid://10709783577'
+,
+[
+'calendardays'
+]
+=
+'rbxassetid://10709783673'
+,
+[
+'calendarheart'
+]
+=
+'rbxassetid://10709783835'
+,
+[
+'calendarminus'
+]
+=
+'rbxassetid://10709783959'
+,
+[
+'calendaroff'
+]
+=
+'rbxassetid://10709788784'
+,
+[
+'calendarplus'
+]
+=
+'rbxassetid://10709788937'
+,
+[
+'calendarrange'
+]
+=
+'rbxassetid://10709789053'
+,
+[
+'calendarsearch'
+]
+=
+'rbxassetid://10709789200'
+,
+[
+'calendarx'
+]
+=
+'rbxassetid://10709789407'
+,
+[
+'calendarx2'
+]
+=
+'rbxassetid://10709789329'
+,
+[
+'camera'
+]
+=
+'rbxassetid://10709789686'
+,
+[
+'cameraoff'
+]
+=
+'rbxassetid://10747822677'
+,
+[
+'car'
+]
+=
+'rbxassetid://10709789810'
+,
+[
+'carrot'
+]
+=
+'rbxassetid://10709789960'
+,
+[
+'cast'
+]
+=
+'rbxassetid://10709790097'
+,
+[
+'charge'
+]
+=
+'rbxassetid://10709790202'
+,
+[
+'check'
+]
+=
+'rbxassetid://10709790644'
+,
+[
+'checkcircle'
+]
+=
+'rbxassetid://10709790387'
+,
+[
+'checkcircle2'
+]
+=
+'rbxassetid://10709790298'
+,
+[
+'checksquare'
+]
+=
+'rbxassetid://10709790537'
+,
+[
+'chefhat'
+]
+=
+'rbxassetid://10709790757'
+,
+[
+'cherry'
+]
+=
+'rbxassetid://10709790875'
+,
+[
+'chevrondown'
+]
+=
+'rbxassetid://10709790948'
+,
+[
+'chevronfirst'
+]
+=
+'rbxassetid://10709791015'
+,
+[
+'chevronlast'
+]
+=
+'rbxassetid://10709791130'
+,
+[
+'chevronleft'
+]
+=
+'rbxassetid://10709791281'
+,
+[
+'chevronright'
+]
+=
+'rbxassetid://10709791437'
+,
+[
+'chevronup'
+]
+=
+'rbxassetid://10709791523'
+,
+[
+'chevronsdown'
+]
+=
+'rbxassetid://10709796864'
+,
+[
+'chevronsdownup'
+]
+=
+'rbxassetid://10709791632'
+,
+[
+'chevronsleft'
+]
+=
+'rbxassetid://10709797151'
+,
+[
+'chevronsleftright'
+]
+=
+'rbxassetid://10709797006'
+,
+[
+'chevronsright'
+]
+=
+'rbxassetid://10709797382'
+,
+[
+'chevronsrightleft'
+]
+=
+'rbxassetid://10709797274'
+,
+[
+'chevronsup'
+]
+=
+'rbxassetid://10709797622'
+,
+[
+'chevronsupdown'
+]
+=
+'rbxassetid://10709797508'
+,
+[
+'chrome'
+]
+=
+'rbxassetid://10709797725'
+,
+[
+'circle'
+]
+=
+'rbxassetid://10709798174'
+,
+[
+'circledot'
+]
+=
+'rbxassetid://10709797837'
+,
+[
+'circleellipsis'
+]
+=
+'rbxassetid://10709797985'
+,
+[
+'circleslashed'
+]
+=
+'rbxassetid://10709798100'
+,
+[
+'citrus'
+]
+=
+'rbxassetid://10709798276'
+,
+[
+'clapperboard'
+]
+=
+'rbxassetid://10709798350'
+,
+[
+'clipboard'
+]
+=
+'rbxassetid://10709799288'
+,
+[
+'clipboardcheck'
+]
+=
+'rbxassetid://10709798443'
+,
+[
+'clipboardcopy'
+]
+=
+'rbxassetid://10709798574'
+,
+[
+'clipboardedit'
+]
+=
+'rbxassetid://10709798682'
+,
+[
+'clipboardlist'
+]
+=
+'rbxassetid://10709798792'
+,
+[
+'clipboardsignature'
+]
+=
+'rbxassetid://10709798890'
+,
+[
+'clipboardtype'
+]
+=
+'rbxassetid://10709798999'
+,
+[
+'clipboardx'
+]
+=
+'rbxassetid://10709799124'
+,
+[
+'clock'
+]
+=
+'rbxassetid://10709805144'
+,
+[
+'clock1'
+]
+=
+'rbxassetid://10709799535'
+,
+[
+'clock10'
+]
+=
+'rbxassetid://10709799718'
+,
+[
+'clock11'
+]
+=
+'rbxassetid://10709799818'
+,
+[
+'clock12'
+]
+=
+'rbxassetid://10709799962'
+,
+[
+'clock2'
+]
+=
+'rbxassetid://10709803876'
+,
+[
+'clock3'
+]
+=
+'rbxassetid://10709803989'
+,
+[
+'clock4'
+]
+=
+'rbxassetid://10709804164'
+,
+[
+'clock5'
+]
+=
+'rbxassetid://10709804291'
+,
+[
+'clock6'
+]
+=
+'rbxassetid://10709804435'
+,
+[
+'clock7'
+]
+=
+'rbxassetid://10709804599'
+,
+[
+'clock8'
+]
+=
+'rbxassetid://10709804784'
+,
+[
+'clock9'
+]
+=
+'rbxassetid://10709804996'
+,
+[
+'cloud'
+]
+=
+'rbxassetid://10709806740'
+,
+[
+'cloudcog'
+]
+=
+'rbxassetid://10709805262'
+,
+[
+'clouddrizzle'
+]
+=
+'rbxassetid://10709805371'
+,
+[
+'cloudfog'
+]
+=
+'rbxassetid://10709805477'
+,
+[
+'cloudhail'
+]
+=
+'rbxassetid://10709805596'
+,
+[
+'cloudlightning'
+]
+=
+'rbxassetid://10709805727'
+,
+[
+'cloudmoon'
+]
+=
+'rbxassetid://10709805942'
+,
+[
+'cloudmoonrain'
+]
+=
+'rbxassetid://10709805838'
+,
+[
+'cloudoff'
+]
+=
+'rbxassetid://10709806060'
+,
+[
+'cloudrain'
+]
+=
+'rbxassetid://10709806277'
+,
+[
+'cloudrainwind'
+]
+=
+'rbxassetid://10709806166'
+,
+[
+'cloudsnow'
+]
+=
+'rbxassetid://10709806374'
+,
+[
+'cloudsun'
+]
+=
+'rbxassetid://10709806631'
+,
+[
+'cloudsunrain'
+]
+=
+'rbxassetid://10709806475'
+,
+[
+'cloudy'
+]
+=
+'rbxassetid://10709806859'
+,
+[
+'clover'
+]
+=
+'rbxassetid://10709806995'
+,
+[
+'code'
+]
+=
+'rbxassetid://10709810463'
+,
+[
+'code2'
+]
+=
+'rbxassetid://10709807111'
+,
+[
+'codepen'
+]
+=
+'rbxassetid://10709810534'
+,
+[
+'codesandbox'
+]
+=
+'rbxassetid://10709810676'
+,
+[
+'coffee'
+]
+=
+'rbxassetid://10709810814'
+,
+[
+'cog'
+]
+=
+'rbxassetid://10709810948'
+,
+[
+'coins'
+]
+=
+'rbxassetid://10709811110'
+,
+[
+'columns'
+]
+=
+'rbxassetid://10709811261'
+,
+[
+'command'
+]
+=
+'rbxassetid://10709811365'
+,
+[
+'compass'
+]
+=
+'rbxassetid://10709811445'
+,
+[
+'component'
+]
+=
+'rbxassetid://10709811595'
+,
+[
+'conciergebell'
+]
+=
+'rbxassetid://10709811706'
+,
+[
+'connection'
+]
+=
+'rbxassetid://10747361219'
+,
+[
+'contact'
+]
+=
+'rbxassetid://10709811834'
+,
+[
+'contrast'
+]
+=
+'rbxassetid://10709811939'
+,
+[
+'cookie'
+]
+=
+'rbxassetid://10709812067'
+,
+[
+'copy'
+]
+=
+'rbxassetid://10709812159'
+,
+[
+'copyleft'
+]
+=
+'rbxassetid://10709812251'
+,
+[
+'copyright'
+]
+=
+'rbxassetid://10709812311'
+,
+[
+'cornerdownleft'
+]
+=
+'rbxassetid://10709812396'
+,
+[
+'cornerdownright'
+]
+=
+'rbxassetid://10709812485'
+,
+[
+'cornerleftdown'
+]
+=
+'rbxassetid://10709812632'
+,
+[
+'cornerleftup'
+]
+=
+'rbxassetid://10709812784'
+,
+[
+'cornerrightdown'
+]
+=
+'rbxassetid://10709812939'
+,
+[
+'cornerrightup'
+]
+=
+'rbxassetid://10709813094'
+,
+[
+'cornerupleft'
+]
+=
+'rbxassetid://10709813185'
+,
+[
+'cornerupright'
+]
+=
+'rbxassetid://10709813281'
+,
+[
+'cpu'
+]
+=
+'rbxassetid://10709813383'
+,
+[
+'croissant'
+]
+=
+'rbxassetid://10709818125'
+,
+[
+'crop'
+]
+=
+'rbxassetid://10709818245'
+,
+[
+'cross'
+]
+=
+'rbxassetid://10709818399'
+,
+[
+'crosshair'
+]
+=
+'rbxassetid://10709818534'
+,
+[
+'crown'
+]
+=
+'rbxassetid://10709818626'
+,
+[
+'cupsoda'
+]
+=
+'rbxassetid://10709818763'
+,
+[
+'curlybraces'
+]
+=
+'rbxassetid://10709818847'
+,
+[
+'currency'
+]
+=
+'rbxassetid://10709818931'
+,
+[
+'database'
+]
+=
+'rbxassetid://10709818996'
+,
+[
+'delete'
+]
+=
+'rbxassetid://10709819059'
+,
+[
+'diamond'
+]
+=
+'rbxassetid://10709819149'
+,
+[
+'dice1'
+]
+=
+'rbxassetid://10709819266'
+,
+[
+'dice2'
+]
+=
+'rbxassetid://10709819361'
+,
+[
+'dice3'
+]
+=
+'rbxassetid://10709819508'
+,
+[
+'dice4'
+]
+=
+'rbxassetid://10709819670'
+,
+[
+'dice5'
+]
+=
+'rbxassetid://10709819801'
+,
+[
+'dice6'
+]
+=
+'rbxassetid://10709819896'
+,
+[
+'dices'
+]
+=
+'rbxassetid://10723343321'
+,
+[
+'diff'
+]
+=
+'rbxassetid://10723343416'
+,
+[
+'disc'
+]
+=
+'rbxassetid://10723343537'
+,
+[
+'divide'
+]
+=
+'rbxassetid://10723343805'
+,
+[
+'dividecircle'
+]
+=
+'rbxassetid://10723343636'
+,
+[
+'dividesquare'
+]
+=
+'rbxassetid://10723343737'
+,
+[
+'dollarsign'
+]
+=
+'rbxassetid://10723343958'
+,
+[
+'download'
+]
+=
+'rbxassetid://10723344270'
+,
+[
+'downloadcloud'
+]
+=
+'rbxassetid://10723344088'
+,
+[
+'droplet'
+]
+=
+'rbxassetid://10723344432'
+,
+[
+'droplets'
+]
+=
+'rbxassetid://10734883356'
+,
+[
+'drumstick'
+]
+=
+'rbxassetid://10723344737'
+,
+[
+'edit'
+]
+=
+'rbxassetid://10734883598'
+,
+[
+'edit2'
+]
+=
+'rbxassetid://10723344885'
+,
+[
+'edit3'
+]
+=
+'rbxassetid://10723345088'
+,
+[
+'egg'
+]
+=
+'rbxassetid://10723345518'
+,
+[
+'eggfried'
+]
+=
+'rbxassetid://10723345347'
+,
+[
+'electricity'
+]
+=
+'rbxassetid://10723345749'
+,
+[
+'electricityoff'
+]
+=
+'rbxassetid://10723345643'
+,
+[
+'equal'
+]
+=
+'rbxassetid://10723345990'
+,
+[
+'equalnot'
+]
+=
+'rbxassetid://10723345866'
+,
+[
+'eraser'
+]
+=
+'rbxassetid://10723346158'
+,
+[
+'euro'
+]
+=
+'rbxassetid://10723346372'
+,
+[
+'expand'
+]
+=
+'rbxassetid://10723346553'
+,
+[
+'externallink'
+]
+=
+'rbxassetid://10723346684'
+,
+[
+'eye'
+]
+=
+'rbxassetid://10723346959'
+,
+[
+'eyeoff'
+]
+=
+'rbxassetid://10723346871'
+,
+[
+'factory'
+]
+=
+'rbxassetid://10723347051'
+,
+[
+'fan'
+]
+=
+'rbxassetid://10723354359'
+,
+[
+'fastforward'
+]
+=
+'rbxassetid://10723354521'
+,
+[
+'feather'
+]
+=
+'rbxassetid://10723354671'
+,
+[
+'figma'
+]
+=
+'rbxassetid://10723354801'
+,
+[
+'file'
+]
+=
+'rbxassetid://10723374641'
+,
+[
+'filearchive'
+]
+=
+'rbxassetid://10723354921'
+,
+[
+'fileaudio'
+]
+=
+'rbxassetid://10723355148'
+,
+[
+'fileaudio2'
+]
+=
+'rbxassetid://10723355026'
+,
+[
+'fileaxis3d'
+]
+=
+'rbxassetid://10723355272'
+,
+[
+'filebadge'
+]
+=
+'rbxassetid://10723355622'
+,
+[
+'filebadge2'
+]
+=
+'rbxassetid://10723355451'
+,
+[
+'filebarchart'
+]
+=
+'rbxassetid://10723355887'
+,
+[
+'filebarchart2'
+]
+=
+'rbxassetid://10723355746'
+,
+[
+'filebox'
+]
+=
+'rbxassetid://10723355989'
+,
+[
+'filecheck'
+]
+=
+'rbxassetid://10723356210'
+,
+[
+'filecheck2'
+]
+=
+'rbxassetid://10723356100'
+,
+[
+'fileclock'
+]
+=
+'rbxassetid://10723356329'
+,
+[
+'filecode'
+]
+=
+'rbxassetid://10723356507'
+,
+[
+'filecog'
+]
+=
+'rbxassetid://10723356830'
+,
+[
+'filecog2'
+]
+=
+'rbxassetid://10723356676'
+,
+[
+'filediff'
+]
+=
+'rbxassetid://10723357039'
+,
+[
+'filedigit'
+]
+=
+'rbxassetid://10723357151'
+,
+[
+'filedown'
+]
+=
+'rbxassetid://10723357322'
+,
+[
+'fileedit'
+]
+=
+'rbxassetid://10723357495'
+,
+[
+'fileheart'
+]
+=
+'rbxassetid://10723357637'
+,
+[
+'fileimage'
+]
+=
+'rbxassetid://10723357790'
+,
+[
+'fileinput'
+]
+=
+'rbxassetid://10723357933'
+,
+[
+'filejson'
+]
+=
+'rbxassetid://10723364435'
+,
+[
+'filejson2'
+]
+=
+'rbxassetid://10723364361'
+,
+[
+'filekey'
+]
+=
+'rbxassetid://10723364605'
+,
+[
+'filekey2'
+]
+=
+'rbxassetid://10723364515'
+,
+[
+'filelinechart'
+]
+=
+'rbxassetid://10723364725'
+,
+[
+'filelock'
+]
+=
+'rbxassetid://10723364957'
+,
+[
+'filelock2'
+]
+=
+'rbxassetid://10723364861'
+,
+[
+'fileminus'
+]
+=
+'rbxassetid://10723365254'
+,
+[
+'fileminus2'
+]
+=
+'rbxassetid://10723365086'
+,
+[
+'fileoutput'
+]
+=
+'rbxassetid://10723365457'
+,
+[
+'filepiechart'
+]
+=
+'rbxassetid://10723365598'
+,
+[
+'fileplus'
+]
+=
+'rbxassetid://10723365877'
+,
+[
+'fileplus2'
+]
+=
+'rbxassetid://10723365766'
+,
+[
+'filequestion'
+]
+=
+'rbxassetid://10723365987'
+,
+[
+'filescan'
+]
+=
+'rbxassetid://10723366167'
+,
+[
+'filesearch'
+]
+=
+'rbxassetid://10723366550'
+,
+[
+'filesearch2'
+]
+=
+'rbxassetid://10723366340'
+,
+[
+'filesignature'
+]
+=
+'rbxassetid://10723366741'
+,
+[
+'filespreadsheet'
+]
+=
+'rbxassetid://10723366962'
+,
+[
+'filesymlink'
+]
+=
+'rbxassetid://10723367098'
+,
+[
+'fileterminal'
+]
+=
+'rbxassetid://10723367244'
+,
+[
+'filetext'
+]
+=
+'rbxassetid://10723367380'
+,
+[
+'filetype'
+]
+=
+'rbxassetid://10723367606'
+,
+[
+'filetype2'
+]
+=
+'rbxassetid://10723367509'
+,
+[
+'fileup'
+]
+=
+'rbxassetid://10723367734'
+,
+[
+'filevideo'
+]
+=
+'rbxassetid://10723373884'
+,
+[
+'filevideo2'
+]
+=
+'rbxassetid://10723367834'
+,
+[
+'filevolume'
+]
+=
+'rbxassetid://10723374172'
+,
+[
+'filevolume2'
+]
+=
+'rbxassetid://10723374030'
+,
+[
+'filewarning'
+]
+=
+'rbxassetid://10723374276'
+,
+[
+'filex'
+]
+=
+'rbxassetid://10723374544'
+,
+[
+'filex2'
+]
+=
+'rbxassetid://10723374378'
+,
+[
+'files'
+]
+=
+'rbxassetid://10723374759'
+,
+[
+'film'
+]
+=
+'rbxassetid://10723374981'
+,
+[
+'filter'
+]
+=
+'rbxassetid://10723375128'
+,
+[
+'fingerprint'
+]
+=
+'rbxassetid://10723375250'
+,
+[
+'flag'
+]
+=
+'rbxassetid://10723375890'
+,
+[
+'flagoff'
+]
+=
+'rbxassetid://10723375443'
+,
+[
+'flagtriangleleft'
+]
+=
+'rbxassetid://10723375608'
+,
+[
+'flagtriangleright'
+]
+=
+'rbxassetid://10723375727'
+,
+[
+'flame'
+]
+=
+'rbxassetid://10723376114'
+,
+[
+'flashlight'
+]
+=
+'rbxassetid://10723376471'
+,
+[
+'flashlightoff'
+]
+=
+'rbxassetid://10723376365'
+,
+[
+'flaskconical'
+]
+=
+'rbxassetid://10734883986'
+,
+[
+'flaskround'
+]
+=
+'rbxassetid://10723376614'
+,
+[
+'fliphorizontal'
+]
+=
+'rbxassetid://10723376884'
+,
+[
+'fliphorizontal2'
+]
+=
+'rbxassetid://10723376745'
+,
+[
+'flipvertical'
+]
+=
+'rbxassetid://10723377138'
+,
+[
+'flipvertical2'
+]
+=
+'rbxassetid://10723377026'
+,
+[
+'flower'
+]
+=
+'rbxassetid://10747830374'
+,
+[
+'flower2'
+]
+=
+'rbxassetid://10723377305'
+,
+[
+'fish'
+]
+=
+'rbxassetid://127664059821666'
+,
+[
+'focus'
+]
+=
+'rbxassetid://10723377537'
+,
+[
+'folder'
+]
+=
+'rbxassetid://10723387563'
+,
+[
+'folderarchive'
+]
+=
+'rbxassetid://10723384478'
+,
+[
+'foldercheck'
+]
+=
+'rbxassetid://10723384605'
+,
+[
+'folderclock'
+]
+=
+'rbxassetid://10723384731'
+,
+[
+'folderclosed'
+]
+=
+'rbxassetid://10723384893'
+,
+[
+'foldercog'
+]
+=
+'rbxassetid://10723385213'
+,
+[
+'foldercog2'
+]
+=
+'rbxassetid://10723385036'
+,
+[
+'folderdown'
+]
+=
+'rbxassetid://10723385338'
+,
+[
+'folderedit'
+]
+=
+'rbxassetid://10723385445'
+,
+[
+'folderheart'
+]
+=
+'rbxassetid://10723385545'
+,
+[
+'folderinput'
+]
+=
+'rbxassetid://10723385721'
+,
+[
+'folderkey'
+]
+=
+'rbxassetid://10723385848'
+,
+[
+'folderlock'
+]
+=
+'rbxassetid://10723386005'
+,
+[
+'folderminus'
+]
+=
+'rbxassetid://10723386127'
+,
+[
+'folderopen'
+]
+=
+'rbxassetid://10723386277'
+,
+[
+'folderoutput'
+]
+=
+'rbxassetid://10723386386'
+,
+[
+'folderplus'
+]
+=
+'rbxassetid://10723386531'
+,
+[
+'foldersearch'
+]
+=
+'rbxassetid://10723386787'
+,
+[
+'foldersearch2'
+]
+=
+'rbxassetid://10723386674'
+,
+[
+'foldersymlink'
+]
+=
+'rbxassetid://10723386930'
+,
+[
+'foldertree'
+]
+=
+'rbxassetid://10723387085'
+,
+[
+'folderup'
+]
+=
+'rbxassetid://10723387265'
+,
+[
+'folderx'
+]
+=
+'rbxassetid://10723387448'
+,
+[
+'folders'
+]
+=
+'rbxassetid://10723387721'
+,
+[
+'forminput'
+]
+=
+'rbxassetid://10723387841'
+,
+[
+'forward'
+]
+=
+'rbxassetid://10723388016'
+,
+[
+'frame'
+]
+=
+'rbxassetid://10723394389'
+,
+[
+'framer'
+]
+=
+'rbxassetid://10723394565'
+,
+[
+'frown'
+]
+=
+'rbxassetid://10723394681'
+,
+[
+'fuel'
+]
+=
+'rbxassetid://10723394846'
+,
+[
+'functionsquare'
+]
+=
+'rbxassetid://10723395041'
+,
+[
+'gamepad'
+]
+=
+'rbxassetid://10723395457'
+,
+[
+'gamepad2'
+]
+=
+'rbxassetid://10723395215'
+,
+[
+'gauge'
+]
+=
+'rbxassetid://10723395708'
+,
+[
+'gavel'
+]
+=
+'rbxassetid://10723395896'
+,
+[
+'gem'
+]
+=
+'rbxassetid://10723396000'
+,
+[
+'ghost'
+]
+=
+'rbxassetid://10723396107'
+,
+[
+'gift'
+]
+=
+'rbxassetid://10723396402'
+,
+[
+'giftcard'
+]
+=
+'rbxassetid://10723396225'
+,
+[
+'gitbranch'
+]
+=
+'rbxassetid://10723396676'
+,
+[
+'gitbranchplus'
+]
+=
+'rbxassetid://10723396542'
+,
+[
+'gitcommit'
+]
+=
+'rbxassetid://10723396812'
+,
+[
+'gitcompare'
+]
+=
+'rbxassetid://10723396954'
+,
+[
+'gitfork'
+]
+=
+'rbxassetid://10723397049'
+,
+[
+'gitmerge'
+]
+=
+'rbxassetid://10723397165'
+,
+[
+'gitpullrequest'
+]
+=
+'rbxassetid://10723397431'
+,
+[
+'gitpullrequestclosed'
+]
+=
+'rbxassetid://10723397268'
+,
+[
+'gitpullrequestdraft'
+]
+=
+'rbxassetid://10734884302'
+,
+[
+'glass'
+]
+=
+'rbxassetid://10723397788'
+,
+[
+'glass2'
+]
+=
+'rbxassetid://10723397529'
+,
+[
+'glasswater'
+]
+=
+'rbxassetid://10723397678'
+,
+[
+'glasses'
+]
+=
+'rbxassetid://10723397895'
+,
+[
+'globe'
+]
+=
+'rbxassetid://10723404337'
+,
+[
+'globe2'
+]
+=
+'rbxassetid://10723398002'
+,
+[
+'grab'
+]
+=
+'rbxassetid://10723404472'
+,
+[
+'graduationcap'
+]
+=
+'rbxassetid://10723404691'
+,
+[
+'grape'
+]
+=
+'rbxassetid://10723404822'
+,
+[
+'grid'
+]
+=
+'rbxassetid://10723404936'
+,
+[
+'griphorizontal'
+]
+=
+'rbxassetid://10723405089'
+,
+[
+'gripvertical'
+]
+=
+'rbxassetid://10723405236'
+,
+[
+'hammer'
+]
+=
+'rbxassetid://10723405360'
+,
+[
+'hand'
+]
+=
+'rbxassetid://10723405649'
+,
+[
+'handmetal'
+]
+=
+'rbxassetid://10723405508'
+,
+[
+'harddrive'
+]
+=
+'rbxassetid://10723405749'
+,
+[
+'hardhat'
+]
+=
+'rbxassetid://10723405859'
+,
+[
+'hash'
+]
+=
+'rbxassetid://10723405975'
+,
+[
+'haze'
+]
+=
+'rbxassetid://10723406078'
+,
+[
+'headphones'
+]
+=
+'rbxassetid://10723406165'
+,
+[
+'heart'
+]
+=
+'rbxassetid://10723406885'
+,
+[
+'heartcrack'
+]
+=
+'rbxassetid://10723406299'
+,
+[
+'hearthandshake'
+]
+=
+'rbxassetid://10723406480'
+,
+[
+'heartoff'
+]
+=
+'rbxassetid://10723406662'
+,
+[
+'heartpulse'
+]
+=
+'rbxassetid://10723406795'
+,
+[
+'helpcircle'
+]
+=
+'rbxassetid://10723406988'
+,
+[
+'hexagon'
+]
+=
+'rbxassetid://10723407092'
+,
+[
+'highlighter'
+]
+=
+'rbxassetid://10723407192'
+,
+[
+'history'
+]
+=
+'rbxassetid://10723407335'
+,
+[
+'home'
+]
+=
+'rbxassetid://10723407389'
+,
+[
+'hourglass'
+]
+=
+'rbxassetid://10723407498'
+,
+[
+'icecream'
+]
+=
+'rbxassetid://10723414308'
+,
+[
+'image'
+]
+=
+'rbxassetid://10723415040'
+,
+[
+'imageminus'
+]
+=
+'rbxassetid://10723414487'
+,
+[
+'imageoff'
+]
+=
+'rbxassetid://10723414677'
+,
+[
+'imageplus'
+]
+=
+'rbxassetid://10723414827'
+,
+[
+'import'
+]
+=
+'rbxassetid://10723415205'
+,
+[
+'inbox'
+]
+=
+'rbxassetid://10723415335'
+,
+[
+'indent'
+]
+=
+'rbxassetid://10723415494'
+,
+[
+'indianrupee'
+]
+=
+'rbxassetid://10723415642'
+,
+[
+'infinity'
+]
+=
+'rbxassetid://10723415766'
+,
+[
+'info'
+]
+=
+'rbxassetid://10723415903'
+,
+[
+'inspect'
+]
+=
+'rbxassetid://10723416057'
+,
+[
+'italic'
+]
+=
+'rbxassetid://10723416195'
+,
+[
+'japaneseyen'
+]
+=
+'rbxassetid://10723416363'
+,
+[
+'joystick'
+]
+=
+'rbxassetid://10723416527'
+,
+[
+'key'
+]
+=
+'rbxassetid://10723416652'
+,
+[
+'keyboard'
+]
+=
+'rbxassetid://10723416765'
+,
+[
+'lamp'
+]
+=
+'rbxassetid://10723417513'
+,
+[
+'lampceiling'
+]
+=
+'rbxassetid://10723416922'
+,
+[
+'lampdesk'
+]
+=
+'rbxassetid://10723417016'
+,
+[
+'lampfloor'
+]
+=
+'rbxassetid://10723417131'
+,
+[
+'lampwalldown'
+]
+=
+'rbxassetid://10723417240'
+,
+[
+'lampwallup'
+]
+=
+'rbxassetid://10723417356'
+,
+[
+'landmark'
+]
+=
+'rbxassetid://10723417608'
+,
+[
+'languages'
+]
+=
+'rbxassetid://10723417703'
+,
+[
+'laptop'
+]
+=
+'rbxassetid://10723423881'
+,
+[
+'laptop2'
+]
+=
+'rbxassetid://10723417797'
+,
+[
+'lasso'
+]
+=
+'rbxassetid://10723424235'
+,
+[
+'lassoselect'
+]
+=
+'rbxassetid://10723424058'
+,
+[
+'laugh'
+]
+=
+'rbxassetid://10723424372'
+,
+[
+'layers'
+]
+=
+'rbxassetid://10723424505'
+,
+[
+'layout'
+]
+=
+'rbxassetid://10723425376'
+,
+[
+'layoutdashboard'
+]
+=
+'rbxassetid://10723424646'
+,
+[
+'layoutgrid'
+]
+=
+'rbxassetid://10723424838'
+,
+[
+'layoutlist'
+]
+=
+'rbxassetid://10723424963'
+,
+[
+'layouttemplate'
+]
+=
+'rbxassetid://10723425187'
+,
+[
+'leaf'
+]
+=
+'rbxassetid://10723425539'
+,
+[
+'library'
+]
+=
+'rbxassetid://10723425615'
+,
+[
+'lifebuoy'
+]
+=
+'rbxassetid://10723425685'
+,
+[
+'lightbulb'
+]
+=
+'rbxassetid://10723425852'
+,
+[
+'lightbulboff'
+]
+=
+'rbxassetid://10723425762'
+,
+[
+'linechart'
+]
+=
+'rbxassetid://10723426393'
+,
+[
+'link'
+]
+=
+'rbxassetid://10723426722'
+,
+[
+'link2'
+]
+=
+'rbxassetid://10723426595'
+,
+[
+'link2off'
+]
+=
+'rbxassetid://10723426513'
+,
+[
+'list'
+]
+=
+'rbxassetid://10723433811'
+,
+[
+'listchecks'
+]
+=
+'rbxassetid://10734884548'
+,
+[
+'listend'
+]
+=
+'rbxassetid://10723426886'
+,
+[
+'listminus'
+]
+=
+'rbxassetid://10723426986'
+,
+[
+'listmusic'
+]
+=
+'rbxassetid://10723427081'
+,
+[
+'listordered'
+]
+=
+'rbxassetid://10723427199'
+,
+[
+'listplus'
+]
+=
+'rbxassetid://10723427334'
+,
+[
+'liststart'
+]
+=
+'rbxassetid://10723427494'
+,
+[
+'listvideo'
+]
+=
+'rbxassetid://10723427619'
+,
+[
+'listx'
+]
+=
+'rbxassetid://10723433655'
+,
+[
+'loader'
+]
+=
+'rbxassetid://10723434070'
+,
+[
+'loader2'
+]
+=
+'rbxassetid://10723433935'
+,
+[
+'locate'
+]
+=
+'rbxassetid://10723434557'
+,
+[
+'locatefixed'
+]
+=
+'rbxassetid://10723434236'
+,
+[
+'locateoff'
+]
+=
+'rbxassetid://10723434379'
+,
+[
+'lock'
+]
+=
+'rbxassetid://10723434711'
+,
+[
+'login'
+]
+=
+'rbxassetid://10723434830'
+,
+[
+'logout'
+]
+=
+'rbxassetid://10723434906'
+,
+[
+'luggage'
+]
+=
+'rbxassetid://10723434993'
+,
+[
+'magnet'
+]
+=
+'rbxassetid://10723435069'
+,
+[
+'mail'
+]
+=
+'rbxassetid://10734885430'
+,
+[
+'mailcheck'
+]
+=
+'rbxassetid://10723435182'
+,
+[
+'mailminus'
+]
+=
+'rbxassetid://10723435261'
+,
+[
+'mailopen'
+]
+=
+'rbxassetid://10723435342'
+,
+[
+'mailplus'
+]
+=
+'rbxassetid://10723435443'
+,
+[
+'mailquestion'
+]
+=
+'rbxassetid://10723435515'
+,
+[
+'mailsearch'
+]
+=
+'rbxassetid://10734884739'
+,
+[
+'mailwarning'
+]
+=
+'rbxassetid://10734885015'
+,
+[
+'mailx'
+]
+=
+'rbxassetid://10734885247'
+,
+[
+'mails'
+]
+=
+'rbxassetid://10734885614'
+,
+[
+'map'
+]
+=
+'rbxassetid://10734886202'
+,
+[
+'mappin'
+]
+=
+'rbxassetid://10734886004'
+,
+[
+'mappinoff'
+]
+=
+'rbxassetid://10734885803'
+,
+[
+'maximize'
+]
+=
+'rbxassetid://10734886735'
+,
+[
+'maximize2'
+]
+=
+'rbxassetid://10734886496'
+,
+[
+'medal'
+]
+=
+'rbxassetid://10734887072'
+,
+[
+'megaphone'
+]
+=
+'rbxassetid://10734887454'
+,
+[
+'megaphoneoff'
+]
+=
+'rbxassetid://10734887311'
+,
+[
+'meh'
+]
+=
+'rbxassetid://10734887603'
+,
+[
+'menu'
+]
+=
+'rbxassetid://10734887784'
+,
+[
+'messagecircle'
+]
+=
+'rbxassetid://10734888000'
+,
+[
+'messagesquare'
+]
+=
+'rbxassetid://10734888228'
+,
+[
+'mic'
+]
+=
+'rbxassetid://10734888864'
+,
+[
+'mic2'
+]
+=
+'rbxassetid://10734888430'
+,
+[
+'micoff'
+]
+=
+'rbxassetid://10734888646'
+,
+[
+'microscope'
+]
+=
+'rbxassetid://10734889106'
+,
+[
+'microwave'
+]
+=
+'rbxassetid://10734895076'
+,
+[
+'milestone'
+]
+=
+'rbxassetid://10734895310'
+,
+[
+'minimize'
+]
+=
+'rbxassetid://10734895698'
+,
+[
+'minimize2'
+]
+=
+'rbxassetid://10734895530'
+,
+[
+'minus'
+]
+=
+'rbxassetid://10734896206'
+,
+[
+'minuscircle'
+]
+=
+'rbxassetid://10734895856'
+,
+[
+'minussquare'
+]
+=
+'rbxassetid://10734896029'
+,
+[
+'monitor'
+]
+=
+'rbxassetid://10734896881'
+,
+[
+'monitoroff'
+]
+=
+'rbxassetid://10734896360'
+,
+[
+'monitorspeaker'
+]
+=
+'rbxassetid://10734896512'
+,
+[
+'moon'
+]
+=
+'rbxassetid://10734897102'
+,
+[
+'morehorizontal'
+]
+=
+'rbxassetid://10734897250'
+,
+[
+'morevertical'
+]
+=
+'rbxassetid://10734897387'
+,
+[
+'mountain'
+]
+=
+'rbxassetid://10734897956'
+,
+[
+'mountainsnow'
+]
+=
+'rbxassetid://10734897665'
+,
+[
+'mouse'
+]
+=
+'rbxassetid://10734898592'
+,
+[
+'mousepointer'
+]
+=
+'rbxassetid://10734898476'
+,
+[
+'mousepointer2'
+]
+=
+'rbxassetid://10734898194'
+,
+[
+'mousepointerclick'
+]
+=
+'rbxassetid://10734898355'
+,
+[
+'move'
+]
+=
+'rbxassetid://10734900011'
+,
+[
+'move3d'
+]
+=
+'rbxassetid://10734898756'
+,
+[
+'movediagonal'
+]
+=
+'rbxassetid://10734899164'
+,
+[
+'movediagonal2'
+]
+=
+'rbxassetid://10734898934'
+,
+[
+'movehorizontal'
+]
+=
+'rbxassetid://10734899414'
+,
+[
+'movevertical'
+]
+=
+'rbxassetid://10734899821'
+,
+[
+'music'
+]
+=
+'rbxassetid://10734905958'
+,
+[
+'music2'
+]
+=
+'rbxassetid://10734900215'
+,
+[
+'music3'
+]
+=
+'rbxassetid://10734905665'
+,
+[
+'music4'
+]
+=
+'rbxassetid://10734905823'
+,
+[
+'navigation'
+]
+=
+'rbxassetid://10734906744'
+,
+[
+'navigation2'
+]
+=
+'rbxassetid://10734906332'
+,
+[
+'navigation2off'
+]
+=
+'rbxassetid://10734906144'
+,
+[
+'navigationoff'
+]
+=
+'rbxassetid://10734906580'
+,
+[
+'network'
+]
+=
+'rbxassetid://10734906975'
+,
+[
+'newspaper'
+]
+=
+'rbxassetid://10734907168'
+,
+[
+'octagon'
+]
+=
+'rbxassetid://10734907361'
+,
+[
+'option'
+]
+=
+'rbxassetid://10734907649'
+,
+[
+'outdent'
+]
+=
+'rbxassetid://10734907933'
+,
+[
+'package'
+]
+=
+'rbxassetid://10734909540'
+,
+[
+'package2'
+]
+=
+'rbxassetid://10734908151'
+,
+[
+'packagecheck'
+]
+=
+'rbxassetid://10734908384'
+,
+[
+'packageminus'
+]
+=
+'rbxassetid://10734908626'
+,
+[
+'packageopen'
+]
+=
+'rbxassetid://10734908793'
+,
+[
+'packageplus'
+]
+=
+'rbxassetid://10734909016'
+,
+[
+'packagesearch'
+]
+=
+'rbxassetid://10734909196'
+,
+[
+'packagex'
+]
+=
+'rbxassetid://10734909375'
+,
+[
+'paintbucket'
+]
+=
+'rbxassetid://10734909847'
+,
+[
+'paintbrush'
+]
+=
+'rbxassetid://10734910187'
+,
+[
+'paintbrush2'
+]
+=
+'rbxassetid://10734910030'
+,
+[
+'palette'
+]
+=
+'rbxassetid://10734910430'
+,
+[
+'palmtree'
+]
+=
+'rbxassetid://10734910680'
+,
+[
+'paperclip'
+]
+=
+'rbxassetid://10734910927'
+,
+[
+'partypopper'
+]
+=
+'rbxassetid://10734918735'
+,
+[
+'pause'
+]
+=
+'rbxassetid://10734919336'
+,
+[
+'pausecircle'
+]
+=
+'rbxassetid://10735024209'
+,
+[
+'pauseoctagon'
+]
+=
+'rbxassetid://10734919143'
+,
+[
+'pentool'
+]
+=
+'rbxassetid://10734919503'
+,
+[
+'pencil'
+]
+=
+'rbxassetid://10734919691'
+,
+[
+'percent'
+]
+=
+'rbxassetid://10734919919'
+,
+[
+'personstanding'
+]
+=
+'rbxassetid://10734920149'
+,
+[
+'phone'
+]
+=
+'rbxassetid://10734921524'
+,
+[
+'phonecall'
+]
+=
+'rbxassetid://10734920305'
+,
+[
+'phoneforwarded'
+]
+=
+'rbxassetid://10734920508'
+,
+[
+'phoneincoming'
+]
+=
+'rbxassetid://10734920694'
+,
+[
+'phonemissed'
+]
+=
+'rbxassetid://10734920845'
+,
+[
+'phoneoff'
+]
+=
+'rbxassetid://10734921077'
+,
+[
+'phoneoutgoing'
+]
+=
+'rbxassetid://10734921288'
+,
+[
+'piechart'
+]
+=
+'rbxassetid://10734921727'
+,
+[
+'piggybank'
+]
+=
+'rbxassetid://10734921935'
+,
+[
+'pin'
+]
+=
+'rbxassetid://10734922324'
+,
+[
+'pinoff'
+]
+=
+'rbxassetid://10734922180'
+,
+[
+'pipette'
+]
+=
+'rbxassetid://10734922497'
+,
+[
+'pizza'
+]
+=
+'rbxassetid://10734922774'
+,
+[
+'plane'
+]
+=
+'rbxassetid://10734922971'
+,
+[
+'play'
+]
+=
+'rbxassetid://10734923549'
+,
+[
+'playcircle'
+]
+=
+'rbxassetid://10734923214'
+,
+[
+'plus'
+]
+=
+'rbxassetid://10734924532'
+,
+[
+'pluscircle'
+]
+=
+'rbxassetid://10734923868'
+,
+[
+'plussquare'
+]
+=
+'rbxassetid://10734924219'
+,
+[
+'podcast'
+]
+=
+'rbxassetid://10734929553'
+,
+[
+'pointer'
+]
+=
+'rbxassetid://10734929723'
+,
+[
+'poundsterling'
+]
+=
+'rbxassetid://10734929981'
+,
+[
+'power'
+]
+=
+'rbxassetid://10734930466'
+,
+[
+'poweroff'
+]
+=
+'rbxassetid://10734930257'
+,
+[
+'printer'
+]
+=
+'rbxassetid://10734930632'
+,
+[
+'puzzle'
+]
+=
+'rbxassetid://10734930886'
+,
+[
+'quote'
+]
+=
+'rbxassetid://10734931234'
+,
+[
+'radio'
+]
+=
+'rbxassetid://10734931596'
+,
+[
+'radioreceiver'
+]
+=
+'rbxassetid://10734931402'
+,
+[
+'rectanglehorizontal'
+]
+=
+'rbxassetid://10734931777'
+,
+[
+'rectanglevertical'
+]
+=
+'rbxassetid://10734932081'
+,
+[
+'recycle'
+]
+=
+'rbxassetid://10734932295'
+,
+[
+'redo'
+]
+=
+'rbxassetid://10734932822'
+,
+[
+'redo2'
+]
+=
+'rbxassetid://10734932586'
+,
+[
+'refreshccw'
+]
+=
+'rbxassetid://10734933056'
+,
+[
+'refreshcw'
+]
+=
+'rbxassetid://10734933222'
+,
+[
+'refrigerator'
+]
+=
+'rbxassetid://10734933465'
+,
+[
+'regex'
+]
+=
+'rbxassetid://10734933655'
+,
+[
+'repeat'
+]
+=
+'rbxassetid://10734933966'
+,
+[
+'repeat1'
+]
+=
+'rbxassetid://10734933826'
+,
+[
+'reply'
+]
+=
+'rbxassetid://10734934252'
+,
+[
+'replyall'
+]
+=
+'rbxassetid://10734934132'
+,
+[
+'rewind'
+]
+=
+'rbxassetid://10734934347'
+,
+[
+'rocket'
+]
+=
+'rbxassetid://10734934585'
+,
+[
+'rockingchair'
+]
+=
+'rbxassetid://10734939942'
+,
+[
+'rotate3d'
+]
+=
+'rbxassetid://10734940107'
+,
+[
+'rotateccw'
+]
+=
+'rbxassetid://10734940376'
+,
+[
+'rotatecw'
+]
+=
+'rbxassetid://10734940654'
+,
+[
+'rss'
+]
+=
+'rbxassetid://10734940825'
+,
+[
+'ruler'
+]
+=
+'rbxassetid://10734941018'
+,
+[
+'russianruble'
+]
+=
+'rbxassetid://10734941199'
+,
+[
+'sailboat'
+]
+=
+'rbxassetid://10734941354'
+,
+[
+'save'
+]
+=
+'rbxassetid://10734941499'
+,
+[
+'scale'
+]
+=
+'rbxassetid://10734941912'
+,
+[
+'scale3d'
+]
+=
+'rbxassetid://10734941739'
+,
+[
+'scaling'
+]
+=
+'rbxassetid://10734942072'
+,
+[
+'scan'
+]
+=
+'rbxassetid://10734942565'
+,
+[
+'scanface'
+]
+=
+'rbxassetid://10734942198'
+,
+[
+'scanline'
+]
+=
+'rbxassetid://10734942351'
+,
+[
+'scissors'
+]
+=
+'rbxassetid://10734942778'
+,
+[
+'screenshare'
+]
+=
+'rbxassetid://10734943193'
+,
+[
+'screenshareoff'
+]
+=
+'rbxassetid://10734942967'
+,
+[
+'scroll'
+]
+=
+'rbxassetid://10734943448'
+,
+[
+'search'
+]
+=
+'rbxassetid://10734943674'
+,
+[
+'send'
+]
+=
+'rbxassetid://10734943902'
+,
+[
+'separatorhorizontal'
+]
+=
+'rbxassetid://10734944115'
+,
+[
+'separatorvertical'
+]
+=
+'rbxassetid://10734944326'
+,
+[
+'server'
+]
+=
+'rbxassetid://10734949856'
+,
+[
+'servercog'
+]
+=
+'rbxassetid://10734944444'
+,
+[
+'servercrash'
+]
+=
+'rbxassetid://10734944554'
+,
+[
+'serveroff'
+]
+=
+'rbxassetid://10734944668'
+,
+[
+'settings'
+]
+=
+'rbxassetid://10734950309'
+,
+[
+'settings2'
+]
+=
+'rbxassetid://10734950020'
+,
+[
+'share'
+]
+=
+'rbxassetid://10734950813'
+,
+[
+'share2'
+]
+=
+'rbxassetid://10734950553'
+,
+[
+'sheet'
+]
+=
+'rbxassetid://10734951038'
+,
+[
+'shield'
+]
+=
+'rbxassetid://10734951847'
+,
+[
+'shieldalert'
+]
+=
+'rbxassetid://10734951173'
+,
+[
+'shieldcheck'
+]
+=
+'rbxassetid://10734951367'
+,
+[
+'shieldclose'
+]
+=
+'rbxassetid://10734951535'
+,
+[
+'shieldoff'
+]
+=
+'rbxassetid://10734951684'
+,
+[
+'shirt'
+]
+=
+'rbxassetid://10734952036'
+,
+[
+'shoppingbag'
+]
+=
+'rbxassetid://10734952273'
+,
+[
+'shoppingcart'
+]
+=
+'rbxassetid://10734952479'
+,
+[
+'shovel'
+]
+=
+'rbxassetid://10734952773'
+,
+[
+'showerhead'
+]
+=
+'rbxassetid://10734952942'
+,
+[
+'shrink'
+]
+=
+'rbxassetid://10734953073'
+,
+[
+'shrub'
+]
+=
+'rbxassetid://10734953241'
+,
+[
+'shuffle'
+]
+=
+'rbxassetid://10734953451'
+,
+[
+'sidebar'
+]
+=
+'rbxassetid://10734954301'
+,
+[
+'sidebarclose'
+]
+=
+'rbxassetid://10734953715'
+,
+[
+'sidebaropen'
+]
+=
+'rbxassetid://10734954000'
+,
+[
+'sigma'
+]
+=
+'rbxassetid://10734954538'
+,
+[
+'signal'
+]
+=
+'rbxassetid://10734961133'
+,
+[
+'signalhigh'
+]
+=
+'rbxassetid://10734954807'
+,
+[
+'signallow'
+]
+=
+'rbxassetid://10734955080'
+,
+[
+'signalmedium'
+]
+=
+'rbxassetid://10734955336'
+,
+[
+'signalzero'
+]
+=
+'rbxassetid://10734960878'
+,
+[
+'siren'
+]
+=
+'rbxassetid://10734961284'
+,
+[
+'skipback'
+]
+=
+'rbxassetid://10734961526'
+,
+[
+'skipforward'
+]
+=
+'rbxassetid://10734961809'
+,
+[
+'skull'
+]
+=
+'rbxassetid://10734962068'
+,
+[
+'slack'
+]
+=
+'rbxassetid://10734962339'
+,
+[
+'slash'
+]
+=
+'rbxassetid://10734962600'
+,
+[
+'slice'
+]
+=
+'rbxassetid://10734963024'
+,
+[
+'sliders'
+]
+=
+'rbxassetid://10734963400'
+,
+[
+'slidershorizontal'
+]
+=
+'rbxassetid://10734963191'
+,
+[
+'smartphone'
+]
+=
+'rbxassetid://10734963940'
+,
+[
+'smartphonecharging'
+]
+=
+'rbxassetid://10734963671'
+,
+[
+'smile'
+]
+=
+'rbxassetid://10734964441'
+,
+[
+'smileplus'
+]
+=
+'rbxassetid://10734964188'
+,
+[
+'snowflake'
+]
+=
+'rbxassetid://10734964600'
+,
+[
+'sofa'
+]
+=
+'rbxassetid://10734964852'
+,
+[
+'sortasc'
+]
+=
+'rbxassetid://10734965115'
+,
+[
+'sortdesc'
+]
+=
+'rbxassetid://10734965287'
+,
+[
+'speaker'
+]
+=
+'rbxassetid://10734965419'
+,
+[
+'sprout'
+]
+=
+'rbxassetid://10734965572'
+,
+[
+'square'
+]
+=
+'rbxassetid://10734965702'
+,
+[
+'star'
+]
+=
+'rbxassetid://10734966248'
+,
+[
+'starhalf'
+]
+=
+'rbxassetid://10734965897'
+,
+[
+'staroff'
+]
+=
+'rbxassetid://10734966097'
+,
+[
+'stethoscope'
+]
+=
+'rbxassetid://10734966384'
+,
+[
+'sticker'
+]
+=
+'rbxassetid://10734972234'
+,
+[
+'stickynote'
+]
+=
+'rbxassetid://10734972463'
+,
+[
+'stopcircle'
+]
+=
+'rbxassetid://10734972621'
+,
+[
+'stretchhorizontal'
+]
+=
+'rbxassetid://10734972862'
+,
+[
+'stretchvertical'
+]
+=
+'rbxassetid://10734973130'
+,
+[
+'strikethrough'
+]
+=
+'rbxassetid://10734973290'
+,
+[
+'subscript'
+]
+=
+'rbxassetid://10734973457'
+,
+[
+'sun'
+]
+=
+'rbxassetid://10734974297'
+,
+[
+'sundim'
+]
+=
+'rbxassetid://10734973645'
+,
+[
+'sunmedium'
+]
+=
+'rbxassetid://10734973778'
+,
+[
+'sunmoon'
+]
+=
+'rbxassetid://10734973999'
+,
+[
+'sunsnow'
+]
+=
+'rbxassetid://10734974130'
+,
+[
+'sunrise'
+]
+=
+'rbxassetid://10734974522'
+,
+[
+'sunset'
+]
+=
+'rbxassetid://10734974689'
+,
+[
+'superscript'
+]
+=
+'rbxassetid://10734974850'
+,
+[
+'swissfranc'
+]
+=
+'rbxassetid://10734975024'
+,
+[
+'switchcamera'
+]
+=
+'rbxassetid://10734975214'
+,
+[
+'sword'
+]
+=
+'rbxassetid://10734975486'
+,
+[
+'swords'
+]
+=
+'rbxassetid://10734975692'
+,
+[
+'syringe'
+]
+=
+'rbxassetid://10734975932'
+,
+[
+'table'
+]
+=
+'rbxassetid://10734976230'
+,
+[
+'table2'
+]
+=
+'rbxassetid://10734976097'
+,
+[
+'tablet'
+]
+=
+'rbxassetid://10734976394'
+,
+[
+'tag'
+]
+=
+'rbxassetid://10734976528'
+,
+[
+'tags'
+]
+=
+'rbxassetid://10734976739'
+,
+[
+'target'
+]
+=
+'rbxassetid://10734977012'
+,
+[
+'tent'
+]
+=
+'rbxassetid://10734981750'
+,
+[
+'terminal'
+]
+=
+'rbxassetid://10734982144'
+,
+[
+'terminalsquare'
+]
+=
+'rbxassetid://10734981995'
+,
+[
+'textcursor'
+]
+=
+'rbxassetid://10734982395'
+,
+[
+'textcursorinput'
+]
+=
+'rbxassetid://10734982297'
+,
+[
+'thermometer'
+]
+=
+'rbxassetid://10734983134'
+,
+[
+'thermometersnowflake'
+]
+=
+'rbxassetid://10734982571'
+,
+[
+'thermometersun'
+]
+=
+'rbxassetid://10734982771'
+,
+[
+'thumbsdown'
+]
+=
+'rbxassetid://10734983359'
+,
+[
+'thumbsup'
+]
+=
+'rbxassetid://10734983629'
+,
+[
+'ticket'
+]
+=
+'rbxassetid://10734983868'
+,
+[
+'timer'
+]
+=
+'rbxassetid://10734984606'
+,
+[
+'timeroff'
+]
+=
+'rbxassetid://10734984138'
+,
+[
+'timerreset'
+]
+=
+'rbxassetid://10734984355'
+,
+[
+'toggleleft'
+]
+=
+'rbxassetid://10734984834'
+,
+[
+'toggleright'
+]
+=
+'rbxassetid://10734985040'
+,
+[
+'tornado'
+]
+=
+'rbxassetid://10734985247'
+,
+[
+'toybrick'
+]
+=
+'rbxassetid://10747361919'
+,
+[
+'train'
+]
+=
+'rbxassetid://10747362105'
+,
+[
+'trash'
+]
+=
+'rbxassetid://10747362393'
+,
+[
+'trash2'
+]
+=
+'rbxassetid://10747362241'
+,
+[
+'treedeciduous'
+]
+=
+'rbxassetid://10747362534'
+,
+[
+'treepine'
+]
+=
+'rbxassetid://10747362748'
+,
+[
+'trees'
+]
+=
+'rbxassetid://10747363016'
+,
+[
+'trendingdown'
+]
+=
+'rbxassetid://10747363205'
+,
+[
+'trendingup'
+]
+=
+'rbxassetid://10747363465'
+,
+[
+'triangle'
+]
+=
+'rbxassetid://10747363621'
+,
+[
+'trophy'
+]
+=
+'rbxassetid://10747363809'
+,
+[
+'truck'
+]
+=
+'rbxassetid://10747364031'
+,
+[
+'tv'
+]
+=
+'rbxassetid://10747364593'
+,
+[
+'tv2'
+]
+=
+'rbxassetid://10747364302'
+,
+[
+'type'
+]
+=
+'rbxassetid://10747364761'
+,
+[
+'umbrella'
+]
+=
+'rbxassetid://10747364971'
+,
+[
+'underline'
+]
+=
+'rbxassetid://10747365191'
+,
+[
+'undo'
+]
+=
+'rbxassetid://10747365484'
+,
+[
+'undo2'
+]
+=
+'rbxassetid://10747365359'
+,
+[
+'unlink'
+]
+=
+'rbxassetid://10747365771'
+,
+[
+'unlink2'
+]
+=
+'rbxassetid://10747397871'
+,
+[
+'unlock'
+]
+=
+'rbxassetid://10747366027'
+,
+[
+'upload'
+]
+=
+'rbxassetid://10747366434'
+,
+[
+'uploadcloud'
+]
+=
+'rbxassetid://10747366266'
+,
+[
+'usb'
+]
+=
+'rbxassetid://10747366606'
+,
+[
+'user'
+]
+=
+'rbxassetid://10747373176'
+,
+[
+'usercheck'
+]
+=
+'rbxassetid://10747371901'
+,
+[
+'usercog'
+]
+=
+'rbxassetid://10747372167'
+,
+[
+'userminus'
+]
+=
+'rbxassetid://10747372346'
+,
+[
+'userplus'
+]
+=
+'rbxassetid://10747372702'
+,
+[
+'userx'
+]
+=
+'rbxassetid://10747372992'
+,
+[
+'users'
+]
+=
+'rbxassetid://10747373426'
+,
+[
+'utensils'
+]
+=
+'rbxassetid://10747373821'
+,
+[
+'utensilscrossed'
+]
+=
+'rbxassetid://10747373629'
+,
+[
+'venetianmask'
+]
+=
+'rbxassetid://10747374003'
+,
+[
+'verified'
+]
+=
+'rbxassetid://10747374131'
+,
+[
+'vibrate'
+]
+=
+'rbxassetid://10747374489'
+,
+[
+'vibrateoff'
+]
+=
+'rbxassetid://10747374269'
+,
+[
+'video'
+]
+=
+'rbxassetid://10747374938'
+,
+[
+'videooff'
+]
+=
+'rbxassetid://10747374721'
+,
+[
+'view'
+]
+=
+'rbxassetid://10747375132'
+,
+[
+'voicemail'
+]
+=
+'rbxassetid://10747375281'
+,
+[
+'volume'
+]
+=
+'rbxassetid://10747376008'
+,
+[
+'volume1'
+]
+=
+'rbxassetid://10747375450'
+,
+[
+'volume2'
+]
+=
+'rbxassetid://10747375679'
+,
+[
+'volumex'
+]
+=
+'rbxassetid://10747375880'
+,
+[
+'wallet'
+]
+=
+'rbxassetid://10747376205'
+,
+[
+'wand'
+]
+=
+'rbxassetid://10747376565'
+,
+[
+'wand2'
+]
+=
+'rbxassetid://10747376349'
+,
+[
+'watch'
+]
+=
+'rbxassetid://10747376722'
+,
+[
+'waves'
+]
+=
+'rbxassetid://10747376931'
+,
+[
+'webcam'
+]
+=
+'rbxassetid://10747381992'
+,
+[
+'wifi'
+]
+=
+'rbxassetid://10747382504'
+,
+[
+'wifioff'
+]
+=
+'rbxassetid://10747382268'
+,
+[
+'wind'
+]
+=
+'rbxassetid://10747382750'
+,
+[
+'wraptext'
+]
+=
+'rbxassetid://10747383065'
+,
+[
+'wrench'
+]
+=
+'rbxassetid://10747383470'
+,
+[
+'x'
+]
+=
+'rbxassetid://10747384394'
+,
+[
+'xcircle'
+]
+=
+'rbxassetid://10747383819'
+,
+[
+'xoctagon'
+]
+=
+'rbxassetid://10747384037'
+,
+[
+'xsquare'
+]
+=
+'rbxassetid://10747384217'
+,
+[
+'zoomin'
+]
+=
+'rbxassetid://10747384552'
+,
+[
+'zoomout'
+]
+=
+'rbxassetid://10747384679'
+}
+end
+
+)(
+)
+}
+local
+i
+=
+workspace
+.
+CurrentCamera
+.
+ViewportSize
+local
+j
+=
+i
+.
+Y
+/
+450
+local
+k
+=
+h
+.
+Settings
+local
+l
+=
+h
+.
+Flags
+local
+m
+,
+n
+,
+o
+,
+p
+do
+o
+=
+function
+(
+q
+,
+r
+)
+table
+.
+
+insert(
+h
+.
+Instances
+,
+{
+Instance
+=
+q
+,
+Type
+=
+r
+}
+)
+return
+q
+end
+n
+=
+function
+(
+q
+,
+r
+)
+if
+r
+then
+table
+.
+
+foreach(
+r
+,
+function
+(
+s
+,
+t
+)
+t
+.
+Parent
+=
+q
+end
+)
+end
+return
+q
+end
+m
+=
+function
+(
+q
+,
+r
+)
+if
+r
+then
+table
+.
+
+foreach(
+r
+,
+function
+(
+s
+,
+t
+)
+q
+[
+s
+]
+=
+t
+end
+)
+end
+return
+q
+end
+p
+=
+function
+(
+...
+)
+local
+q
+=
+{
+...
+}
+if
+
+type(
+q
+)
+~=
+'table'
+then
+return
+end
+local
+r
+=
+Instance
+.
+
+new(
+q
+[
+1
+]
+)
+local
+s
+=
+{
+}
+if
+
+type(
+q
+[
+2
+]
+)
+==
+'table'
+then
+
+m(
+r
+,
+q
+[
+2
+]
+)
+
+n(
+r
+,
+q
+[
+3
+]
+)
+s
+=
+q
+[
+3
+]
+or
+{
+}
+elseif
+
+typeof(
+q
+[
+2
+]
+)
+==
+'Instance'
+then
+r
+.
+Parent
+=
+q
+[
+2
+]
+
+m(
+r
+,
+q
+[
+3
+]
+)
+
+n(
+r
+,
+q
+[
+4
+]
+)
+s
+=
+q
+[
+4
+]
+or
+{
+}
+end
+return
+r
+end
+local 
+function 
+q
+(
+r
+)
+if
+readfile
+and
+isfile
+and
+
+isfile(
+r
+)
+then
+local
+s
+=
+c
+:
+
+JSONDecode(
+
+readfile(
+r
+)
+)
+if
+
+type(
+s
+)
+==
+'table'
+then
+if
+
+rawget(
+s
+,
+'UISize'
+)
+then
+h
+.
+Save
+[
+'UISize'
+]
+=
+s
+[
+'UISize'
+]
+end
+if
+
+rawget(
+s
+,
+'TabSize'
+)
+then
+h
+.
+Save
+[
+'TabSize'
+]
+=
+s
+[
+'TabSize'
+]
+end
+if
+
+rawget(
+s
+,
+'Theme'
+)
+and
+
+VerifyTheme(
+s
+[
+'Theme'
+]
+)
+then
+h
+.
+Save
+[
+'Theme'
+]
+=
+s
+[
+'Theme'
+]
+end
+end
+end
+end
+
+pcall(
+q
+,
+'redz library V7.json'
+)
+end
+local
+q
+=
+{
+}
+do
+function
+q
+:
+InsertCallback
+(
+r
+,
+s
+)
+if
+
+type(
+s
+)
+==
+'function'
+then
+table
+.
+
+insert(
+r
+,
+s
+)
+end
+return
+s
+end
+function
+q
+:
+FireCallback
+(
+r
+,
+...
+)
+for
+s
+,
+t
+in
+
+ipairs(
+r
+)
+do
+if
+
+type(
+t
+)
+==
+'function'
+then
+task
+.
+
+spawn(
+t
+,
+...
+)
+end
+end
+end
+function
+q
+:
+ToggleVisible
+(
+r
+,
+s
+)
+r
+.
+Visible
+=
+s
+~=
+nil
+and
+s
+or
+r
+.
+Visible
+end
+function
+q
+:
+ToggleParent
+(
+r
+,
+s
+)
+if
+Bool
+~=
+nil
+then
+r
+.
+Parent
+=
+Bool
+else
+r
+.
+Parent
+=
+not
+r
+.
+Parent
+and
+s
+end
+end
+function
+q
+:
+GetConnectionFunctions
+(
+r
+,
+s
+)
+local
+t
+=
+{
+Function
+=
+s
+,
+Connected
+=
+true
+}
+function
+t
+:
+Disconnect
+(
+)
+if
+self
+.
+Connected
+then
+table
+.
+
+remove(
+r
+,
+table
+.
+
+find(
+r
+,
+self
+.
+Function
+)
+)
+self
+.
+Connected
+=
+false
+end
+end
+function
+t
+:
+Fire
+(
+...
+)
+if
+self
+.
+Connected
+then
+task
+.
+
+spawn(
+self
+.
+Function
+,
+...
+)
+end
+end
+return
+t
+end
+function
+q
+:
+GetCallback
+(
+r
+,
+s
+)
+local
+t
+=
+r
+[
+s
+]
+or
+r
+.
+Callback
+or
+function
+(
+)
+end
+if
+
+type(
+t
+)
+==
+'table'
+then
+return
+(
+{
+function
+(
+u
+)
+t
+[
+1
+]
+[
+t
+[
+2
+]
+]
+=
+u
+end
+}
+)
+end
+return
+{
+t
+}
+end
+end
+local
+r
+,
+s
+=
+{
+}
+,
+h
+.
+Connection
+do
+local 
+function 
+t
+(
+u
+)
+if
+
+type(
+u
+)
+~=
+'table'
+then
+return
+end
+for
+v
+,
+w
+in
+
+ipairs(
+u
+)
+do
+local
+x
+,
+y
+=
+{
+}
+,
+{
+}
+s
+[
+w
+]
+=
+y
+r
+[
+w
+]
+=
+x
+y
+.
+Name
+=
+w
+function
+y
+:
+Connect
+(
+z
+)
+if
+
+type(
+z
+)
+==
+'function'
+then
+table
+.
+
+insert(
+x
+,
+z
+)
+return
+q
+:
+
+GetConnectionFunctions(
+x
+,
+z
+)
+end
+end
+function
+y
+:
+Once
+(
+z
+)
+if
+
+type(
+z
+)
+==
+'function'
+then
+local
+A
+local
+B
+B
+=
+function
+(
+...
+)
+task
+.
+
+spawn(
+z
+,
+...
+)
+A
+:
+
+Disconnect(
+)
+end
+A
+=
+q
+:
+
+GetConnectionFunctions(
+x
+,
+B
+)
+return
+A
+end
+end
+end
+end
+function
+s
+:
+FireConnection
+(
+u
+,
+...
+)
+local
+v
+=
+
+type(
+u
+)
+==
+'string'
+and
+r
+[
+u
+]
+or
+r
+[
+u
+.
+Name
+]
+for
+w
+,
+x
+in
+
+pairs(
+v
+)
+do
+task
+.
+
+spawn(
+x
+,
+...
+)
+end
+end
+
+t(
+{
+'FlagsChanged'
+,
+'ThemeChanged'
+,
+'FileSaved'
+,
+'ThemeChanging'
+,
+'OptionAdded'
+}
+)
+end
+local
+t
+,
+u
+,
+v
+do
+v
+=
+function
+(
+w
+)
+return
+
+type(
+w
+)
+==
+'string'
+and
+l
+[
+w
+]
+~=
+nil
+end
+t
+=
+function
+(
+w
+)
+return
+
+type(
+w
+)
+==
+'string'
+and
+l
+[
+w
+]
+end
+u
+=
+function
+(
+w
+,
+x
+)
+if
+w
+and
+(
+x
+~=
+l
+[
+w
+]
+or
+
+type(
+x
+)
+==
+'table'
+)
+then
+l
+[
+w
+]
+=
+x
+s
+:
+
+FireConnection(
+'FlagsChanged'
+,
+w
+,
+x
+)
+end
+end
+local
+w
+s
+.
+FlagsChanged
+:
+
+Connect(
+function
+(
+x
+,
+y
+)
+local
+z
+=
+k
+.
+ScriptFile
+if
+not
+w
+and
+z
+and
+writefile
+then
+w
+=
+true
+task
+.
+
+wait(
+0.1
+)
+w
+=
+false
+local
+A
+,
+B
+=
+
+pcall(
+function
+(
+)
+return
+c
+:
+
+JSONEncode(
+l
+)
+end
+)
+if
+A
+then
+local
+C
+=
+
+pcall(
+writefile
+,
+z
+,
+B
+)
+if
+C
+then
+s
+:
+
+FireConnection(
+'FileSaved'
+,
+'Script-Flags'
+,
+z
+,
+B
+)
+end
+end
+end
+end
+)
+end
+local
+w
+=
+
+p(
+'ScreenGui'
+,
+g
+,
+{
+Name
+=
+'redz Library V7'
+}
+,
+{
+
+p(
+'UIScale'
+,
+{
+Scale
+=
+j
+,
+Name
+=
+'Scale'
+}
+)
+}
+)
+local
+x
+=
+g
+:
+
+FindFirstChild(
+w
+.
+Name
+)
+if
+x
+and
+x
+~=
+w
+then
+x
+:
+
+Destroy(
+)
+end
+local 
+function 
+y
+(
+z
+)
+if
+
+type(
+z
+)
+==
+'function'
+then
+return
+
+z(
+)
+end
+return
+z
+end
+local 
+function 
+z
+(
+A
+,
+B
+)
+A
+.
+InputBegan
+:
+
+Connect(
+function
+(
+C
+)
+if
+C
+.
+UserInputType
+==
+Enum
+.
+UserInputType
+.
+MouseButton1
+or
+C
+.
+UserInputType
+==
+Enum
+.
+UserInputType
+.
+Touch
+then
+while
+a
+:
+
+IsMouseButtonPressed(
+Enum
+.
+UserInputType
+.
+MouseButton1
+)
+do
+task
+.
+
+wait(
+)
+end
+end
+
+B(
+)
+end
+)
+end
+local 
+function 
+A
+(
+B
+)
+local
+C
+=
+B
+[
+1
+]
+or
+B
+.
+Instance
+local
+D
+=
+B
+[
+2
+]
+or
+B
+.
+Prop
+local
+E
+=
+B
+[
+3
+]
+or
+B
+.
+NewVal
+local
+F
+=
+B
+[
+4
+]
+or
+B
+.
+Time
+or
+0.5
+local
+G
+=
+B
+[
+5
+]
+or
+B
+.
+wait
+or
+false
+local
+H
+=
+TweenInfo
+.
+
+new(
+F
+,
+Enum
+.
+EasingStyle
+.
+Quint
+)
+local
+I
+=
+b
+:
+
+Create(
+C
+,
+H
+,
+{
+[
+D
+]
+=
+E
+}
+)
+I
+:
+
+Play(
+)
+if
+G
+then
+I
+.
+Completed
+:
+
+Wait(
+)
+end
+return
+I
+end
+local 
+function 
+B
+(
+C
+)
+
+m(
+C
+,
+{
+Active
+=
+true
+,
+AutoButtonColor
+=
+false
+}
+)
+local
+D
+=
+false
+local
+E
+=
+Vector2
+.
+zero
+local
+F
+=
+UDim2
+.
+
+new(
+)
+local 
+function 
+G
+(
+H
+)
+if
+H
+.
+UserInputType
+==
+Enum
+.
+UserInputType
+.
+Touch
+then
+return
+Vector2
+.
+
+new(
+H
+.
+Position
+.
+X
+,
+H
+.
+Position
+.
+Y
+)
+end
+local
+I
+=
+a
+:
+
+GetMouseLocation(
+)
+return
+Vector2
+.
+
+new(
+I
+.
+X
+,
+I
+.
+Y
+)
+end
+local 
+function 
+H
+(
+I
+)
+if
+not
+D
+then
+return
+end
+local
+J
+=
+
+G(
+I
+)
+local
+K
+=
+J
+-
+E
+local
+L
+=
+j
+or
+1
+C
+.
+Position
+=
+UDim2
+.
+
+new(
+F
+.
+X
+.
+Scale
+,
+F
+.
+X
+.
+Offset
++
+(
+K
+.
+X
+/
+L
+)
+,
+F
+.
+Y
+.
+Scale
+,
+F
+.
+Y
+.
+Offset
++
+(
+K
+.
+Y
+/
+L
+)
+)
+end
+C
+.
+InputBegan
+:
+
+Connect(
+function
+(
+I
+)
+if
+I
+.
+UserInputType
+==
+Enum
+.
+UserInputType
+.
+MouseButton1
+or
+I
+.
+UserInputType
+==
+Enum
+.
+UserInputType
+.
+Touch
+then
+D
+=
+true
+F
+=
+C
+.
+Position
+E
+=
+
+G(
+I
+)
+local
+J
+,
+K
+J
+=
+a
+.
+InputChanged
+:
+
+Connect(
+function
+(
+L
+)
+if
+not
+D
+then
+return
+end
+if
+L
+.
+UserInputType
+==
+Enum
+.
+UserInputType
+.
+MouseMovement
+or
+L
+.
+UserInputType
+==
+Enum
+.
+UserInputType
+.
+Touch
+then
+
+H(
+L
+)
+end
+end
+)
+K
+=
+a
+.
+InputEnded
+:
+
+Connect(
+function
+(
+L
+)
+if
+L
+.
+UserInputType
+==
+Enum
+.
+UserInputType
+.
+MouseButton1
+or
+L
+.
+UserInputType
+==
+Enum
+.
+UserInputType
+.
+Touch
+then
+D
+=
+false
+if
+J
+then
+J
+:
+
+Disconnect(
+)
+end
+if
+K
+then
+K
+:
+
+Disconnect(
+)
+end
+end
+end
+)
+end
+end
+)
+return
+C
+end
+local 
+function 
+C
+(
+D
+)
+for
+E
+,
+F
+in
+
+pairs(
+h
+.
+Themes
+)
+do
+if
+E
+==
+D
+then
+return
+true
+end
+end
+end
+local 
+function 
+D
+(
+E
+,
+F
+)
+if
+writefile
+then
+local
+G
+=
+c
+:
+
+JSONEncode(
+F
+)
+
+writefile(
+E
+,
+G
+)
+end
+end
+local
+E
+=
+h
+.
+Themes
+[
+h
+.
+Save
+.
+Theme
+]
+local 
+function 
+F
+(
+G
+,
+H
+)
+h
+.
+Elements
+[
+G
+]
+=
+H
+end
+local 
+function 
+G
+(
+H
+,
+I
+,
+J
+,
+...
+)
+local
+K
+=
+h
+.
+Elements
+[
+H
+
+](
+I
+,
+J
+,
+...
+)
+return
+K
+end
+
+F(
+'Corner'
+,
+function
+(
+H
+,
+I
+)
+local
+J
+=
+
+m(
+
+p(
+'UICorner'
+,
+H
+,
+{
+CornerRadius
+=
+I
+or
+UDim
+.
+
+new(
+0
+,
+7
+)
+}
+)
+,
+props
+)
+return
+J
+end
+)
+
+F(
+'Stroke'
+,
+function
+(
+H
+,
+I
+,
+...
+)
+local
+J
+=
+{
+...
+}
+local
+K
+=
+
+o(
+
+m(
+
+p(
+'UIStroke'
+,
+H
+,
+{
+Color
+=
+J
+[
+1
+]
+or
+E
+[
+'Color Stroke'
+]
+,
+Thickness
+=
+J
+[
+2
+]
+or
+1
+,
+ApplyStrokeMode
+=
+'Border'
+}
+)
+,
+I
+)
+,
+'Stroke'
+)
+return
+K
+end
+)
+
+F(
+'Button'
+,
+function
+(
+H
+,
+I
+,
+...
+)
+local
+J
+=
+{
+...
+}
+local
+K
+=
+
+o(
+
+m(
+
+p(
+'TextButton'
+,
+H
+,
+{
+Text
+=
+''
+,
+Size
+=
+UDim2
+.
+
+fromScale(
+1
+,
+1
+)
+,
+BackgroundColor3
+=
+E
+[
+'Color Hub 2'
+]
+,
+AutoButtonColor
+=
+false
+}
+)
+,
+I
+)
+,
+'Frame'
+)
+K
+.
+MouseEnter
+:
+
+Connect(
+function
+(
+)
+K
+.
+BackgroundTransparency
+=
+0.4
+end
+)
+K
+.
+MouseLeave
+:
+
+Connect(
+function
+(
+)
+K
+.
+BackgroundTransparency
+=
+0
+end
+)
+if
+J
+[
+1
+]
+then
+K
+.
+Activated
+:
+
+Connect(
+J
+[
+1
+]
+)
+end
+return
+K
+end
+)
+
+F(
+'Gradient'
+,
+function
+(
+H
+,
+I
+,
+...
+)
+local
+J
+=
+{
+...
+}
+local
+K
+=
+
+o(
+
+m(
+
+p(
+'UIGradient'
+,
+H
+,
+{
+Color
+=
+E
+[
+'Color Hub 1'
+]
+}
+)
+,
+I
+)
+,
+'Gradient'
+)
+return
+K
+end
+)
+local 
+function 
+H
+(
+I
+,
+J
+,
+K
+,
+L
+)
+local
+M
+=
+
+o(
+
+p(
+'TextLabel'
+,
+{
+Font
+=
+Enum
+.
+Font
+.
+BuilderSansMedium
+,
+TextColor3
+=
+E
+[
+'Color Text'
+]
+,
+Size
+=
+UDim2
+.
+
+new(
+1
+,
+-
+20
+)
+,
+AutomaticSize
+=
+'Y'
+,
+Position
+=
+UDim2
+.
+
+new(
+0
+,
+0
+,
+0.5
+)
+,
+AnchorPoint
+=
+Vector2
+.
+
+new(
+0
+,
+0.5
+)
+,
+BackgroundTransparency
+=
+1
+,
+TextTruncate
+=
+'AtEnd'
+,
+TextSize
+=
+10
+,
+TextXAlignment
+=
+'Left'
+,
+Text
+=
+''
+,
+RichText
+=
+false
+}
+)
+,
+'Text'
+)
+local
+N
+=
+
+o(
+
+p(
+'TextLabel'
+,
+{
+Font
+=
+Enum
+.
+Font
+.
+BuilderSans
+,
+TextColor3
+=
+E
+[
+'Color Dark Text'
+]
+,
+Size
+=
+UDim2
+.
+
+new(
+1
+,
+-
+20
+)
+,
+AutomaticSize
+=
+'Y'
+,
+Position
+=
+UDim2
+.
+
+new(
+0
+,
+12
+,
+0
+,
+15
+)
+,
+BackgroundTransparency
+=
+1
+,
+TextWrapped
+=
+true
+,
+TextSize
+=
+8
+,
+TextXAlignment
+=
+'Left'
+,
+Text
+=
+''
+,
+RichText
+=
+false
+}
+)
+,
+'DarkText'
+)
+local
+O
+=
+
+G(
+'Button'
+,
+I
+,
+{
+Size
+=
+UDim2
+.
+
+new(
+1
+,
+0
+,
+0
+,
+25
+)
+,
+AutomaticSize
+=
+'Y'
+,
+Name
+=
+'Option'
+}
+)
+
+G(
+'Corner'
+,
+O
+,
+UDim
+.
+
+new(
+0
+,
+6
+)
+)
+local
+P
+=
+
+p(
+'Frame'
+,
+O
+,
+{
+AutomaticSize
+=
+'Y'
+,
+BackgroundTransparency
+=
+1
+,
+Size
+=
+L
+,
+Position
+=
+UDim2
+.
+
+new(
+0
+,
+10
+,
+0
+)
+,
+AnchorPoint
+=
+Vector2
+.
+
+new(
+0
+,
+0
+)
+}
+,
+{
+
+p(
+'UIListLayout'
+,
+{
+SortOrder
+=
+'LayoutOrder'
+,
+VerticalAlignment
+=
+'Center'
+,
+Padding
+=
+UDim
+.
+
+new(
+0
+,
+2
+)
+}
+)
+,
+
+p(
+'UIPadding'
+,
+{
+PaddingBottom
+=
+UDim
+.
+
+new(
+0
+,
+5
+)
+,
+PaddingTop
+=
+UDim
+.
+
+new(
+0
+,
+5
+)
+}
+)
+,
+M
+,
+N
+}
+)
+local
+Q
+=
+{
+}
+function
+Q
+:
+SetTitle
+(
+R
+)
+if
+
+type(
+R
+)
+==
+'string'
+and
+R
+:
+
+gsub(
+' '
+,
+''
+)
+:
+
+len(
+)
+>
+0
+then
+M
+.
+Text
+=
+R
+end
+end
+function
+Q
+:
+SetDesc
+(
+R
+)
+if
+
+type(
+R
+)
+==
+'string'
+and
+R
+:
+
+gsub(
+' '
+,
+''
+)
+:
+
+len(
+)
+>
+0
+then
+N
+.
+Visible
+=
+true
+N
+.
+Text
+=
+R
+P
+.
+Position
+=
+UDim2
+.
+
+new(
+0
+,
+10
+,
+0
+)
+P
+.
+AnchorPoint
+=
+Vector2
+.
+
+new(
+0
+,
+0
+)
+else
+N
+.
+Visible
+=
+false
+N
+.
+Text
+=
+''
+P
+.
+Position
+=
+UDim2
+.
+
+new(
+0
+,
+10
+,
+0.5
+)
+P
+.
+AnchorPoint
+=
+Vector2
+.
+
+new(
+0
+,
+0.5
+)
+end
+end
+Q
+:
+
+SetTitle(
+J
+)
+Q
+:
+
+SetDesc(
+K
+)
+return
+O
+,
+Q
+end
+local 
+function 
+I
+(
+J
+)
+if
+J
+:
+
+IsA(
+'Frame'
+)
+then
+return
+'BackgroundColor3'
+elseif
+J
+:
+
+IsA(
+'ImageLabel'
+)
+then
+return
+'ImageColor3'
+elseif
+J
+:
+
+IsA(
+'TextLabel'
+)
+then
+return
+'TextColor3'
+elseif
+J
+:
+
+IsA(
+'ScrollingFrame'
+)
+then
+return
+'ScrollBarImageColor3'
+elseif
+J
+:
+
+IsA(
+'UIStroke'
+)
+then
+return
+'Color'
+end
+return
+''
+end
+function
+h
+:
+GetIcon
+(
+J
+)
+if
+
+type(
+J
+)
+~=
+'string'
+or
+J
+:
+
+find(
+'rbxassetid://'
+)
+or
+#
+J
+==
+0
+then
+return
+J
+end
+local
+K
+J
+=
+string
+.
+
+lower(
+J
+)
+:
+
+gsub(
+'lucide'
+,
+''
+)
+:
+
+gsub(
+'-'
+,
+''
+)
+if
+self
+.
+Icons
+[
+J
+]
+then
+return
+self
+.
+Icons
+[
+J
+]
+end
+for
+L
+,
+M
+in
+self
+.
+Icons
+do
+if
+L
+==
+J
+then
+return
+M
+elseif
+not
+K
+and
+L
+:
+
+find(
+J
+,
+1
+,
+true
+)
+then
+K
+=
+M
+end
+end
+return
+K
+or
+J
+end
+function
+h
+:
+SetTheme
+(
+J
+)
+local
+K
+=
+h
+.
+Themes
+[
+J
+]
+if
+not
+K
+then
+return
+end
+h
+.
+Save
+.
+Theme
+=
+J
+
+pcall(
+function
+(
+)
+
+D(
+'redz library V7.json'
+,
+h
+.
+Save
+)
+end
+)
+E
+=
+K
+
+pcall(
+function
+(
+)
+if
+s
+and
+
+type(
+s
+.
+FireConnection
+)
+==
+'function'
+then
+s
+:
+
+FireConnection(
+'ThemeChanged'
+,
+J
+)
+end
+end
+)
+for
+L
+,
+M
+in
+
+ipairs(
+h
+.
+Instances
+)
+do
+local
+N
+=
+M
+.
+Instance
+if
+not
+N
+then
+continue
+end
+local
+O
+=
+
+type(
+M
+.
+Type
+)
+==
+'table'
+and
+M
+.
+Type
+or
+{
+M
+.
+Type
+}
+for
+P
+,
+Q
+in
+
+ipairs(
+O
+)
+do
+
+pcall(
+function
+(
+)
+if
+Q
+==
+'Gradient'
+and
+N
+:
+
+IsA(
+'UIGradient'
+)
+then
+local
+R
+=
+K
+[
+'Color Hub 1'
+]
+N
+.
+Color
+=
+
+typeof(
+R
+)
+==
+'ColorSequence'
+and
+R
+or
+ColorSequence
+.
+
+new(
+R
+)
+elseif
+Q
+==
+'Frame'
+or
+Q
+==
+'Hub2'
+then
+N
+.
+BackgroundColor3
+=
+K
+[
+'Color Hub 2'
+]
+elseif
+Q
+==
+'Stroke'
+and
+N
+:
+
+IsA(
+'UIStroke'
+)
+then
+N
+.
+Color
+=
+K
+[
+'Color Stroke'
+]
+elseif
+Q
+==
+'Theme'
+then
+if
+N
+:
+
+IsA(
+'ImageLabel'
+)
+or
+N
+:
+
+IsA(
+'ImageButton'
+)
+then
+N
+.
+ImageColor3
+=
+K
+[
+'Color Theme'
+]
+else
+N
+.
+BackgroundColor3
+=
+K
+[
+'Color Theme'
+]
+end
+elseif
+Q
+==
+'ScrollBar'
+and
+N
+:
+
+IsA(
+'ScrollingFrame'
+)
+then
+N
+.
+ScrollBarImageColor3
+=
+K
+[
+'Color Theme'
+]
+elseif
+Q
+==
+'Text'
+then
+if
+N
+:
+
+IsA(
+'ImageLabel'
+)
+or
+N
+:
+
+IsA(
+'ImageButton'
+)
+then
+N
+.
+ImageColor3
+=
+K
+[
+'Color Text'
+]
+else
+N
+.
+TextColor3
+=
+K
+[
+'Color Text'
+]
+end
+elseif
+Q
+==
+'DarkText'
+then
+if
+N
+:
+
+IsA(
+'ImageLabel'
+)
+or
+N
+:
+
+IsA(
+'ImageButton'
+)
+then
+N
+.
+ImageColor3
+=
+K
+[
+'Color Dark Text'
+]
+else
+N
+.
+TextColor3
+=
+K
+[
+'Color Dark Text'
+]
+end
+end
+end
+)
+end
+end
+end
+function
+h
+:
+SetScale
+(
+J
+)
+J
+=
+i
+.
+Y
+/
+math
+.
+
+clamp(
+J
+,
+300
+,
+2000
+)
+j
+,
+w
+.
+Scale
+.
+Scale
+=
+J
+,
+J
+end
+function
+h
+:
+MakeWindow
+(
+J
+)
+local
+K
+=
+J
+[
+1
+]
+or
+J
+.
+Name
+or
+J
+.
+Title
+local
+L
+=
+J
+[
+2
+]
+or
+J
+.
+SubTitle
+local
+M
+=
+J
+.
+Introduction
+or
+false
+local
+N
+=
+J
+.
+IntroductionTitle
+or
+K
+or
+''
+local
+O
+=
+J
+.
+IntroductionDescription
+or
+''
+local
+P
+=
+J
+.
+IntroductionImage
+or
+''
+if
+P
+and
+P
+~=
+''
+then
+P
+=
+h
+:
+
+GetIcon(
+P
+)
+end
+k
+.
+ScriptFile
+=
+J
+[
+3
+]
+or
+J
+.
+SaveFolder
+or
+false
+local 
+function 
+Q
+(
+)
+local
+R
+=
+k
+.
+ScriptFile
+if
+
+type(
+R
+)
+~=
+'string'
+then
+return
+end
+if
+not
+readfile
+or
+not
+isfile
+then
+return
+end
+local
+S
+,
+T
+=
+
+pcall(
+isfile
+,
+R
+)
+if
+S
+and
+T
+then
+local
+U
+,
+V
+=
+
+pcall(
+readfile
+,
+R
+)
+if
+U
+and
+
+type(
+V
+)
+==
+'string'
+then
+local
+W
+,
+X
+=
+
+pcall(
+function
+(
+)
+return
+c
+:
+
+JSONDecode(
+V
+)
+end
+)
+l
+=
+W
+and
+X
+or
+{
+}
+end
+end
+end
+
+Q(
+)
+local
+R
+,
+S
+=
+
+unpack(
+h
+.
+Save
+.
+UISize
+)
+local
+T
+=
+
+o(
+
+p(
+'ImageButton'
+,
+w
+,
+{
+Size
+=
+UDim2
+.
+
+fromOffset(
+R
+,
+S
+)
+,
+Position
+=
+UDim2
+.
+
+new(
+0.5
+,
+-
+R
+/
+2
+,
+0.5
+,
+-
+S
+/
+2
+)
+,
+BackgroundTransparency
+=
+0.03
+,
+ClipsDescendants
+=
+true
+,
+Name
+=
+'Hub'
+}
+)
+,
+'Main'
+)
+
+B(
+T
+)
+
+G(
+'Gradient'
+,
+T
+,
+{
+Rotation
+=
+45
+}
+)
+local
+U
+=
+
+G(
+'Corner'
+,
+T
+)
+local
+V
+=
+
+p(
+'Frame'
+,
+T
+,
+{
+Name
+=
+'ContentHolder'
+,
+Size
+=
+UDim2
+.
+
+new(
+1
+,
+0
+,
+0
+,
+S
+)
+,
+BackgroundTransparency
+=
+1
+}
+)
+local
+W
+=
+
+p(
+'Folder'
+,
+V
+,
+{
+Name
+=
+'Components'
+}
+)
+local
+X
+=
+
+p(
+'Folder'
+,
+w
+,
+{
+Name
+=
+'Dropdown'
+}
+)
+if
+M
+then
+local
+Y
+=
+
+p(
+'Frame'
+,
+T
+,
+{
+Name
+=
+'IntroductionOverlay'
+,
+Size
+=
+UDim2
+.
+
+fromScale(
+1
+,
+1
+)
+,
+Position
+=
+UDim2
+.
+
+fromScale(
+0
+,
+0
+)
+,
+BackgroundTransparency
+=
+1
+,
+BackgroundColor3
+=
+Color3
+.
+
+fromRGB(
+0
+,
+0
+,
+0
+)
+,
+BorderSizePixel
+=
+0
+,
+ZIndex
+=
+10
+}
+)
+
+G(
+'Corner'
+,
+Y
+,
+UDim
+.
+
+new(
+0
+,
+8
+)
+)
+if
+P
+and
+P
+~=
+''
+then
+Logo
+=
+
+p(
+'ImageLabel'
+,
+Y
+,
+{
+Name
+=
+'StartLogo'
+,
+BackgroundTransparency
+=
+1
+,
+Size
+=
+UDim2
+.
+
+fromOffset(
+80
+,
+80
+)
+,
+AnchorPoint
+=
+Vector2
+.
+
+new(
+0.5
+,
+1
+)
+,
+Position
+=
+UDim2
+.
+
+new(
+0.5
+,
+0
+,
+0.5
+,
+-
+8
+)
+,
+Image
+=
+P
+,
+ImageTransparency
+=
+1
+,
+ZIndex
+=
+11
+}
+)
+end
+local
+Z
+=
+
+o(
+
+p(
+'TextLabel'
+,
+Y
+,
+{
+Name
+=
+'StartTitle'
+,
+BackgroundTransparency
+=
+1
+,
+AnchorPoint
+=
+Vector2
+.
+
+new(
+0.5
+,
+0
+)
+,
+Position
+=
+UDim2
+.
+
+new(
+0.5
+,
+0
+,
+0.5
+,
+12
+)
+,
+AutomaticSize
+=
+Enum
+.
+AutomaticSize
+.
+XY
+,
+Text
+=
+N
+,
+Font
+=
+Enum
+.
+Font
+.
+GothamMedium
+,
+TextSize
+=
+14
+,
+TextXAlignment
+=
+Enum
+.
+TextXAlignment
+.
+Center
+,
+TextYAlignment
+=
+Enum
+.
+TextYAlignment
+.
+Top
+,
+TextColor3
+=
+E
+[
+'Color Text'
+]
+,
+TextTransparency
+=
+1
+,
+ZIndex
+=
+11
+}
+)
+,
+'Text'
+)
+if
+O
+~=
+''
+then
+DescriptionLabel
+=
+
+p(
+'TextLabel'
+,
+Y
+,
+{
+Name
+=
+'StartDescription'
+,
+BackgroundTransparency
+=
+1
+,
+AnchorPoint
+=
+Vector2
+.
+
+new(
+0.5
+,
+0
+)
+,
+Position
+=
+UDim2
+.
+
+new(
+0.5
+,
+0
+,
+0.5
+,
+32
+)
+,
+AutomaticSize
+=
+Enum
+.
+AutomaticSize
+.
+XY
+,
+Text
+=
+O
+,
+Font
+=
+Enum
+.
+Font
+.
+Gotham
+,
+TextSize
+=
+12
+,
+TextXAlignment
+=
+Enum
+.
+TextXAlignment
+.
+Center
+,
+TextYAlignment
+=
+Enum
+.
+TextYAlignment
+.
+Top
+,
+TextColor3
+=
+E
+[
+'Color Dark Text'
+]
+,
+TextTransparency
+=
+1
+,
+ZIndex
+=
+11
+}
+)
+end
+task
+.
+
+spawn(
+function
+(
+)
+
+A(
+{
+Y
+,
+'BackgroundTransparency'
+,
+0.45
+,
+0.35
+}
+)
+if
+Logo
+then
+
+A(
+{
+Logo
+,
+'ImageTransparency'
+,
+0
+,
+0.3
+}
+)
+end
+
+A(
+{
+Z
+,
+'TextTransparency'
+,
+0
+,
+0.3
+}
+)
+if
+DescriptionLabel
+then
+
+A(
+{
+DescriptionLabel
+,
+'TextTransparency'
+,
+0
+,
+0.3
+}
+)
+end
+task
+.
+
+wait(
+1.5
+)
+if
+Logo
+then
+
+A(
+{
+Logo
+,
+'ImageTransparency'
+,
+1
+,
+0.4
+}
+)
+end
+
+A(
+{
+Z
+,
+'TextTransparency'
+,
+1
+,
+0.4
+}
+)
+if
+DescriptionLabel
+then
+
+A(
+{
+DescriptionLabel
+,
+'TextTransparency'
+,
+1
+,
+0.4
+}
+)
+end
+
+A(
+{
+Y
+,
+'BackgroundTransparency'
+,
+1
+,
+0.4
+}
+)
+task
+.
+
+wait(
+0.4
+)
+if
+Y
+and
+Y
+.
+Parent
+then
+Y
+:
+
+Destroy(
+)
+end
+end
+)
+end
+local
+Y
+=
+
+p(
+'Frame'
+,
+W
+,
+{
+Size
+=
+UDim2
+.
+
+new(
+1
+,
+0
+,
+0
+,
+28
+)
+,
+BackgroundTransparency
+=
+1
+,
+Name
+=
+'Top Bar'
+}
+)
+local
+Z
+=
+
+p(
+'Frame'
+,
+w
+,
+{
+Name
+=
+'NotificationsHolder'
+,
+AnchorPoint
+=
+Vector2
+.
+
+new(
+1
+,
+1
+)
+,
+Position
+=
+UDim2
+.
+
+new(
+1
+,
+-
+10
+,
+1
+,
+-
+10
+)
+,
+Size
+=
+UDim2
+.
+
+new(
+0
+,
+300
+,
+1
+,
+-
+20
+)
+,
+BackgroundTransparency
+=
+1
+,
+ClipsDescendants
+=
+false
+}
+)
+local
+_
+=
+
+o(
+
+p(
+'TextLabel'
+,
+Y
+,
+{
+Position
+=
+UDim2
+.
+
+new(
+0
+,
+15
+,
+0.5
+)
+,
+AnchorPoint
+=
+Vector2
+.
+
+new(
+0
+,
+0.5
+)
+,
+AutomaticSize
+=
+'XY'
+,
+Text
+=
+K
+,
+TextXAlignment
+=
+'Left'
+,
+TextSize
+=
+12
+,
+TextColor3
+=
+E
+[
+'Color Text'
+]
+,
+BackgroundTransparency
+=
+1
+,
+Font
+=
+Enum
+.
+Font
+.
+BuilderSansBold
+,
+Name
+=
+'Title'
+}
+,
+{
+
+o(
+
+p(
+'TextLabel'
+,
+{
+Size
+=
+UDim2
+.
+
+fromScale(
+0
+,
+1
+)
+,
+AutomaticSize
+=
+'X'
+,
+AnchorPoint
+=
+Vector2
+.
+
+new(
+0
+,
+1
+)
+,
+Position
+=
+UDim2
+.
+
+new(
+1
+,
+5
+,
+0.9
+)
+,
+Text
+=
+L
+,
+TextColor3
+=
+E
+[
+'Color Dark Text'
+]
+,
+BackgroundTransparency
+=
+1
+,
+TextXAlignment
+=
+'Left'
+,
+TextYAlignment
+=
+'Bottom'
+,
+TextSize
+=
+8
+,
+Font
+=
+Enum
+.
+Font
+.
+BuilderSansMedium
+,
+Name
+=
+'SubTitle'
+}
+)
+,
+'DarkText'
+)
+}
+)
+,
+'Text'
+)
+local
+aa
+=
+
+o(
+
+p(
+'ScrollingFrame'
+,
+W
+,
+{
+Size
+=
+UDim2
+.
+
+new(
+0
+,
+h
+.
+Save
+.
+TabSize
+,
+1
+,
+-
+Y
+.
+Size
+.
+Y
+.
+Offset
+)
+,
+ScrollBarImageColor3
+=
+E
+[
+'Color Theme'
+]
+,
+Position
+=
+UDim2
+.
+
+new(
+0
+,
+0
+,
+1
+,
+0
+)
+,
+AnchorPoint
+=
+Vector2
+.
+
+new(
+0
+,
+1
+)
+,
+ScrollBarThickness
+=
+1.5
+,
+BackgroundTransparency
+=
+1
+,
+ScrollBarImageTransparency
+=
+0.2
+,
+CanvasSize
+=
+UDim2
+.
+
+new(
+)
+,
+AutomaticCanvasSize
+=
+'Y'
+,
+ScrollingDirection
+=
+'Y'
+,
+BorderSizePixel
+=
+0
+,
+Name
+=
+'Tab Scroll'
+}
+,
+{
+
+p(
+'UIPadding'
+,
+{
+PaddingLeft
+=
+UDim
+.
+
+new(
+0
+,
+10
+)
+,
+PaddingRight
+=
+UDim
+.
+
+new(
+0
+,
+10
+)
+,
+PaddingTop
+=
+UDim
+.
+
+new(
+0
+,
+10
+)
+,
+PaddingBottom
+=
+UDim
+.
+
+new(
+0
+,
+10
+)
+}
+)
+,
+
+p(
+'UIListLayout'
+,
+{
+Padding
+=
+UDim
+.
+
+new(
+0
+,
+5
+)
+}
+)
+}
+)
+,
+'ScrollBar'
+)
+local
+ab
+=
+
+p(
+'Frame'
+,
+W
+,
+{
+Size
+=
+UDim2
+.
+
+new(
+1
+,
+-
+aa
+.
+Size
+.
+X
+.
+Offset
+,
+1
+,
+-
+Y
+.
+Size
+.
+Y
+.
+Offset
+)
+,
+AnchorPoint
+=
+Vector2
+.
+
+new(
+1
+,
+1
+)
+,
+Position
+=
+UDim2
+.
+
+new(
+1
+,
+0
+,
+1
+,
+0
+)
+,
+BackgroundTransparency
+=
+1
+,
+ClipsDescendants
+=
+true
+,
+Name
+=
+'Containers'
+}
+)
+local
+ac
+,
+ad
+=
+
+B(
+
+p(
+'ImageButton'
+,
+T
+,
+{
+Size
+=
+UDim2
+.
+
+new(
+0
+,
+35
+,
+0
+,
+35
+)
+,
+Position
+=
+T
+.
+Size
+,
+Active
+=
+true
+,
+AnchorPoint
+=
+Vector2
+.
+
+new(
+0.8
+,
+0.8
+)
+,
+BackgroundTransparency
+=
+1
+,
+Name
+=
+'Control Hub Size'
+}
+)
+)
+,
+
+B(
+
+p(
+'ImageButton'
+,
+T
+,
+{
+Size
+=
+UDim2
+.
+
+new(
+0
+,
+20
+,
+1
+,
+-
+30
+)
+,
+Position
+=
+UDim2
+.
+
+new(
+0
+,
+aa
+.
+Size
+.
+X
+.
+Offset
+,
+1
+,
+0
+)
+,
+AnchorPoint
+=
+Vector2
+.
+
+new(
+0.5
+,
+1
+)
+,
+Active
+=
+true
+,
+BackgroundTransparency
+=
+1
+,
+Name
+=
+'Control Tab Size'
+}
+)
+)
+local 
+function 
+ae
+(
+)
+local
+af
+,
+ag
+=
+ac
+.
+Position
+,
+ad
+.
+Position
+ac
+.
+Position
+=
+UDim2
+.
+
+fromOffset(
+math
+.
+
+clamp(
+af
+.
+X
+.
+Offset
+,
+430
+,
+1000
+)
+,
+math
+.
+
+clamp(
+af
+.
+Y
+.
+Offset
+,
+200
+,
+500
+)
+)
+ad
+.
+Position
+=
+UDim2
+.
+
+new(
+0
+,
+math
+.
+
+clamp(
+ag
+.
+X
+.
+Offset
+,
+135
+,
+250
+)
+,
+1
+,
+0
+)
+V
+.
+Size
+=
+UDim2
+.
+
+new(
+1
+,
+0
+,
+0
+,
+ac
+.
+Position
+.
+Y
+.
+Offset
+)
+aa
+.
+Size
+=
+UDim2
+.
+
+new(
+0
+,
+ad
+.
+Position
+.
+X
+.
+Offset
+,
+1
+,
+-
+Y
+.
+Size
+.
+Y
+.
+Offset
+)
+ab
+.
+Size
+=
+UDim2
+.
+
+new(
+1
+,
+-
+aa
+.
+Size
+.
+X
+.
+Offset
+,
+1
+,
+-
+Y
+.
+Size
+.
+Y
+.
+Offset
+)
+if
+not
+Minimized
+then
+T
+.
+Size
+=
+ac
+.
+Position
+end
+end
+ac
+:
+
+GetPropertyChangedSignal(
+'Position'
+)
+:
+
+Connect(
+ae
+)
+ad
+:
+
+GetPropertyChangedSignal(
+'Position'
+)
+:
+
+Connect(
+ae
+)
+
+z(
+ac
+,
+function
+(
+)
+if
+not
+Minimized
+then
+h
+.
+Save
+.
+UISize
+=
+{
+T
+.
+Size
+.
+X
+.
+Offset
+,
+T
+.
+Size
+.
+Y
+.
+Offset
 }
 
-local ViewportSize = workspace.CurrentCamera.ViewportSize
-local UIScale = ViewportSize.Y / 450
+D(
+'redz library V7.json'
+,
+h
+.
+Save
+)
+end
+end
+)
 
-local Settings = redzlib.Settings
-local Flags = redzlib.Flags
+z(
+ad
+,
+function
+(
+)
+h
+.
+Save
+.
+TabSize
+=
+aa
+.
+Size
+.
+X
+.
+Offset
 
-local SetProps, SetChildren, InsertTheme, Create do
-	InsertTheme = function(Instance, Type)
-		table.insert(redzlib.Instances, {
-			Instance = Instance,
-			Type = Type
-		})
-		return Instance
-	end
-	
-	SetChildren = function(Instance, Children)
-		if Children then
-			table.foreach(Children, function(_,Child)
-				Child.Parent = Instance
-			end)
-		end
-		return Instance
-	end
-	
-	SetProps = function(Instance, Props)
-		if Props then
-			table.foreach(Props, function(prop, value)
-				Instance[prop] = value
-			end)
-		end
-		return Instance
-	end
-	
-	Create = function(...)
-		local args = {...}
-		if type(args) ~= "table" then return end
-		local new = Instance.new(args[1])
-		local Children = {}
-		
-		if type(args[2]) == "table" then
-			SetProps(new, args[2])
-			SetChildren(new, args[3])
-			Children = args[3] or {}
-		elseif typeof(args[2]) == "Instance" then
-			new.Parent = args[2]
-			SetProps(new, args[3])
-			SetChildren(new, args[4])
-			Children = args[4] or {}
-		end
-		return new
-	end
-	
-	local function Save(file)
-		if readfile and isfile and isfile(file) then
-			local decode = HttpService:JSONDecode(readfile(file))
-			
-			if type(decode) == "table" then
-				if rawget(decode, "UISize") then redzlib.Save["UISize"] = decode["UISize"] end
-				if rawget(decode, "TabSize") then redzlib.Save["TabSize"] = decode["TabSize"] end
-				if rawget(decode, "Theme") and VerifyTheme(decode["Theme"]) then redzlib.Save["Theme"] = decode["Theme"] end
-			end
-		end
-	end
-	
-	pcall(Save, "redz library V7.json")
+D(
+'redz library V7.json'
+,
+h
+.
+Save
+)
+end
+)
+local
+af
+=
+
+p(
+'Folder'
+,
+Y
+,
+{
+Name
+=
+'Buttons'
+}
+)
+local 
+function 
+ag
+(
+ah
+,
+ai
+,
+aj
+,
+ak
+,
+al
+)
+local
+am
+=
+false
+local
+an
+=
+
+p(
+'ImageButton'
+,
+af
+,
+{
+Name
+=
+ah
+,
+Size
+=
+UDim2
+.
+
+fromOffset(
+18
+,
+18
+)
+,
+Position
+=
+UDim2
+.
+
+new(
+1
+,
+aj
+,
+0.5
+,
+0
+)
+,
+AnchorPoint
+=
+Vector2
+.
+
+new(
+1
+,
+0.5
+)
+,
+BackgroundTransparency
+=
+1
+,
+Image
+=
+ai
+,
+ImageColor3
+=
+Color3
+.
+
+fromRGB(
+255
+,
+255
+,
+255
+)
+,
+AutoButtonColor
+=
+false
+}
+)
+
+p(
+'UICorner'
+,
+an
+,
+{
+CornerRadius
+=
+UDim
+.
+
+new(
+0
+,
+3
+)
+}
+)
+an
+.
+MouseEnter
+:
+
+Connect(
+function
+(
+)
+am
+=
+true
+an
+.
+BackgroundColor3
+=
+ak
+an
+.
+BackgroundTransparency
+=
+0
+end
+)
+an
+.
+MouseLeave
+:
+
+Connect(
+function
+(
+)
+am
+=
+false
+an
+.
+BackgroundTransparency
+=
+1
+end
+)
+an
+.
+MouseButton1Down
+:
+
+Connect(
+function
+(
+)
+an
+.
+BackgroundColor3
+=
+al
+an
+.
+BackgroundTransparency
+=
+0
+end
+)
+an
+.
+MouseButton1Up
+:
+
+Connect(
+function
+(
+)
+if
+am
+then
+an
+.
+BackgroundColor3
+=
+ak
+an
+.
+BackgroundTransparency
+=
+0
+else
+an
+.
+BackgroundTransparency
+=
+1
+end
+end
+)
+return
+an
+end
+local
+ah
+=
+
+ag(
+'Close'
+,
+'rbxassetid://10747384394'
+,
+-
+10
+,
+Color3
+.
+
+fromRGB(
+92
+,
+21
+,
+21
+)
+,
+Color3
+.
+
+fromRGB(
+170
+,
+40
+,
+40
+)
+)
+local
+ai
+=
+
+ag(
+'Minimize'
+,
+'rbxassetid://10734896206'
+,
+-
+35
+,
+Color3
+.
+
+fromRGB(
+111
+,
+111
+,
+117
+)
+,
+Color3
+.
+
+fromRGB(
+170
+,
+170
+,
+170
+)
+)
+local
+aj
+,
+ak
+,
+al
+local
+am
+,
+an
+=
+{
+}
+,
+false
+function
+am
+:
+CloseBtn
+(
+)
+am
+:
+
+Dialog(
+{
+Title
+=
+'Close Window'
+,
+Text
+=
+'You Want Close Window?'
+,
+Options
+=
+{
+{
+'No'
+}
+,
+{
+'Yes'
+,
+function
+(
+)
+w
+:
+
+Destroy(
+)
+end
+}
+}
+}
+)
+end
+function
+am
+:
+MinimizeBtn
+(
+)
+if
+T
+:
+
+FindFirstChild(
+'Dialog'
+)
+or
+al
+then
+return
+end
+al
+=
+true
+if
+aj
+then
+ai
+.
+Image
+=
+'rbxassetid://10734896206'
+
+A(
+{
+T
+,
+'Size'
+,
+ac
+.
+Position
+,
+0.25
+,
+true
+}
+)
+ac
+.
+Visible
+=
+true
+ad
+.
+Visible
+=
+true
+aj
+=
+false
+else
+ai
+.
+Image
+=
+'rbxassetid://10734924532'
+ac
+.
+Visible
+=
+false
+ad
+.
+Visible
+=
+false
+
+A(
+{
+T
+,
+'Size'
+,
+UDim2
+.
+
+new(
+0
+,
+ac
+.
+Position
+.
+X
+.
+Offset
+,
+0
+,
+28
+)
+,
+0.25
+,
+true
+}
+)
+aj
+=
+true
+end
+al
+=
+false
+end
+function
+am
+:
+Minimize
+(
+)
+T
+.
+Visible
+=
+not
+T
+.
+Visible
+end
+function
+am
+:
+NewMinimizer
+(
+ao
+)
+local
+ap
+=
+ao
+[
+1
+]
+or
+ao
+.
+KeyCode
+if
+not
+ap
+then
+return
+end
+a
+.
+InputBegan
+:
+
+Connect(
+function
+(
+aq
+,
+ar
+)
+if
+ar
+then
+return
+end
+if
+aq
+.
+KeyCode
+==
+ap
+or
+aq
+.
+UserInputType
+==
+ap
+then
+if
+a
+.
+KeyboardEnabled
+then
+am
+:
+
+Minimize(
+)
+end
+end
+end
+)
+end
+function
+am
+:
+AddMinimizeButton
+(
+ao
+)
+ao
+=
+ao
+or
+{
+}
+local
+ap
+=
+
+B(
+
+p(
+'ImageButton'
+,
+w
+,
+{
+Name
+=
+'MobileMinimizeButton'
+,
+Size
+=
+UDim2
+.
+
+fromOffset(
+35
+,
+35
+)
+,
+Position
+=
+UDim2
+.
+
+fromScale(
+0.15
+,
+0.15
+)
+,
+BackgroundTransparency
+=
+1
+,
+BackgroundColor3
+=
+E
+[
+'Color Hub 2'
+]
+,
+AutoButtonColor
+=
+false
+}
+)
+)
+local
+aq
+,
+ar
+if
+ao
+.
+Corner
+then
+ar
+=
+
+G(
+'Corner'
+,
+ap
+)
+
+m(
+ar
+,
+ao
+.
+Corner
+)
+end
+if
+ao
+.
+Stroke
+then
+aq
+=
+
+G(
+'Stroke'
+,
+ap
+)
+
+m(
+aq
+,
+ao
+.
+Stroke
+)
+end
+if
+ao
+.
+Button
+then
+
+m(
+ap
+,
+ao
+.
+Button
+)
+end
+ap
+.
+Activated
+:
+
+Connect(
+am
+.
+Minimize
+)
+return
+{
+Stroke
+=
+aq
+,
+Corner
+=
+ar
+,
+Button
+=
+ap
+}
+end
+function
+am
+:
+Set
+(
+ao
+,
+ap
+)
+if
+
+type(
+ao
+)
+==
+'string'
+and
+
+type(
+ap
+)
+==
+'string'
+then
+_
+.
+Text
+=
+ao
+_
+.
+SubTitle
+.
+Text
+=
+ap
+elseif
+
+type(
+ao
+)
+==
+'string'
+then
+_
+.
+Text
+=
+ao
+end
+end
+function
+am
+:
+Notify
+(
+ao
+)
+local
+ap
+=
+w
+:
+
+FindFirstChild(
+'NotificationsHolder'
+)
+if
+not
+ap
+then
+ap
+=
+
+p(
+'Frame'
+,
+w
+,
+{
+Name
+=
+'NotificationsHolder'
+,
+AnchorPoint
+=
+Vector2
+.
+
+new(
+1
+,
+1
+)
+,
+Position
+=
+UDim2
+.
+
+new(
+1
+,
+-
+10
+,
+1
+,
+-
+10
+)
+,
+Size
+=
+UDim2
+.
+
+new(
+0
+,
+300
+,
+1
+,
+-
+20
+)
+,
+BackgroundTransparency
+=
+1
+,
+ClipsDescendants
+=
+false
+}
+)
+end
+if
+not
+ap
+:
+
+FindFirstChild(
+'NotifyLayout'
+)
+then
+
+p(
+'UIListLayout'
+,
+ap
+,
+{
+Name
+=
+'NotifyLayout'
+,
+HorizontalAlignment
+=
+Enum
+.
+HorizontalAlignment
+.
+Right
+,
+VerticalAlignment
+=
+Enum
+.
+VerticalAlignment
+.
+Bottom
+,
+SortOrder
+=
+Enum
+.
+SortOrder
+.
+LayoutOrder
+,
+Padding
+=
+UDim
+.
+
+new(
+0
+,
+10
+)
+}
+)
+end
+local
+aq
+=
+ao
+.
+Title
+or
+'Notification'
+local
+ar
+=
+ao
+.
+Content
+or
+'This is a Notification'
+local
+as
+=
+ao
+.
+Duration
+or
+5
+local
+at
+=
+ao
+.
+Image
+or
+''
+at
+=
+h
+:
+
+GetIcon(
+at
+)
+if
+
+type(
+at
+)
+~=
+'string'
+or
+not
+at
+:
+
+find(
+'rbxassetid://'
+)
+or
+#
+at
+:
+
+gsub(
+'rbxassetid://'
+,
+''
+)
+<
+6
+then
+at
+=
+''
+end
+local
+au
+=
+at
+~=
+''
+local 
+function 
+av
+(
+aw
+)
+aw
+=
+math
+.
+
+max(
+0
+,
+math
+.
+
+floor(
+aw
++
+0.0001
+)
+)
+local
+ax
+=
+math
+.
+
+floor(
+aw
+/
+3600
+)
+local
+ay
+=
+math
+.
+
+floor(
+(
+aw
+%
+3600
+)
+/
+60
+)
+local
+az
+=
+aw
+%
+60
+if
+ax
+>
+0
+then
+return
+string
+.
+
+format(
+'%dh %dm %ds'
+,
+ax
+,
+ay
+,
+az
+)
+elseif
+ay
+>
+0
+then
+return
+string
+.
+
+format(
+'%dm %ds'
+,
+ay
+,
+az
+)
+else
+return
+string
+.
+
+format(
+'%ds'
+,
+az
+)
+end
+end
+local
+aw
+=
+
+p(
+'Frame'
+,
+ap
+,
+{
+Size
+=
+UDim2
+.
+
+fromOffset(
+280
+,
+60
+)
+,
+BackgroundTransparency
+=
+1
+,
+AutomaticSize
+=
+Enum
+.
+AutomaticSize
+.
+Y
+}
+)
+local
+ax
+=
+
+o(
+
+p(
+'Frame'
+,
+aw
+,
+{
+Size
+=
+UDim2
+.
+
+fromScale(
+1
+,
+1
+)
+,
+Position
+=
+UDim2
+.
+
+fromScale(
+2
+,
+0
+)
+,
+BackgroundTransparency
+=
+0.1
+,
+BackgroundColor3
+=
+E
+[
+'Color Hub 2'
+]
+,
+BorderSizePixel
+=
+0
+,
+AutomaticSize
+=
+Enum
+.
+AutomaticSize
+.
+Y
+}
+)
+,
+'Hub2'
+)
+
+G(
+'Corner'
+,
+ax
+)
+
+G(
+'Gradient'
+,
+ax
+,
+{
+Rotation
+=
+45
+}
+)
+
+p(
+'UISizeConstraint'
+,
+ax
+,
+{
+MinSize
+=
+Vector2
+.
+
+new(
+280
+,
+60
+)
+}
+)
+if
+au
+then
+
+p(
+'ImageLabel'
+,
+ax
+,
+{
+Image
+=
+at
+,
+Size
+=
+UDim2
+.
+
+fromOffset(
+32
+,
+32
+)
+,
+Position
+=
+UDim2
+.
+
+new(
+0
+,
+10
+,
+0.5
+,
+0
+)
+,
+AnchorPoint
+=
+Vector2
+.
+
+new(
+0
+,
+0.5
+)
+,
+BackgroundTransparency
+=
+1
+}
+)
+end
+local
+ay
+=
+
+p(
+'Frame'
+,
+ax
+,
+{
+Size
+=
+UDim2
+.
+
+fromScale(
+1
+,
+1
+)
+,
+BackgroundTransparency
+=
+1
+,
+AutomaticSize
+=
+Enum
+.
+AutomaticSize
+.
+Y
+}
+,
+{
+
+p(
+'UIListLayout'
+,
+{
+SortOrder
+=
+Enum
+.
+SortOrder
+.
+LayoutOrder
+,
+VerticalAlignment
+=
+Enum
+.
+VerticalAlignment
+.
+Center
+,
+Padding
+=
+UDim
+.
+
+new(
+0
+,
+4
+)
+}
+)
+,
+
+p(
+'UIPadding'
+,
+{
+PaddingBottom
+=
+UDim
+.
+
+new(
+0
+,
+8
+)
+,
+PaddingTop
+=
+UDim
+.
+
+new(
+0
+,
+8
+)
+,
+PaddingLeft
+=
+UDim
+.
+
+new(
+0
+,
+au
+and
+50
+or
+15
+)
+,
+PaddingRight
+=
+UDim
+.
+
+new(
+0
+,
+62
+)
+}
+)
+}
+)
+local
+az
+=
+
+o(
+
+p(
+'TextLabel'
+,
+ay
+,
+{
+Text
+=
+aq
+,
+Font
+=
+Enum
+.
+Font
+.
+GothamBold
+,
+TextSize
+=
+16
+,
+TextColor3
+=
+E
+[
+'Color Text'
+]
+,
+BackgroundTransparency
+=
+1
+,
+Size
+=
+UDim2
+.
+
+new(
+1
+,
+0
+,
+0
+,
+20
+)
+,
+TextXAlignment
+=
+Enum
+.
+TextXAlignment
+.
+Left
+,
+TextYAlignment
+=
+Enum
+.
+TextYAlignment
+.
+Bottom
+,
+TextTruncate
+=
+Enum
+.
+TextTruncate
+.
+AtEnd
+,
+RichText
+=
+false
+}
+)
+,
+'Text'
+)
+local
+aA
+=
+
+o(
+
+p(
+'TextLabel'
+,
+ay
+,
+{
+Text
+=
+ar
+,
+Font
+=
+Enum
+.
+Font
+.
+Gotham
+,
+TextSize
+=
+14
+,
+TextColor3
+=
+E
+[
+'Color Dark Text'
+]
+,
+BackgroundTransparency
+=
+1
+,
+Size
+=
+UDim2
+.
+
+new(
+1
+,
+0
+,
+0
+,
+20
+)
+,
+AutomaticSize
+=
+Enum
+.
+AutomaticSize
+.
+Y
+,
+TextXAlignment
+=
+Enum
+.
+TextXAlignment
+.
+Left
+,
+TextYAlignment
+=
+Enum
+.
+TextYAlignment
+.
+Top
+,
+TextWrapped
+=
+true
+,
+RichText
+=
+false
+}
+)
+,
+'DarkText'
+)
+local
+aB
+=
+
+o(
+
+p(
+'TextLabel'
+,
+ax
+,
+{
+Text
+=
+
+av(
+as
+)
+,
+Font
+=
+Enum
+.
+Font
+.
+Gotham
+,
+TextSize
+=
+14
+,
+TextColor3
+=
+E
+[
+'Color Dark Text'
+]
+,
+BackgroundTransparency
+=
+1
+,
+Position
+=
+UDim2
+.
+
+new(
+1
+,
+-
+10
+,
+0
+,
+10
+)
+,
+AnchorPoint
+=
+Vector2
+.
+
+new(
+1
+,
+0
+)
+,
+Size
+=
+UDim2
+.
+
+fromOffset(
+44
+,
+18
+)
+,
+TextXAlignment
+=
+Enum
+.
+TextXAlignment
+.
+Right
+,
+RichText
+=
+false
+}
+)
+,
+'DarkText'
+)
+
+A(
+{
+ax
+,
+'Position'
+,
+UDim2
+.
+
+fromScale(
+0
+,
+0
+)
+,
+0.4
+}
+)
+task
+.
+
+spawn(
+function
+(
+)
+local
+aC
+=
+
+tick(
+)
++
+as
++
+1
+while
+true
+do
+if
+not
+aB
+or
+not
+aB
+.
+Parent
+then
+break
+end
+local
+aD
+=
+math
+.
+
+max(
+0
+,
+aC
+-
+
+tick(
+)
+)
+
+pcall(
+function
+(
+)
+aB
+.
+Text
+=
+
+av(
+aD
+)
+end
+)
+if
+aD
+<=
+0
+then
+break
+end
+task
+.
+
+wait(
+)
+end
+if
+not
+ax
+or
+not
+ax
+.
+Parent
+then
+return
 end
 
-local Funcs = {} do
-	function Funcs:InsertCallback(tab, func)
-		if type(func) == "function" then
-			table.insert(tab, func)
-		end
-		return func
-	end
-	
-	function Funcs:FireCallback(tab, ...)
-		for _,v in ipairs(tab) do
-			if type(v) == "function" then
-				task.spawn(v, ...)
-			end
-		end
-	end
-	
-	function Funcs:ToggleVisible(Obj, Bool)
-		Obj.Visible = Bool ~= nil and Bool or Obj.Visible
-	end
-	
-	function Funcs:ToggleParent(Obj, Parent)
-		if Bool ~= nil then
-			Obj.Parent = Bool
-		else
-			Obj.Parent = not Obj.Parent and Parent
-		end
-	end
-	
-	function Funcs:GetConnectionFunctions(ConnectedFuncs, func)
-		local Connected = { Function = func, Connected = true }
-		
-		function Connected:Disconnect()
-			if self.Connected then
-				table.remove(ConnectedFuncs, table.find(ConnectedFuncs, self.Function))
-				self.Connected = false
-			end
-		end
-		
-		function Connected:Fire(...)
-			if self.Connected then
-				task.spawn(self.Function, ...)
-			end
-		end
-		
-		return Connected
-	end
-	
-	function Funcs:GetCallback(Configs, index)
-		local func = Configs[index] or Configs.Callback or function()end
-		
-		if type(func) == "table" then
-			return ({function(Value) func[1][func[2]] = Value end})
-		end
-		return {func}
-	end
+A(
+{
+ax
+,
+'BackgroundTransparency'
+,
+1
+,
+0.35
+}
+)
+for
+aD
+,
+aE
+in
+
+ipairs(
+ax
+:
+
+GetDescendants(
+)
+)
+do
+if
+aE
+:
+
+IsA(
+'TextLabel'
+)
+then
+
+A(
+{
+aE
+,
+'TextTransparency'
+,
+1
+,
+0.35
+}
+)
+elseif
+aE
+:
+
+IsA(
+'ImageLabel'
+)
+then
+
+A(
+{
+aE
+,
+'ImageTransparency'
+,
+1
+,
+0.35
+}
+)
+end
+end
+task
+.
+
+wait(
+0.35
+)
+if
+aw
+and
+aw
+.
+Parent
+then
+aw
+:
+
+Destroy(
+)
+end
+end
+)
+end
+function
+am
+:
+Dialog
+(
+ao
+)
+if
+T
+:
+
+FindFirstChild(
+'Dialog'
+)
+or
+al
+then
+return
+end
+if
+aj
+then
+am
+:
+
+MinimizeBtn(
+)
+task
+.
+
+wait(
+0.3
+)
+end
+local
+ap
+=
+ao
+[
+1
+]
+or
+ao
+.
+Title
+or
+'Dialog'
+local
+aq
+=
+ao
+[
+2
+]
+or
+ao
+.
+Text
+or
+'This is a Dialog'
+local
+ar
+=
+ao
+[
+3
+]
+or
+ao
+.
+Options
+or
+{
+}
+local
+as
+=
+
+o(
+
+p(
+'TextButton'
+,
+T
+,
+{
+Name
+=
+'Dialog'
+,
+Size
+=
+UDim2
+.
+
+new(
+1
+,
+0
+,
+1
+,
+0
+)
+,
+Position
+=
+UDim2
+.
+
+fromScale(
+0.5
+,
+0.5
+)
+,
+AnchorPoint
+=
+Vector2
+.
+
+new(
+0.5
+,
+0.5
+)
+,
+BackgroundTransparency
+=
+1
+,
+AutoButtonColor
+=
+false
+,
+Text
+=
+''
+,
+BackgroundColor3
+=
+E
+[
+'Color Stroke'
+]
+}
+)
+,
+'Stroke'
+)
+U
+:
+
+Clone(
+)
+.
+Parent
+=
+as
+local
+at
+=
+
+p(
+'Frame'
+,
+{
+Name
+=
+'Template'
+,
+Active
+=
+true
+,
+Size
+=
+UDim2
+.
+
+fromOffset(
+310
+,
+190
+)
+,
+Position
+=
+UDim2
+.
+
+fromScale(
+0.5
+,
+0.5
+)
+,
+AnchorPoint
+=
+Vector2
+.
+
+new(
+0.5
+,
+0.5
+)
+,
+BackgroundTransparency
+=
+0
+,
+BackgroundColor3
+=
+E
+[
+'Color Hub 3'
+]
+}
+)
+local
+au
+=
+
+G(
+'Corner'
+,
+at
+)
+au
+.
+CornerRadius
+=
+UDim
+.
+
+new(
+0
+,
+6
+)
+
+G(
+'Gradient'
+,
+at
+,
+{
+Rotation
+=
+45
+}
+)
+local
+av
+=
+
+p(
+'TextLabel'
+,
+at
+,
+{
+Name
+=
+'Title'
+,
+Size
+=
+UDim2
+.
+
+new(
+1
+,
+-
+20
+,
+0
+,
+20
+)
+,
+Position
+=
+UDim2
+.
+
+new(
+0.5
+,
+0
+,
+0
+,
+28
+)
+,
+AnchorPoint
+=
+Vector2
+.
+
+new(
+0.5
+,
+0
+)
+,
+BackgroundTransparency
+=
+1
+,
+TextTruncate
+=
+Enum
+.
+TextTruncate
+.
+AtEnd
+,
+Text
+=
+ap
+,
+TextSize
+=
+15
+,
+Font
+=
+Enum
+.
+Font
+.
+GothamBlack
+,
+TextColor3
+=
+Color3
+.
+
+fromRGB(
+255
+,
+255
+,
+255
+)
+,
+TextXAlignment
+=
+Enum
+.
+TextXAlignment
+.
+Center
+,
+TextYAlignment
+=
+Enum
+.
+TextYAlignment
+.
+Center
+,
+TextTransparency
+=
+0
+}
+)
+local
+aw
+=
+
+p(
+'TextLabel'
+,
+at
+,
+{
+Name
+=
+'Description'
+,
+Position
+=
+UDim2
+.
+
+new(
+0.5
+,
+0
+,
+0
+,
+46
+)
+,
+Size
+=
+UDim2
+.
+
+new(
+1
+,
+-
+20
+,
+0
+,
+0
+)
+,
+AnchorPoint
+=
+Vector2
+.
+
+new(
+0.5
+,
+0
+)
+,
+BackgroundTransparency
+=
+1
+,
+TextWrapped
+=
+true
+,
+AutomaticSize
+=
+Enum
+.
+AutomaticSize
+.
+Y
+,
+Text
+=
+aq
+,
+TextSize
+=
+11
+,
+Font
+=
+Enum
+.
+Font
+.
+GothamMedium
+,
+TextColor3
+=
+Color3
+.
+
+fromRGB(
+175
+,
+175
+,
+175
+)
+,
+TextXAlignment
+=
+Enum
+.
+TextXAlignment
+.
+Center
+,
+TextYAlignment
+=
+Enum
+.
+TextYAlignment
+.
+Top
+,
+TextTransparency
+=
+0
+}
+)
+local
+ax
+=
+
+p(
+'Frame'
+,
+at
+,
+{
+Name
+=
+'Options'
+,
+Size
+=
+UDim2
+.
+
+new(
+1
+,
+-
+20
+,
+0.15
+,
+18
+)
+,
+Position
+=
+UDim2
+.
+
+new(
+0.5
+,
+0
+,
+1
+,
+-
+10
+)
+,
+AnchorPoint
+=
+Vector2
+.
+
+new(
+0.5
+,
+1
+)
+,
+BackgroundTransparency
+=
+1
+}
+,
+{
+
+p(
+'UIPadding'
+,
+{
+PaddingLeft
+=
+UDim
+.
+
+new(
+0
+,
+10
+)
+,
+PaddingRight
+=
+UDim
+.
+
+new(
+0
+,
+10
+)
+,
+PaddingBottom
+=
+UDim
+.
+
+new(
+0
+,
+30
+)
+,
+PaddingTop
+=
+UDim
+.
+
+new(
+0
+,
+30
+)
+}
+)
+,
+
+p(
+'UIListLayout'
+,
+{
+HorizontalAlignment
+=
+Enum
+.
+HorizontalAlignment
+.
+Right
+,
+VerticalAlignment
+=
+Enum
+.
+VerticalAlignment
+.
+Center
+,
+FillDirection
+=
+Enum
+.
+FillDirection
+.
+Horizontal
+,
+Padding
+=
+UDim
+.
+
+new(
+0
+,
+10
+)
+}
+)
+}
+)
+at
+.
+Parent
+=
+as
+
+A(
+{
+at
+,
+'Size'
+,
+UDim2
+.
+
+fromOffset(
+260
+,
+160
+)
+,
+0.3
+}
+)
+
+A(
+{
+as
+,
+'BackgroundTransparency'
+,
+0.6
+,
+0.3
+}
+)
+
+A(
+{
+at
+,
+'BackgroundTransparency'
+,
+0
+,
+0.15
+}
+)
+local
+ay
+=
+{
+}
+local
+az
+=
+false
+local
+aA
+=
+false
+function
+ay
+:
+Button
+(
+aB
+)
+if
+az
+then
+return
+end
+local
+aC
+=
+aB
+[
+1
+]
+or
+aB
+.
+Name
+or
+aB
+.
+Title
+or
+''
+local
+aD
+=
+aB
+[
+2
+]
+or
+aB
+.
+Callback
+or
+function
+(
+)
+end
+local
+aE
+=
+
+G(
+'Button'
+,
+ax
+)
+
+G(
+'Corner'
+,
+aE
+)
+.
+CornerRadius
+=
+UDim
+.
+
+new(
+1
+,
+0
+)
+
+m(
+aE
+,
+{
+AutoButtonColor
+=
+false
+,
+Size
+=
+UDim2
+.
+
+fromScale(
+0.2
+,
+1
+)
+,
+BackgroundTransparency
+=
+1
+,
+Text
+=
+aC
+,
+TextSize
+=
+10
+,
+Font
+=
+Enum
+.
+Font
+.
+GothamMedium
+,
+TextColor3
+=
+Color3
+.
+
+fromRGB(
+200
+,
+200
+,
+200
+)
+}
+)
+local
+aF
+=
+
+A(
+{
+aE
+,
+'BackgroundTransparency'
+,
+0
+,
+0.3
+}
+)
+local
+aG
+=
+
+A(
+{
+aE
+,
+'BackgroundTransparency'
+,
+1
+,
+0.3
+}
+)
+aE
+.
+MouseEnter
+:
+
+Connect(
+function
+(
+)
+aF
+:
+
+Play(
+)
+end
+)
+aE
+.
+MouseLeave
+:
+
+Connect(
+function
+(
+)
+aG
+:
+
+Play(
+)
+end
+)
+aE
+.
+Activated
+:
+
+Connect(
+function
+(
+)
+ay
+:
+
+Close(
+)
+
+aD(
+)
+end
+)
+end
+function
+ay
+:
+Close
+(
+aB
+)
+if
+az
+or
+aA
+then
+return
+end
+aA
+=
+true
+local
+aC
+=
+
+A(
+{
+at
+,
+'Size'
+,
+UDim2
+.
+
+fromOffset(
+310
+,
+190
+)
+,
+0.1
+}
+)
+aC
+:
+
+Play(
+)
+local 
+function 
+aD
+(
+)
+az
+=
+true
+as
+:
+
+Destroy(
+)
+end
+if
+aB
+then
+
+aD(
+)
+else
+aC
+.
+Completed
+:
+
+Connect(
+aD
+)
+
+A(
+{
+as
+,
+'BackgroundTransparency'
+,
+1
+,
+0.1
+}
+)
+
+A(
+{
+at
+,
+'BackgroundTransparency'
+,
+1
+,
+0.1
+}
+)
+end
+end
+for
+aB
+,
+aC
+in
+
+ipairs(
+ar
+)
+do
+ay
+:
+
+Button(
+aC
+)
+end
+return
+ay
+end
+function
+am
+:
+SelectTab
+(
+ao
+)
+if
+
+type(
+ao
+)
+==
+'number'
+then
+h
+.
+Tabs
+[
+ao
+]
+.
+func
+:
+
+Enable(
+)
+else
+for
+ap
+,
+aq
+in
+
+pairs(
+h
+.
+Tabs
+)
+do
+if
+aq
+.
+Cont
+==
+ao
+.
+Cont
+then
+aq
+.
+func
+:
+
+Enable(
+)
+end
+end
+end
+end
+local
+ao
+=
+{
+}
+function
+am
+:
+MakeTab
+(
+ap
+,
+aq
+)
+if
+
+type(
+ap
+)
+==
+'table'
+then
+aq
+=
+ap
+end
+local
+ar
+=
+aq
+[
+1
+]
+or
+aq
+.
+Title
+or
+'Tab!'
+local
+as
+=
+aq
+[
+2
+]
+or
+aq
+.
+Icon
+or
+''
+as
+=
+h
+:
+
+GetIcon(
+as
+)
+if
+not
+as
+:
+
+find(
+'rbxassetid://'
+)
+or
+as
+:
+
+gsub(
+'rbxassetid://'
+,
+''
+)
+:
+
+len(
+)
+<
+6
+then
+as
+=
+false
+end
+local
+at
+=
+
+G(
+'Button'
+,
+aa
+,
+{
+Size
+=
+UDim2
+.
+
+new(
+1
+,
+0
+,
+0
+,
+24
+)
+}
+)
+
+G(
+'Corner'
+,
+at
+)
+local
+au
+=
+
+o(
+
+p(
+'TextLabel'
+,
+at
+,
+{
+Size
+=
+UDim2
+.
+
+new(
+1
+,
+as
+and
+-
+25
+or
+-
+15
+,
+1
+)
+,
+Position
+=
+UDim2
+.
+
+fromOffset(
+as
+and
+25
+or
+15
+)
+,
+BackgroundTransparency
+=
+1
+,
+Font
+=
+Enum
+.
+Font
+.
+GothamMedium
+,
+Text
+=
+ar
+,
+TextColor3
+=
+E
+[
+'Color Text'
+]
+,
+TextSize
+=
+10
+,
+TextXAlignment
+=
+Enum
+.
+TextXAlignment
+.
+Left
+,
+TextTransparency
+=
+(
+an
+and
+0.3
+)
+or
+0
+,
+TextTruncate
+=
+'AtEnd'
+}
+)
+,
+'Text'
+)
+local
+av
+=
+
+o(
+
+p(
+'ImageLabel'
+,
+at
+,
+{
+Position
+=
+UDim2
+.
+
+new(
+0
+,
+8
+,
+0.5
+)
+,
+Size
+=
+UDim2
+.
+
+new(
+0
+,
+13
+,
+0
+,
+13
+)
+,
+AnchorPoint
+=
+Vector2
+.
+
+new(
+0
+,
+0.5
+)
+,
+Image
+=
+as
+or
+''
+,
+BackgroundTransparency
+=
+1
+,
+ImageTransparency
+=
+(
+an
+and
+0.3
+)
+or
+0
+}
+)
+,
+'Text'
+)
+local
+aw
+=
+
+o(
+
+p(
+'Frame'
+,
+at
+,
+{
+Size
+=
+an
+and
+UDim2
+.
+
+new(
+0
+,
+4
+,
+0
+,
+4
+)
+or
+UDim2
+.
+
+new(
+0
+,
+4
+,
+0
+,
+13
+)
+,
+Position
+=
+UDim2
+.
+
+new(
+0
+,
+1
+,
+0.5
+)
+,
+AnchorPoint
+=
+Vector2
+.
+
+new(
+0
+,
+0.5
+)
+,
+BackgroundColor3
+=
+E
+[
+'Color Theme'
+]
+,
+BackgroundTransparency
+=
+an
+and
+1
+or
+0
+}
+)
+,
+'Theme'
+)
+
+G(
+'Corner'
+,
+aw
+,
+UDim
+.
+
+new(
+0.5
+,
+0
+)
+)
+local
+ax
+=
+
+o(
+
+p(
+'ScrollingFrame'
+,
+{
+Size
+=
+UDim2
+.
+
+new(
+1
+,
+0
+,
+1
+,
+0
+)
+,
+Position
+=
+UDim2
+.
+
+new(
+0
+,
+0
+,
+1
+)
+,
+AnchorPoint
+=
+Vector2
+.
+
+new(
+0
+,
+1
+)
+,
+ScrollBarThickness
+=
+1.5
+,
+BackgroundTransparency
+=
+1
+,
+ScrollBarImageTransparency
+=
+0.2
+,
+ScrollBarImageColor3
+=
+E
+[
+'Color Theme'
+]
+,
+AutomaticCanvasSize
+=
+'Y'
+,
+ScrollingDirection
+=
+'Y'
+,
+BorderSizePixel
+=
+0
+,
+CanvasSize
+=
+UDim2
+.
+
+new(
+)
+,
+Name
+=
+(
+'Container %i [ %s ]'
+)
+:
+
+format(
+#
+ao
++
+1
+,
+ar
+)
+}
+,
+{
+
+p(
+'UIPadding'
+,
+{
+PaddingLeft
+=
+UDim
+.
+
+new(
+0
+,
+10
+)
+,
+PaddingRight
+=
+UDim
+.
+
+new(
+0
+,
+10
+)
+,
+PaddingTop
+=
+UDim
+.
+
+new(
+0
+,
+10
+)
+,
+PaddingBottom
+=
+UDim
+.
+
+new(
+0
+,
+10
+)
+}
+)
+,
+
+p(
+'UIListLayout'
+,
+{
+Padding
+=
+UDim
+.
+
+new(
+0
+,
+5
+)
+}
+)
+}
+)
+,
+'ScrollBar'
+)
+table
+.
+
+insert(
+ao
+,
+ax
+)
+if
+not
+an
+then
+ax
+.
+Parent
+=
+ab
+end
+local 
+function 
+ay
+(
+)
+if
+ax
+.
+Parent
+then
+return
+end
+for
+az
+,
+aA
+in
+
+pairs(
+ao
+)
+do
+if
+aA
+:
+
+IsA(
+'ScrollingFrame'
+)
+and
+aA
+~=
+ax
+then
+aA
+.
+Parent
+=
+nil
+end
+end
+ax
+.
+Parent
+=
+ab
+ax
+.
+Size
+=
+UDim2
+.
+
+new(
+1
+,
+0
+,
+1
+,
+150
+)
+table
+.
+
+foreach(
+h
+.
+Tabs
+,
+function
+(
+az
+,
+aA
+)
+if
+aA
+.
+Cont
+~=
+ax
+then
+aA
+.
+func
+:
+
+Disable(
+)
+end
+end
+)
+
+A(
+{
+ax
+,
+'Size'
+,
+UDim2
+.
+
+new(
+1
+,
+0
+,
+1
+,
+0
+)
+,
+0.3
+}
+)
+
+A(
+{
+au
+,
+'TextTransparency'
+,
+0
+,
+0.35
+}
+)
+
+A(
+{
+av
+,
+'ImageTransparency'
+,
+0
+,
+0.35
+}
+)
+
+A(
+{
+aw
+,
+'Size'
+,
+UDim2
+.
+
+new(
+0
+,
+4
+,
+0
+,
+13
+)
+,
+0.35
+}
+)
+
+A(
+{
+aw
+,
+'BackgroundTransparency'
+,
+0
+,
+0.35
+}
+)
+end
+at
+.
+Activated
+:
+
+Connect(
+ay
+)
+an
+=
+true
+local
+az
+=
+{
+}
+table
+.
+
+insert(
+h
+.
+Tabs
+,
+{
+TabInfo
+=
+{
+Name
+=
+ar
+,
+Icon
+=
+as
+}
+,
+func
+=
+az
+,
+Cont
+=
+ax
+}
+)
+az
+.
+Cont
+=
+ax
+function
+az
+:
+Disable
+(
+)
+ax
+.
+Parent
+=
+nil
+
+A(
+{
+au
+,
+'TextTransparency'
+,
+0.3
+,
+0.35
+}
+)
+
+A(
+{
+av
+,
+'ImageTransparency'
+,
+0.3
+,
+0.35
+}
+)
+
+A(
+{
+aw
+,
+'Size'
+,
+UDim2
+.
+
+new(
+0
+,
+4
+,
+0
+,
+4
+)
+,
+0.35
+}
+)
+
+A(
+{
+aw
+,
+'BackgroundTransparency'
+,
+1
+,
+0.35
+}
+)
+end
+function
+az
+:
+Enable
+(
+)
+
+ay(
+)
+end
+function
+az
+:
+Visible
+(
+aA
+)
+q
+:
+
+ToggleVisible(
+at
+,
+aA
+)
+q
+:
+
+ToggleParent(
+ax
+,
+aA
+,
+ab
+)
+end
+function
+az
+:
+Destroy
+(
+)
+at
+:
+
+Destroy(
+)
+ax
+:
+
+Destroy(
+)
+end
+function
+az
+:
+AddSection
+(
+aA
+)
+local
+aB
+=
+
+type(
+aA
+)
+==
+'string'
+and
+aA
+or
+aA
+[
+1
+]
+or
+aA
+.
+Name
+or
+aA
+.
+Title
+or
+aA
+.
+Section
+local
+aC
+=
+
+p(
+'Frame'
+,
+ax
+,
+{
+Size
+=
+UDim2
+.
+
+new(
+1
+,
+0
+,
+0
+,
+20
+)
+,
+BackgroundTransparency
+=
+1
+,
+Name
+=
+'Option'
+}
+)
+local
+aD
+=
+
+o(
+
+p(
+'TextLabel'
+,
+aC
+,
+{
+Font
+=
+Enum
+.
+Font
+.
+GothamBold
+,
+Text
+=
+aB
+,
+TextColor3
+=
+E
+[
+'Color Text'
+]
+,
+Size
+=
+UDim2
+.
+
+new(
+1
+,
+-
+25
+,
+1
+,
+0
+)
+,
+Position
+=
+UDim2
+.
+
+new(
+0
+,
+5
+)
+,
+BackgroundTransparency
+=
+1
+,
+TextTruncate
+=
+'AtEnd'
+,
+TextSize
+=
+14
+,
+TextXAlignment
+=
+'Left'
+}
+)
+,
+'Text'
+)
+local
+aE
+=
+{
+}
+table
+.
+
+insert(
+h
+.
+Options
+,
+{
+type
+=
+'Section'
+,
+Name
+=
+aB
+,
+func
+=
+aE
+}
+)
+function
+aE
+:
+Visible
+(
+aF
+)
+if
+aF
+==
+nil
+then
+aC
+.
+Visible
+=
+not
+aC
+.
+Visible
+return
+end
+aC
+.
+Visible
+=
+aF
+end
+function
+aE
+:
+Destroy
+(
+)
+aC
+:
+
+Destroy(
+)
+end
+function
+aE
+:
+Set
+(
+aF
+)
+if
+aF
+then
+aD
+.
+Text
+=
+
+y(
+aF
+)
+end
+end
+return
+aE
+end
+function
+az
+:
+AddParagraph
+(
+aA
+)
+local
+aB
+=
+aA
+[
+1
+]
+or
+aA
+.
+Title
+or
+'Paragraph'
+local
+aC
+=
+aA
+[
+2
+]
+or
+aA
+.
+Text
+or
+''
+local
+aD
+,
+aE
+=
+
+H(
+ax
+,
+aB
+,
+aC
+,
+UDim2
+.
+
+new(
+1
+,
+-
+20
+)
+)
+local
+aF
+=
+{
+}
+function
+aF
+:
+Visible
+(
+...
+)
+q
+:
+
+ToggleVisible(
+aD
+,
+...
+)
+end
+function
+aF
+:
+Destroy
+(
+)
+aD
+:
+
+Destroy(
+)
+end
+function
+aF
+:
+SetTitle
+(
+aG
+)
+aE
+:
+
+SetTitle(
+
+y(
+aG
+)
+)
+end
+function
+aF
+:
+SetDesc
+(
+aG
+)
+aE
+:
+
+SetDesc(
+
+y(
+aG
+)
+)
+end
+function
+aF
+:
+Set
+(
+aG
+,
+aH
+)
+if
+aG
+and
+aH
+then
+aE
+:
+
+SetTitle(
+
+y(
+aG
+)
+)
+aE
+:
+
+SetDesc(
+
+y(
+aH
+)
+)
+elseif
+aG
+then
+aE
+:
+
+SetDesc(
+
+y(
+aG
+)
+)
+end
+end
+return
+aF
+end
+function
+az
+:
+AddButton
+(
+aA
+)
+local
+aB
+=
+aA
+[
+1
+]
+or
+aA
+.
+Name
+or
+aA
+.
+Title
+or
+'Button!'
+local
+aC
+=
+aA
+.
+Desc
+or
+aA
+.
+Description
+or
+''
+local
+aD
+=
+q
+:
+
+GetCallback(
+aA
+,
+2
+)
+local
+aE
+,
+aF
+=
+
+H(
+ax
+,
+aB
+,
+aC
+,
+UDim2
+.
+
+new(
+1
+,
+-
+20
+)
+)
+local
+aG
+=
+
+p(
+'ImageLabel'
+,
+aE
+,
+{
+Size
+=
+UDim2
+.
+
+new(
+0
+,
+14
+,
+0
+,
+14
+)
+,
+Position
+=
+UDim2
+.
+
+new(
+1
+,
+-
+10
+,
+0.5
+)
+,
+AnchorPoint
+=
+Vector2
+.
+
+new(
+1
+,
+0.5
+)
+,
+BackgroundTransparency
+=
+1
+,
+Image
+=
+'rbxassetid://10709791437'
+}
+)
+aE
+.
+Activated
+:
+
+Connect(
+function
+(
+)
+q
+:
+
+FireCallback(
+aD
+)
+end
+)
+local
+aH
+=
+{
+}
+function
+aH
+:
+Visible
+(
+...
+)
+q
+:
+
+ToggleVisible(
+aE
+,
+...
+)
+end
+function
+aH
+:
+Destroy
+(
+)
+aE
+:
+
+Destroy(
+)
+end
+function
+aH
+:
+Callback
+(
+...
+)
+q
+:
+
+InsertCallback(
+aD
+,
+...
+)
+end
+function
+aH
+:
+Set
+(
+aI
+,
+aJ
+)
+if
+
+type(
+aI
+)
+==
+'string'
+and
+
+type(
+aJ
+)
+==
+'string'
+then
+aF
+:
+
+SetTitle(
+aI
+)
+aF
+:
+
+SetDesc(
+aJ
+)
+elseif
+
+type(
+aI
+)
+==
+'string'
+then
+aF
+:
+
+SetTitle(
+aI
+)
+elseif
+
+type(
+aI
+)
+==
+'function'
+then
+aD
+=
+aI
+end
+end
+return
+aH
+end
+function
+az
+:
+AddToggle
+(
+aA
+)
+local
+aB
+=
+aA
+[
+1
+]
+or
+aA
+.
+Name
+or
+aA
+.
+Title
+or
+'Toggle'
+local
+aC
+=
+aA
+.
+Desc
+or
+aA
+.
+Description
+or
+''
+local
+aD
+=
+q
+:
+
+GetCallback(
+aA
+,
+3
+)
+local
+aE
+=
+aA
+[
+4
+]
+or
+aA
+.
+Flag
+or
+false
+local
+aF
+=
+aA
+[
+2
+]
+or
+aA
+.
+Default
+or
+false
+if
+
+v(
+aE
+)
+then
+aF
+=
+
+t(
+aE
+)
+end
+local
+aG
+,
+aH
+=
+
+H(
+ax
+,
+aB
+,
+aC
+,
+UDim2
+.
+
+new(
+1
+,
+-
+38
+)
+)
+local
+aI
+=
+
+o(
+
+p(
+'Frame'
+,
+aG
+,
+{
+Size
+=
+UDim2
+.
+
+new(
+0
+,
+35
+,
+0
+,
+18
+)
+,
+Position
+=
+UDim2
+.
+
+new(
+1
+,
+-
+10
+,
+0.5
+)
+,
+AnchorPoint
+=
+Vector2
+.
+
+new(
+1
+,
+0.5
+)
+,
+BackgroundColor3
+=
+E
+[
+'Color Stroke'
+]
+}
+)
+,
+'Stroke'
+)
+
+G(
+'Corner'
+,
+aI
+,
+UDim
+.
+
+new(
+0.5
+,
+0
+)
+)
+local
+aJ
+=
+
+p(
+'Frame'
+,
+aI
+,
+{
+BackgroundTransparency
+=
+1
+,
+Size
+=
+UDim2
+.
+
+new(
+0.8
+,
+0
+,
+0.8
+,
+0
+)
+,
+Position
+=
+UDim2
+.
+
+new(
+0.5
+,
+0
+,
+0.5
+,
+0
+)
+,
+AnchorPoint
+=
+Vector2
+.
+
+new(
+0.5
+,
+0.5
+)
+}
+)
+local
+aK
+=
+
+o(
+
+p(
+'Frame'
+,
+aJ
+,
+{
+Size
+=
+UDim2
+.
+
+new(
+0
+,
+12
+,
+0
+,
+12
+)
+,
+Position
+=
+UDim2
+.
+
+new(
+0
+,
+0
+,
+0.5
+)
+,
+AnchorPoint
+=
+Vector2
+.
+
+new(
+0
+,
+0.5
+)
+,
+BackgroundColor3
+=
+E
+[
+'Color Theme'
+]
+}
+)
+,
+'Theme'
+)
+
+G(
+'Corner'
+,
+aK
+,
+UDim
+.
+
+new(
+0.5
+,
+0
+)
+)
+local
+aL
+local 
+function 
+aM
+(
+aN
+)
+if
+aL
+then
+return
+end
+aL
+,
+aF
+=
+true
+,
+aN
+
+u(
+aE
+,
+aF
+)
+q
+:
+
+FireCallback(
+aD
+,
+aF
+)
+if
+aF
+then
+
+A(
+{
+aK
+,
+'Position'
+,
+UDim2
+.
+
+new(
+1
+,
+0
+,
+0.5
+)
+,
+0.25
+}
+)
+
+A(
+{
+aK
+,
+'BackgroundTransparency'
+,
+0
+,
+0.25
+}
+)
+
+A(
+{
+aK
+,
+'AnchorPoint'
+,
+Vector2
+.
+
+new(
+1
+,
+0.5
+)
+,
+0.25
+,
+Wait
+or
+false
+}
+)
+else
+
+A(
+{
+aK
+,
+'Position'
+,
+UDim2
+.
+
+new(
+0
+,
+0
+,
+0.5
+)
+,
+0.25
+}
+)
+
+A(
+{
+aK
+,
+'BackgroundTransparency'
+,
+0.8
+,
+0.25
+}
+)
+
+A(
+{
+aK
+,
+'AnchorPoint'
+,
+Vector2
+.
+
+new(
+0
+,
+0.5
+)
+,
+0.25
+,
+Wait
+or
+false
+}
+)
+end
+aL
+=
+false
+end
+task
+.
+
+spawn(
+aM
+,
+aF
+)
+aG
+.
+Activated
+:
+
+Connect(
+function
+(
+)
+
+aM(
+not
+aF
+)
+end
+)
+local
+aN
+=
+{
+}
+function
+aN
+:
+Visible
+(
+...
+)
+q
+:
+
+ToggleVisible(
+aG
+,
+...
+)
+end
+function
+aN
+:
+Destroy
+(
+)
+aG
+:
+
+Destroy(
+)
+end
+function
+aN
+:
+Callback
+(
+...
+)
+q
+:
+
+InsertCallback(
+aD
+,
+...
+
+)(
+)
+end
+function
+aN
+:
+Set
+(
+aO
+,
+aP
+)
+if
+
+type(
+aO
+)
+==
+'string'
+and
+
+type(
+aP
+)
+==
+'string'
+then
+aH
+:
+
+SetTitle(
+aO
+)
+aH
+:
+
+SetDesc(
+aP
+)
+elseif
+
+type(
+aO
+)
+==
+'string'
+then
+aH
+:
+
+SetTitle(
+aO
+,
+false
+,
+true
+)
+elseif
+
+type(
+aO
+)
+==
+'boolean'
+then
+if
+aL
+and
+aP
+then
+repeat
+task
+.
+
+wait(
+)
+until
+not
+aL
+end
+task
+.
+
+spawn(
+aM
+,
+aO
+)
+elseif
+
+type(
+aO
+)
+==
+'function'
+then
+aD
+=
+aO
+end
+end
+return
+aN
+end
+function
+az
+:
+AddDropdown
+(
+aA
+)
+local
+aB
+=
+aA
+[
+1
+]
+or
+aA
+.
+Name
+or
+aA
+.
+Title
+or
+'Dropdown'
+local
+aC
+=
+aA
+.
+Desc
+or
+aA
+.
+Description
+or
+''
+local
+aD
+=
+aA
+[
+2
+]
+or
+aA
+.
+Options
+or
+{
+}
+local
+aE
+=
+aA
+[
+3
+]
+or
+aA
+.
+Default
+or
+{
+}
+local
+aF
+=
+aA
+[
+5
+]
+or
+aA
+.
+Flag
+or
+false
+local
+aG
+=
+aA
+.
+MultiSelect
+or
+false
+local
+aH
+=
+q
+:
+
+GetCallback(
+aA
+,
+4
+)
+local
+aI
+,
+aJ
+=
+
+H(
+ax
+,
+aB
+,
+aC
+,
+UDim2
+.
+
+new(
+1
+,
+-
+180
+)
+)
+local
+aL
+=
+
+o(
+
+p(
+'Frame'
+,
+aI
+,
+{
+Size
+=
+UDim2
+.
+
+new(
+0
+,
+150
+,
+0
+,
+18
+)
+,
+Position
+=
+UDim2
+.
+
+new(
+1
+,
+-
+10
+,
+0.5
+)
+,
+AnchorPoint
+=
+Vector2
+.
+
+new(
+1
+,
+0.5
+)
+,
+BackgroundColor3
+=
+E
+[
+'Color Stroke'
+]
+}
+)
+,
+'Stroke'
+)
+
+G(
+'Corner'
+,
+aL
+,
+UDim
+.
+
+new(
+0
+,
+4
+)
+)
+local
+aM
+=
+
+o(
+
+p(
+'TextLabel'
+,
+aL
+,
+{
+Size
+=
+UDim2
+.
+
+new(
+0.85
+,
+0
+,
+0.85
+,
+0
+)
+,
+AnchorPoint
+=
+Vector2
+.
+
+new(
+0.5
+,
+0.5
+)
+,
+Position
+=
+UDim2
+.
+
+new(
+0.5
+,
+0
+,
+0.5
+,
+0
+)
+,
+BackgroundTransparency
+=
+1
+,
+Font
+=
+Enum
+.
+Font
+.
+GothamBold
+,
+TextScaled
+=
+true
+,
+TextColor3
+=
+E
+[
+'Color Text'
+]
+,
+Text
+=
+'...'
+}
+)
+,
+'Text'
+)
+local
+aN
+=
+
+p(
+'ImageLabel'
+,
+aL
+,
+{
+Size
+=
+UDim2
+.
+
+new(
+0
+,
+15
+,
+0
+,
+15
+)
+,
+Position
+=
+UDim2
+.
+
+new(
+0
+,
+-
+5
+,
+0.5
+)
+,
+AnchorPoint
+=
+Vector2
+.
+
+new(
+1
+,
+0.5
+)
+,
+Image
+=
+'rbxassetid://10709791523'
+,
+BackgroundTransparency
+=
+1
+}
+)
+local
+aO
+=
+
+p(
+'TextButton'
+,
+X
+,
+{
+Name
+=
+'AntiClick'
+,
+Size
+=
+UDim2
+.
+
+new(
+1
+,
+0
+,
+1
+,
+0
+)
+,
+BackgroundTransparency
+=
+1
+,
+Visible
+=
+false
+,
+Text
+=
+''
+}
+)
+local
+aP
+=
+
+p(
+'Frame'
+,
+aO
+,
+{
+Size
+=
+UDim2
+.
+
+new(
+aL
+.
+Size
+.
+X
+,
+0
+,
+0
+)
+,
+BackgroundTransparency
+=
+0.1
+,
+BackgroundColor3
+=
+Color3
+.
+
+fromRGB(
+255
+,
+255
+,
+255
+)
+,
+AnchorPoint
+=
+Vector2
+.
+
+new(
+0
+,
+1
+)
+,
+Name
+=
+'DropdownFrame'
+,
+ClipsDescendants
+=
+true
+,
+Active
+=
+true
+}
+)
+
+G(
+'Corner'
+,
+aP
+)
+
+G(
+'Stroke'
+,
+aP
+)
+
+G(
+'Gradient'
+,
+aP
+,
+{
+Rotation
+=
+60
+}
+)
+local
+aQ
+=
+
+o(
+
+p(
+'ScrollingFrame'
+,
+aP
+,
+{
+ScrollBarImageColor3
+=
+E
+[
+'Color Theme'
+]
+,
+Size
+=
+UDim2
+.
+
+new(
+1
+,
+0
+,
+1
+,
+0
+)
+,
+ScrollBarThickness
+=
+1.5
+,
+BackgroundTransparency
+=
+1
+,
+BorderSizePixel
+=
+0
+,
+CanvasSize
+=
+UDim2
+.
+
+new(
+)
+,
+ScrollingDirection
+=
+'Y'
+,
+AutomaticCanvasSize
+=
+'Y'
+,
+Active
+=
+true
+}
+,
+{
+
+p(
+'UIPadding'
+,
+{
+PaddingLeft
+=
+UDim
+.
+
+new(
+0
+,
+8
+)
+,
+PaddingRight
+=
+UDim
+.
+
+new(
+0
+,
+8
+)
+,
+PaddingTop
+=
+UDim
+.
+
+new(
+0
+,
+5
+)
+,
+PaddingBottom
+=
+UDim
+.
+
+new(
+0
+,
+5
+)
+}
+)
+,
+
+p(
+'UIListLayout'
+,
+{
+Padding
+=
+UDim
+.
+
+new(
+0
+,
+4
+)
+}
+)
+}
+)
+,
+'ScrollBar'
+)
+local
+aR
+,
+aS
+=
+5
+local 
+function 
+aT
+(
+)
+aS
+=
+true
+
+A(
+{
+aN
+,
+'Rotation'
+,
+0
+,
+0.2
+}
+)
+
+A(
+{
+aP
+,
+'Size'
+,
+UDim2
+.
+
+new(
+0
+,
+152
+,
+0
+,
+0
+)
+,
+0.2
+,
+true
+}
+)
+
+A(
+{
+aN
+,
+'ImageColor3'
+,
+Color3
+.
+
+fromRGB(
+255
+,
+255
+,
+255
+)
+,
+0.2
+}
+)
+aN
+.
+Image
+=
+'rbxassetid://10709791523'
+aO
+.
+Visible
+=
+false
+aS
+=
+false
+end
+local 
+function 
+aU
+(
+)
+return
+UDim2
+.
+
+fromOffset(
+152
+,
+aR
+)
+end
+local 
+function 
+aV
+(
+)
+local
+aW
+=
+0
+for
+aX
+,
+aY
+in
+
+pairs(
+aQ
+:
+
+GetChildren(
+)
+)
+do
+if
+aY
+:
+
+IsA(
+'Frame'
+)
+or
+aY
+.
+Name
+==
+'Option'
+then
+aW
+=
+aW
++
+1
+end
+end
+aR
+=
+(
+math
+.
+
+clamp(
+aW
+,
+0
+,
+10
+)
+*
+25
+)
++
+10
+if
+aO
+.
+Visible
+then
+aO
+.
+Visible
+=
+true
+
+A(
+{
+aP
+,
+'Size'
+,
+
+aU(
+)
+,
+0.2
+,
+true
+}
+)
+end
+end
+local 
+function 
+aW
+(
+)
+if
+aS
+then
+return
+end
+aS
+=
+true
+if
+aO
+.
+Visible
+then
+aN
+.
+Image
+=
+'rbxassetid://10709791523'
+
+A(
+{
+aN
+,
+'ImageColor3'
+,
+Color3
+.
+
+fromRGB(
+255
+,
+255
+,
+255
+)
+,
+0.2
+}
+)
+
+A(
+{
+aP
+,
+'Size'
+,
+UDim2
+.
+
+new(
+0
+,
+152
+,
+0
+,
+0
+)
+,
+0.2
+,
+true
+}
+)
+aO
+.
+Visible
+=
+false
+else
+aO
+.
+Visible
+=
+true
+aN
+.
+Image
+=
+'rbxassetid://10709790948'
+
+A(
+{
+aN
+,
+'ImageColor3'
+,
+E
+[
+'Color Theme'
+]
+,
+0.2
+}
+)
+
+A(
+{
+aP
+,
+'Size'
+,
+
+aU(
+)
+,
+0.2
+,
+true
+}
+)
+end
+aS
+=
+false
+end
+local 
+function 
+aX
+(
+)
+local
+aY
+=
+aL
+.
+AbsolutePosition
+local
+aZ
+=
+w
+.
+AbsoluteSize
+local
+a_
+=
+math
+.
+
+clamp(
+(
+aY
+.
+X
+/
+j
+)
+,
+0
+,
+aZ
+.
+X
+/
+j
+-
+aP
+.
+Size
+.
+X
+.
+Offset
+)
+local
+a0
+=
+math
+.
+
+clamp(
+(
+aY
+.
+Y
+/
+j
+)
+,
+0
+,
+aZ
+.
+Y
+/
+j
+)
+local
+a1
+=
+UDim2
+.
+
+fromOffset(
+a_
+,
+a0
+)
+local
+a2
+=
+aY
+.
+Y
+>
+aZ
+.
+Y
+/
+1.4
+and
+1
+or
+aR
+>
+80
+and
+0.5
+or
+0
+aP
+.
+AnchorPoint
+=
+Vector2
+.
+
+new(
+0
+,
+a2
+)
+
+A(
+{
+aP
+,
+'Position'
+,
+a1
+,
+0.1
+}
+)
+end
+local
+aY
+,
+aZ
+,
+a_
+,
+a0
+,
+a1
+do
+local
+a2
+=
+
+type(
+aE
+)
+~=
+'table'
+and
+{
+aE
+}
+or
+aE
+local
+a3
+=
+aG
+local
+a4
+=
+{
+}
+a1
+=
+a3
+and
+{
+}
+or
+
+v(
+aF
+)
+and
+
+t(
+aF
+)
+or
+a2
+[
+1
+]
+if
+a3
+then
+for
+a5
+,
+a6
+in
+
+pairs(
+
+v(
+aF
+)
+and
+
+t(
+aF
+)
+or
+a2
+)
+do
+if
+
+type(
+a5
+)
+==
+'string'
+and
+(
+aD
+[
+a5
+]
+or
+table
+.
+
+find(
+aD
+,
+a5
+)
+)
+then
+a1
+[
+a5
+]
+=
+a6
+elseif
+aD
+[
+a6
+]
+then
+a1
+[
+a6
+]
+=
+true
+end
+end
+end
+local 
+function 
+a5
+(
+)
+
+u(
+aF
+,
+a3
+and
+a1
+or
+
+tostring(
+a1
+)
+)
+q
+:
+
+FireCallback(
+aH
+,
+a1
+)
+end
+local 
+function 
+a6
+(
+)
+if
+a3
+then
+local
+a7
+=
+{
+}
+for
+a8
+,
+a9
+in
+
+pairs(
+a1
+)
+do
+if
+a9
+then
+table
+.
+
+insert(
+a7
+,
+a8
+)
+end
+end
+aM
+.
+Text
+=
+#
+a7
+>
+0
+and
+table
+.
+
+concat(
+a7
+,
+', '
+)
+or
+'...'
+else
+aM
+.
+Text
+=
+
+tostring(
+a1
+or
+'...'
+)
+end
+end
+local 
+function 
+a7
+(
+)
+if
+a3
+then
+for
+a8
+,
+a9
+in
+
+pairs(
+a4
+)
+do
+local
+ba
+,
+bb
+=
+a9
+.
+nodes
+,
+a9
+.
+Stats
+
+A(
+{
+ba
+[
+2
+]
+,
+'BackgroundTransparency'
+,
+bb
+and
+0
+or
+0.8
+,
+0.35
+}
+)
+
+A(
+{
+ba
+[
+2
+]
+,
+'Size'
+,
+bb
+and
+UDim2
+.
+
+fromOffset(
+4
+,
+12
+)
+or
+UDim2
+.
+
+fromOffset(
+4
+,
+4
+)
+,
+0.35
+}
+)
+
+A(
+{
+ba
+[
+3
+]
+,
+'TextTransparency'
+,
+bb
+and
+0
+or
+0.4
+,
+0.35
+}
+)
+end
+else
+for
+a8
+,
+a9
+in
+
+pairs(
+a4
+)
+do
+local
+ba
+=
+a9
+.
+Value
+==
+a1
+local
+bb
+=
+a9
+.
+nodes
+
+A(
+{
+bb
+[
+2
+]
+,
+'BackgroundTransparency'
+,
+ba
+and
+0
+or
+1
+,
+0.35
+}
+)
+
+A(
+{
+bb
+[
+2
+]
+,
+'Size'
+,
+ba
+and
+UDim2
+.
+
+fromOffset(
+4
+,
+14
+)
+or
+UDim2
+.
+
+fromOffset(
+4
+,
+4
+)
+,
+0.35
+}
+)
+
+A(
+{
+bb
+[
+3
+]
+,
+'TextTransparency'
+,
+ba
+and
+0
+or
+0.4
+,
+0.35
+}
+)
+end
 end
 
-local Connections, Connection = {}, redzlib.Connection do
-	local function NewConnectionList(List)
-		if type(List) ~= "table" then return end
-		
-		for _,CoName in ipairs(List) do
-			local ConnectedFuncs, Connect = {}, {}
-			Connection[CoName] = Connect
-			Connections[CoName] = ConnectedFuncs
-			Connect.Name = CoName
-			
-			function Connect:Connect(func)
-				if type(func) == "function" then
-					table.insert(ConnectedFuncs, func)
-					return Funcs:GetConnectionFunctions(ConnectedFuncs, func)
-				end
-			end
-			
-			function Connect:Once(func)
-				if type(func) == "function" then
-					local Connected;
-					
-					local _NFunc;_NFunc = function(...)
-						task.spawn(func, ...)
-						Connected:Disconnect()
-					end
-					
-					Connected = Funcs:GetConnectionFunctions(ConnectedFuncs, _NFunc)
-					return Connected
-				end
-			end
-		end
-	end
-	
-	function Connection:FireConnection(CoName, ...)
-		local Connection = type(CoName) == "string" and Connections[CoName] or Connections[CoName.Name]
-		for _,Func in pairs(Connection) do
-			task.spawn(Func, ...)
-		end
-	end
-	
-	NewConnectionList({"FlagsChanged", "ThemeChanged", "FileSaved", "ThemeChanging", "OptionAdded"})
+a6(
+)
+end
+local 
+function 
+a8
+(
+a9
+)
+if
+a3
+then
+a9
+.
+Stats
+=
+not
+a9
+.
+Stats
+a9
+.
+LastCB
+=
+
+tick(
+)
+a1
+[
+a9
+.
+Name
+]
+=
+a9
+.
+Stats
+
+a5(
+)
+else
+a9
+.
+LastCB
+=
+
+tick(
+)
+a1
+=
+a9
+.
+Value
+
+a5(
+)
 end
 
-local GetFlag, SetFlag, CheckFlag do
-	CheckFlag = function(Name)
-		return type(Name) == "string" and Flags[Name] ~= nil
-	end
-	
-	GetFlag = function(Name)
-		return type(Name) == "string" and Flags[Name]
-	end
-	
-	SetFlag = function(Flag, Value)
-		if Flag and (Value ~= Flags[Flag] or type(Value) == "table") then
-			Flags[Flag] = Value
-			Connection:FireConnection("FlagsChanged", Flag, Value)
-		end
-	end
-	
-	local db
-	Connection.FlagsChanged:Connect(function(Flag, Value)
-		local ScriptFile = Settings.ScriptFile
-		if not db and ScriptFile and writefile then
-			db=true;task.wait(0.1);db=false
-			
-			local Success, Encoded = pcall(function()
-		
-				return HttpService:JSONEncode(Flags)
-			end)
-			
-			if Success then
-				local Success = pcall(writefile, ScriptFile, Encoded)
-				if Success then
-					Connection:FireConnection("FileSaved", "Script-Flags", ScriptFile, Encoded)
-				end
-			end
-		end
-	end)
+a7(
+)
+end
+a_
+=
+function
+(
+a9
+,
+ba
+)
+local
+bb
+=
+
+tostring(
+
+type(
+a9
+)
+==
+'string'
+and
+a9
+or
+ba
+)
+if
+a4
+[
+bb
+]
+then
+return
+end
+a4
+[
+bb
+]
+=
+{
+index
+=
+a9
+,
+Value
+=
+ba
+,
+Name
+=
+bb
+,
+Stats
+=
+false
+,
+LastCB
+=
+0
+}
+if
+a3
+then
+local
+bc
+=
+a1
+[
+bb
+]
+a1
+[
+bb
+]
+=
+bc
+or
+false
+a4
+[
+bb
+]
+.
+Stats
+=
+bc
+end
+local
+bc
+=
+
+G(
+'Button'
+,
+aQ
+,
+{
+Name
+=
+'Option'
+,
+Size
+=
+UDim2
+.
+
+new(
+1
+,
+0
+,
+0
+,
+21
+)
+,
+Position
+=
+UDim2
+.
+
+new(
+0
+,
+0
+,
+0.5
+)
+,
+AnchorPoint
+=
+Vector2
+.
+
+new(
+0
+,
+0.5
+)
+}
+)
+
+G(
+'Corner'
+,
+bc
+,
+UDim
+.
+
+new(
+0
+,
+4
+)
+)
+local
+bd
+=
+
+o(
+
+p(
+'Frame'
+,
+bc
+,
+{
+Position
+=
+UDim2
+.
+
+new(
+0
+,
+1
+,
+0.5
+)
+,
+Size
+=
+UDim2
+.
+
+new(
+0
+,
+4
+,
+0
+,
+4
+)
+,
+BackgroundColor3
+=
+E
+[
+'Color Theme'
+]
+,
+BackgroundTransparency
+=
+1
+,
+AnchorPoint
+=
+Vector2
+.
+
+new(
+0
+,
+0.5
+)
+}
+)
+,
+'Theme'
+)
+
+G(
+'Corner'
+,
+bd
+,
+UDim
+.
+
+new(
+0.5
+,
+0
+)
+)
+local
+be
+=
+
+o(
+
+p(
+'TextLabel'
+,
+bc
+,
+{
+Size
+=
+UDim2
+.
+
+new(
+1
+,
+0
+,
+1
+)
+,
+Position
+=
+UDim2
+.
+
+new(
+0
+,
+10
+)
+,
+Text
+=
+bb
+,
+TextColor3
+=
+E
+[
+'Color Text'
+]
+,
+Font
+=
+Enum
+.
+Font
+.
+GothamBold
+,
+TextXAlignment
+=
+'Left'
+,
+BackgroundTransparency
+=
+1
+,
+TextTransparency
+=
+0.4
+}
+)
+,
+'Text'
+)
+bc
+.
+Activated
+:
+
+Connect(
+function
+(
+)
+
+a8(
+a4
+[
+bb
+]
+)
+end
+)
+a4
+[
+bb
+]
+.
+nodes
+=
+{
+bc
+,
+bd
+,
+be
+}
+end
+a0
+=
+function
+(
+a9
+,
+ba
+)
+local
+bb
+=
+
+tostring(
+
+type(
+a9
+)
+==
+'string'
+and
+a9
+or
+ba
+)
+if
+a4
+[
+bb
+]
+then
+if
+a3
+then
+a1
+[
+bb
+]
+=
+nil
+else
+a1
+=
+nil
+end
+a4
+[
+bb
+]
+.
+nodes
+[
+1
+]
+:
+
+Destroy(
+)
+table
+.
+
+clear(
+a4
+[
+bb
+]
+)
+a4
+[
+bb
+]
+=
+nil
+end
+end
+aZ
+=
+function
+(
+)
+return
+a4
+end
+aY
+=
+function
+(
+a9
+,
+ba
+)
+if
+ba
+then
+table
+.
+
+foreach(
+a4
+,
+a0
+)
+end
+table
+.
+
+foreach(
+a9
+,
+a_
+)
+
+a5(
+)
+
+a7(
+)
+end
+table
+.
+
+foreach(
+aD
+,
+a_
+)
+
+a5(
+)
+
+a7(
+)
+end
+aI
+.
+Activated
+:
+
+Connect(
+aW
+)
+aO
+.
+MouseButton1Down
+:
+
+Connect(
+aT
+)
+aO
+.
+MouseButton1Click
+:
+
+Connect(
+aT
+)
+T
+:
+
+GetPropertyChangedSignal(
+'Visible'
+)
+:
+
+Connect(
+aT
+)
+aL
+:
+
+GetPropertyChangedSignal(
+'AbsolutePosition'
+)
+:
+
+Connect(
+aX
+)
+aI
+.
+Activated
+:
+
+Connect(
+aV
+)
+aQ
+.
+ChildAdded
+:
+
+Connect(
+aV
+)
+aQ
+.
+ChildRemoved
+:
+
+Connect(
+aV
+)
+
+aX(
+)
+
+aV(
+)
+local
+a2
+=
+{
+}
+function
+a2
+:
+Visible
+(
+...
+)
+q
+:
+
+ToggleVisible(
+aI
+,
+...
+)
+end
+function
+a2
+:
+Destroy
+(
+)
+aI
+:
+
+Destroy(
+)
+end
+function
+a2
+:
+Callback
+(
+...
+)
+q
+:
+
+InsertCallback(
+aH
+,
+...
+
+)(
+a1
+)
+end
+function
+a2
+:
+Add
+(
+...
+)
+local
+a3
+=
+{
+...
+}
+if
+
+type(
+a3
+[
+1
+]
+)
+==
+'table'
+then
+table
+.
+
+foreach(
+Option
+,
+function
+(
+a4
+,
+a5
+)
+
+a_(
+a5
+)
+end
+)
+else
+table
+.
+
+foreach(
+a3
+,
+function
+(
+a4
+,
+a5
+)
+
+a_(
+a5
+)
+end
+)
+end
+end
+function
+a2
+:
+Remove
+(
+a3
+)
+for
+a4
+,
+a5
+in
+
+pairs(
+
+aZ(
+)
+)
+do
+if
+
+type(
+a3
+)
+==
+'number'
+and
+a4
+==
+a3
+or
+a5
+.
+Name
+==
+'Option'
+then
+
+a0(
+a4
+,
+a5
+.
+Value
+)
+end
+end
+end
+function
+a2
+:
+Select
+(
+a3
+)
+if
+
+type(
+a3
+)
+==
+'string'
+then
+for
+a4
+,
+a5
+in
+
+pairs(
+Options
+)
+do
+if
+a5
+.
+Name
+==
+a3
+then
+a5
+.
+
+Active(
+)
+end
+end
+elseif
+
+type(
+a3
+)
+==
+'number'
+then
+for
+a4
+,
+a5
+in
+
+pairs(
+Options
+)
+do
+if
+a4
+==
+a3
+then
+a5
+.
+
+Active(
+)
+end
+end
+end
+end
+function
+a2
+:
+Set
+(
+a3
+,
+a4
+)
+if
+
+type(
+a3
+)
+==
+'table'
+then
+
+aY(
+a3
+,
+not
+a4
+)
+elseif
+
+type(
+a3
+)
+==
+'function'
+then
+aH
+=
+a3
+end
+end
+return
+a2
+end
+function
+az
+:
+AddSlider
+(
+aA
+)
+local
+aB
+=
+aA
+[
+1
+]
+or
+aA
+.
+Name
+or
+aA
+.
+Title
+or
+'Slider!'
+local
+aC
+=
+aA
+.
+Desc
+or
+aA
+.
+Description
+or
+''
+local
+aD
+=
+aA
+[
+2
+]
+or
+aA
+.
+MinValue
+or
+aA
+.
+Min
+or
+10
+local
+aE
+=
+aA
+[
+3
+]
+or
+aA
+.
+MaxValue
+or
+aA
+.
+Max
+or
+100
+local
+aF
+=
+aA
+[
+4
+]
+or
+aA
+.
+Increase
+or
+1
+local
+aG
+=
+q
+:
+
+GetCallback(
+aA
+,
+6
+)
+local
+aH
+=
+aA
+[
+7
+]
+or
+aA
+.
+Flag
+or
+false
+local
+aI
+=
+aA
+[
+5
+]
+or
+aA
+.
+Default
+or
+25
+if
+
+v(
+aH
+)
+then
+aI
+=
+
+t(
+aH
+)
+end
+aD
+,
+aE
+=
+aD
+/
+aF
+,
+aE
+/
+aF
+local
+aJ
+,
+aL
+=
+
+H(
+ax
+,
+aB
+,
+aC
+,
+UDim2
+.
+
+new(
+1
+,
+-
+180
+)
+)
+local
+aM
+=
+
+p(
+'TextButton'
+,
+aJ
+,
+{
+Size
+=
+UDim2
+.
+
+new(
+0.45
+,
+0
+,
+1
+)
+,
+Position
+=
+UDim2
+.
+
+new(
+1
+)
+,
+AnchorPoint
+=
+Vector2
+.
+
+new(
+1
+,
+0
+)
+,
+AutoButtonColor
+=
+false
+,
+Text
+=
+''
+,
+BackgroundTransparency
+=
+1
+}
+)
+local
+aN
+=
+
+o(
+
+p(
+'Frame'
+,
+aM
+,
+{
+BackgroundColor3
+=
+E
+[
+'Color Stroke'
+]
+,
+Size
+=
+UDim2
+.
+
+new(
+1
+,
+-
+20
+,
+0
+,
+6
+)
+,
+Position
+=
+UDim2
+.
+
+new(
+0.5
+,
+0
+,
+0.5
+)
+,
+AnchorPoint
+=
+Vector2
+.
+
+new(
+0.5
+,
+0.5
+)
+}
+)
+,
+'Stroke'
+)
+
+G(
+'Corner'
+,
+aN
+)
+local
+aO
+=
+
+o(
+
+p(
+'Frame'
+,
+aN
+,
+{
+BackgroundColor3
+=
+E
+[
+'Color Theme'
+]
+,
+Size
+=
+UDim2
+.
+
+fromScale(
+0.3
+,
+1
+)
+,
+BorderSizePixel
+=
+0
+}
+)
+,
+'Theme'
+)
+
+G(
+'Corner'
+,
+aO
+)
+local
+aP
+=
+
+p(
+'Frame'
+,
+aN
+,
+{
+Size
+=
+UDim2
+.
+
+new(
+0
+,
+6
+,
+0
+,
+12
+)
+,
+BackgroundColor3
+=
+Color3
+.
+
+fromRGB(
+220
+,
+220
+,
+220
+)
+,
+Position
+=
+UDim2
+.
+
+fromScale(
+0.3
+,
+0.5
+)
+,
+AnchorPoint
+=
+Vector2
+.
+
+new(
+0.5
+,
+0.5
+)
+,
+BackgroundTransparency
+=
+0.2
+}
+)
+
+G(
+'Corner'
+,
+aP
+)
+local
+aQ
+=
+
+o(
+
+p(
+'TextLabel'
+,
+aM
+,
+{
+Size
+=
+UDim2
+.
+
+new(
+0
+,
+14
+,
+0
+,
+14
+)
+,
+AnchorPoint
+=
+Vector2
+.
+
+new(
+1
+,
+0.5
+)
+,
+Position
+=
+UDim2
+.
+
+new(
+0
+,
+0
+,
+0.5
+)
+,
+BackgroundTransparency
+=
+1
+,
+TextColor3
+=
+E
+[
+'Color Text'
+]
+,
+Font
+=
+Enum
+.
+Font
+.
+FredokaOne
+,
+TextSize
+=
+12
+}
+)
+,
+'Text'
+)
+local
+aR
+=
+
+p(
+'UIScale'
+,
+aQ
+)
+local
+aS
+=
+
+p(
+'Frame'
+,
+aN
+,
+{
+Position
+=
+UDim2
+.
+
+new(
+0
+,
+0
+,
+0.5
+,
+0
+)
+,
+Visible
+=
+false
+}
+)
+local 
+function 
+aT
+(
+aU
+)
+local
+aV
+=
+
+tonumber(
+aU
+*
+aF
+)
+aV
+=
+math
+.
+
+floor(
+aV
+*
+100
+)
+/
+100
+aI
+,
+aQ
+.
+Text
+=
+aV
+,
+
+tostring(
+aV
+)
+q
+:
+
+FireCallback(
+aG
+,
+aI
+)
+end
+local 
+function 
+aU
+(
+)
+local
+aV
+=
+e
+:
+
+GetMouse(
+)
+local
+aW
+=
+aV
+.
+X
+-
+aS
+.
+AbsolutePosition
+.
+X
+local
+aX
+=
+aW
+/
+aN
+.
+AbsoluteSize
+.
+X
+aP
+.
+Position
+=
+UDim2
+.
+
+new(
+math
+.
+
+clamp(
+aX
+,
+0
+,
+1
+)
+,
+0
+,
+0.5
+,
+0
+)
+end
+local 
+function 
+aV
+(
+)
+aO
+.
+Size
+=
+UDim2
+.
+
+new(
+aP
+.
+Position
+.
+X
+.
+Scale
+,
+0
+,
+1
+,
+0
+)
+local
+aW
+=
+aP
+.
+Position
+.
+X
+.
+Scale
+local
+aX
+=
+math
+.
+
+floor(
+(
+(
+aW
+*
+aE
+)
+/
+aE
+)
+*
+(
+aE
+-
+aD
+)
++
+aD
+)
+
+aT(
+aX
+)
+end
+aM
+.
+MouseButton1Down
+:
+
+Connect(
+function
+(
+)
+
+A(
+{
+aP
+,
+'Transparency'
+,
+0
+,
+0.3
+}
+)
+ax
+.
+ScrollingEnabled
+=
+false
+while
+a
+:
+
+IsMouseButtonPressed(
+Enum
+.
+UserInputType
+.
+MouseButton1
+)
+do
+task
+.
+
+wait(
+)
+
+aU(
+)
 end
 
-local ScreenGui = Create("ScreenGui", CoreGui, {
-	Name = "redz Library V7",
-}, {
-	Create("UIScale", {
-		Scale = UIScale,
-		Name = "Scale"
-	})
-})
+A(
+{
+aP
+,
+'Transparency'
+,
+0.2
+,
+0.3
+}
+)
+ax
+.
+ScrollingEnabled
+=
+true
 
-local ScreenFind = CoreGui:FindFirstChild(ScreenGui.Name)
-if ScreenFind and ScreenFind ~= ScreenGui then
-	ScreenFind:Destroy()
+u(
+aH
+,
+aI
+)
+end
+)
+aQ
+:
+
+GetPropertyChangedSignal(
+'Text'
+)
+:
+
+Connect(
+function
+(
+)
+aR
+.
+Scale
+=
+0.3
+
+A(
+{
+aR
+,
+'Scale'
+,
+1.2
+,
+0.1
+}
+)
+
+A(
+{
+aQ
+,
+'Rotation'
+,
+math
+.
+
+random(
+-
+1
+,
+1
+)
+*
+5
+,
+0.15
+,
+true
+}
+)
+
+A(
+{
+aR
+,
+'Scale'
+,
+1
+,
+0.2
+}
+)
+
+A(
+{
+aQ
+,
+'Rotation'
+,
+0
+,
+0.1
+}
+)
+end
+)
+function
+SetSlider
+(
+aW
+)
+if
+
+type(
+aW
+)
+~=
+'number'
+then
+return
+end
+local
+aX
+,
+aY
+=
+aD
+*
+aF
+,
+aE
+*
+aF
+local
+aZ
+=
+(
+aW
+-
+aX
+)
+/
+(
+aY
+-
+aX
+)
+
+u(
+aH
+,
+aW
+)
+
+A(
+{
+aP
+,
+'Position'
+,
+UDim2
+.
+
+fromScale(
+math
+.
+
+clamp(
+aZ
+,
+0
+,
+1
+)
+,
+0.5
+)
+,
+0.3
+,
+true
+}
+)
 end
 
-local function GetStr(val)
-	if type(val) == "function" then
-		return val()
-	end
-	return val
+SetSlider(
+aI
+)
+aP
+:
+
+GetPropertyChangedSignal(
+'Position'
+)
+:
+
+Connect(
+aV
+)
+
+aV(
+)
+local
+aW
+=
+{
+}
+function
+aW
+:
+Set
+(
+aX
+,
+aY
+)
+if
+aX
+and
+aY
+then
+aL
+:
+
+SetTitle(
+aX
+)
+aL
+:
+
+SetDesc(
+aY
+)
+elseif
+
+type(
+aX
+)
+==
+'string'
+then
+aL
+:
+
+SetTitle(
+aX
+)
+elseif
+
+type(
+aX
+)
+==
+'function'
+then
+aG
+=
+aX
+elseif
+
+type(
+aX
+)
+==
+'number'
+then
+
+SetSlider(
+aX
+)
 end
-
-local function ConnectSave(Instance, func)
-	Instance.InputBegan:Connect(function(Input)
-		if Input.UserInputType == Enum.UserInputType.MouseButton1 or Input.UserInputType == Enum.UserInputType.Touch then
-			while UserInputService:IsMouseButtonPressed(Enum.UserInputType.MouseButton1) do task.wait()
-			end
-		end
-		func()
-	end)
 end
+function
+aW
+:
+Callback
+(
+...
+)
+q
+:
 
-local function CreateTween(Configs)
-	local Instance = Configs[1] or Configs.Instance
-	local Prop = Configs[2] or Configs.Prop
-	local NewVal = Configs[3] or Configs.NewVal
-	local Time = Configs[4] or Configs.Time or 0.5
-	local TweenWait = Configs[5] or Configs.wait or false
-	local TweenInfo = TweenInfo.new(Time, Enum.EasingStyle.Quint)
-	
-	local Tween = TweenService:Create(Instance, TweenInfo, {[Prop] = NewVal})
-	Tween:Play()
-	if TweenWait then
-		Tween.Completed:Wait()
-	end
-	return Tween
+InsertCallback(
+aG
+,
+...
+
+)(
+
+tonumber(
+aI
+)
+)
 end
+function
+aW
+:
+Visible
+(
+...
+)
+q
+:
 
-local function MakeDrag(Instance)
-	task.spawn(function()
-		SetProps(Instance, {
-			Active = true,
-			AutoButtonColor = false
-		})
-
-		local Dragging = false
-		local DragStart, StartPos
-		local MoveCon, EndCon
-
-		local function GetPos(Input)
-			if Input.UserInputType == Enum.UserInputType.Touch then
-				return Input.Position
-			end
-			return UserInputService:GetMouseLocation()
-		end
-
-		local function Update(CurrentPos)
-			local delta = CurrentPos - DragStart
-			Instance.Position = UDim2.new(
-				StartPos.X.Scale, StartPos.X.Offset + delta.X / UIScale,
-				StartPos.Y.Scale, StartPos.Y.Offset + delta.Y / UIScale
-			)
-		end
-
-		Instance.InputBegan:Connect(function(Input)
-			if Input.UserInputType == Enum.UserInputType.MouseButton1 or Input.UserInputType == Enum.UserInputType.Touch then
-				Dragging = true
-				StartPos = Instance.Position
-				DragStart = GetPos(Input)
-
-				if MoveCon then MoveCon:Disconnect() end
-				if EndCon then EndCon:Disconnect() end
-
-				MoveCon = UserInputService.InputChanged:Connect(function(I)
-					if not Dragging then return end
-
-					if Input.UserInputType == Enum.UserInputType.Touch then
-						if I.UserInputType == Enum.UserInputType.Touch then
-							Update(I.Position)
-						end
-					else
-						if I.UserInputType == Enum.UserInputType.MouseMovement then
-							Update(UserInputService:GetMouseLocation())
-						end
-					end
-				end)
-
-				EndCon = UserInputService.InputEnded:Connect(function(I)
-					if I.UserInputType == Enum.UserInputType.MouseButton1 or I.UserInputType == Enum.UserInputType.Touch then
-						Dragging = false
-						if MoveCon then MoveCon:Disconnect() MoveCon = nil end
-						if EndCon then EndCon:Disconnect() EndCon = nil end
-					end
-				end)
-			end
-		end)
-	end)
-
-	return Instance
+ToggleVisible(
+aJ
+,
+...
+)
 end
+function
+aW
+:
+Destroy
+(
+)
+aJ
+:
 
-local function VerifyTheme(Theme)
-	for name,_ in pairs(redzlib.Themes) do
-		if name == Theme then
-			return true
-		end
-	end
+Destroy(
+)
 end
-
-local function SaveJson(FileName, save)
-	if writefile then
-		local json = HttpService:JSONEncode(save)
-		writefile(FileName, json)
-	end
+return
+aW
 end
+function
+az
+:
+AddTextBox
+(
+aA
+)
+local
+aB
+=
+aA
+[
+1
+]
+or
+aA
+.
+Name
+or
+aA
+.
+Title
+or
+'Text Box'
+local
+aC
+=
+aA
+.
+Desc
+or
+aA
+.
+Description
+or
+''
+local
+aD
+=
+aA
+[
+2
+]
+or
+aA
+.
+Default
+or
+''
+local
+aE
+=
+aA
+[
+5
+]
+or
+aA
+.
+PlaceholderText
+or
+'Input'
+local
+aF
+=
+aA
+[
+3
+]
+or
+aA
+.
+ClearText
+or
+false
+local
+aG
+=
+q
+:
 
-local Theme = redzlib.Themes[redzlib.Save.Theme]
+GetCallback(
+aA
+,
+4
+)
+local
+aH
+=
+aA
+[
+6
+]
+or
+aA
+.
+Flag
+or
+false
+if
 
-local function AddEle(Name, Func)
-	redzlib.Elements[Name] = Func
+type(
+aD
+)
+~=
+'string'
+then
+aD
+=
+''
 end
+if
+aH
+and
 
-local function Make(Ele, Instance, props, ...)
-	local Element = redzlib.Elements[Ele](Instance, props, ...)
-	return Element
+v(
+aH
+)
+and
+
+type(
+
+t(
+aH
+)
+)
+==
+'string'
+then
+aD
+=
+
+t(
+aH
+)
 end
+if
+aH
+and
+(
+not
 
-AddEle("Corner", function(parent, CornerRadius)
-	local New = SetProps(Create("UICorner", parent, {
-		CornerRadius = CornerRadius or UDim.new(0, 7)
-	}), props)
-	return New
-end)
+v(
+aH
+)
+or
 
-AddEle("Stroke", function(parent, props, ...)
-	local args = {...}
-	local New = InsertTheme(SetProps(Create("UIStroke", parent, {
-		Color = args[1] or Theme["Color Stroke"],
-		Thickness = args[2] or 1,
-		ApplyStrokeMode = "Border"
-	}), props), "Stroke")
-	return New
-end)
+t(
+aH
+)
+==
+nil
+)
+then
 
-AddEle("Button", function(parent, props, ...)
-	local args = {...}
-	local New = InsertTheme(SetProps(Create("TextButton", parent, {
-		Text = "",
-		Size = UDim2.fromScale(1, 1),
-		BackgroundColor3 = Theme["Color Hub 2"],
-		AutoButtonColor = false
-	}), props), "Frame")
-	
-	New.MouseEnter:Connect(function()
-		New.BackgroundTransparency = 0.4
-	end)
-	New.MouseLeave:Connect(function()
-		New.BackgroundTransparency = 0
-	end)
-	if args[1] then
-		New.Activated:Connect(args[1])
-	end
-	return New
-end)
-
-AddEle("Gradient", function(parent, props, ...)
-	local args = {...}
-	local New = InsertTheme(SetProps(Create("UIGradient", parent, {
-		Color = Theme["Color Hub 1"]
-	}), props), "Gradient")
-	return New
-end)
-
-local function ButtonFrame(Instance, Title, Description, HolderSize)
-	local TitleL = InsertTheme(Create("TextLabel", {
-		Font = Enum.Font.GothamMedium,
-		TextColor3 = Theme["Color Text"],
-		Size = UDim2.new(1, -20),
-		AutomaticSize = "Y",
-		Position = UDim2.new(0, 0, 0.5),
-		AnchorPoint = Vector2.new(0, 0.5),
-		BackgroundTransparency = 1,
-		TextTruncate = "AtEnd",
-		TextSize = 10,
-		TextXAlignment = "Left",
-		Text = "",
-		RichText = true
-	}), "Text")
-	
-	local DescL = InsertTheme(Create("TextLabel", {
-		Font = Enum.Font.Gotham,
-		TextColor3 = Theme["Color Dark Text"],
-		Size = UDim2.new(1, -20),
-		AutomaticSize = "Y",
-		Position = UDim2.new(0, 12, 0, 15),
-		BackgroundTransparency = 1,
-		TextWrapped = true,
-		TextSize = 8,
-		TextXAlignment = "Left",
-		Text = "",
-		RichText = true
-	}), "DarkText")
-
-	local Frame = Make("Button", Instance, {
-		Size = UDim2.new(1, 0, 0, 25),
-		AutomaticSize = "Y",
-		Name = "Option"
-	})Make("Corner", Frame, UDim.new(0, 6))
-	
-	LabelHolder = Create("Frame", Frame, {
-		AutomaticSize = "Y",
-		BackgroundTransparency = 1,
-		Size = HolderSize,
-		Position = UDim2.new(0, 10, 0),
-		AnchorPoint = Vector2.new(0, 0)
-	}, {
-		Create("UIListLayout", {
-			SortOrder = "LayoutOrder",
-			VerticalAlignment = "Center",
-			Padding = UDim.new(0, 2)
-		}),
-		Create("UIPadding", {
-			PaddingBottom = UDim.new(0, 5),
-			PaddingTop = UDim.new(0, 5)
-		}),
-		TitleL,
-		DescL,
-	})
-	
-	local Label = {}
-	function Label:SetTitle(NewTitle)
-		if type(NewTitle) == "string" and NewTitle:gsub(" ", ""):len() > 0 then
-			TitleL.Text = NewTitle
-		end
-	end
-	function Label:SetDesc(NewDesc)
-		if type(NewDesc) == "string" and NewDesc:gsub(" ", ""):len() > 0 then
-			DescL.Visible = true
-			DescL.Text = NewDesc
-			LabelHolder.Position = UDim2.new(0, 10, 0)
-			LabelHolder.AnchorPoint = Vector2.new(0, 0)
-		else
-			DescL.Visible = false
-			DescL.Text = ""
-			LabelHolder.Position = UDim2.new(0, 10, 0.5)
-			LabelHolder.AnchorPoint = Vector2.new(0, 0.5)
-		end
-	end
-	
-	Label:SetTitle(Title)
-	Label:SetDesc(Description)
-	return Frame, Label
+u(
+aH
+,
+aD
+)
 end
+local
+aI
+,
+aJ
+=
 
-local function GetColor(Instance)
-	if Instance:IsA("Frame") then
-		return "BackgroundColor3"
-	elseif Instance:IsA("ImageLabel") then
-		return "ImageColor3"
-	elseif Instance:IsA("TextLabel") then
-		return "TextColor3"
-	elseif Instance:IsA("ScrollingFrame") then
-		return "ScrollBarImageColor3"
-	elseif Instance:IsA("UIStroke") then
-		return "Color"
-	end
-	return ""
+H(
+ax
+,
+aB
+,
+aC
+,
+UDim2
+.
+
+new(
+1
+,
+-
+170
+)
+)
+task
+.
+
+defer(
+function
+(
+)
+for
+aL
+,
+aM
+in
+
+ipairs(
+aI
+:
+
+GetDescendants(
+)
+)
+do
+if
+aM
+:
+
+IsA(
+'TextLabel'
+)
+then
+aM
+.
+TextWrapped
+=
+true
+aM
+.
+TextTruncate
+=
+Enum
+.
+TextTruncate
+.
+None
 end
-
-
-function redzlib:GetIcon(index)
-	if type(index) ~= "string" or index:find("rbxassetid://") or #index == 0 then
-		return index
-	end
-	
-	local firstMatch = nil
-	index = string.lower(index):gsub("lucide", ""):gsub("-", "")
-	
-	if self.Icons[index] then
-	  return self.Icons[index]
-	end
-	
-	for Name, Icon in self.Icons do
-		if Name == index then
-			return Icon
-		elseif not firstMatch and Name:find(index, 1, true) then
-			firstMatch = Icon
-		end
-	end
-	
-	return firstMatch or index
 end
-
-function redzlib:SetTheme(NewTheme)
-	local SelectedTheme = redzlib.Themes[NewTheme]
-	if not SelectedTheme then return end
-		
-	redzlib.Save.Theme = NewTheme
-	pcall(function() SaveJson("redz library V7.json", redzlib.Save) end)
-	Theme = SelectedTheme
-
-	pcall(function()
-		if Connection and type(Connection.FireConnection) == "function" then
-			Connection:FireConnection("ThemeChanged", NewTheme)
-		end
-	end)
-
-	for _, ElementData in ipairs(redzlib.Instances) do
-		local UI = ElementData.Instance
-		
-		if not UI then continue end
-
-		local Types = type(ElementData.Type) == "table" and ElementData.Type or {ElementData.Type}
-
-		for _, UIType in ipairs(Types) do
-			pcall(function()
-				if UIType == "Gradient" and UI:IsA("UIGradient") then
-					local color = SelectedTheme["Color Hub 1"]
-					UI.Color = typeof(color) == "ColorSequence" and color or ColorSequence.new(color)
-					
-				elseif UIType == "Frame" or UIType == "Hub2" then
-					UI.BackgroundColor3 = SelectedTheme["Color Hub 2"]
-					
-				elseif UIType == "Stroke" and UI:IsA("UIStroke") then
-					UI.Color = SelectedTheme["Color Stroke"]
-					
-				elseif UIType == "Theme" then
-					if UI:IsA("ImageLabel") or UI:IsA("ImageButton") then
-						UI.ImageColor3 = SelectedTheme["Color Theme"]
-					else
-						UI.BackgroundColor3 = SelectedTheme["Color Theme"]
-					end
-					
-				elseif UIType == "ScrollBar" and UI:IsA("ScrollingFrame") then
-					UI.ScrollBarImageColor3 = SelectedTheme["Color Theme"]
-					
-				elseif UIType == "Text" then
-					if UI:IsA("ImageLabel") or UI:IsA("ImageButton") then
-						UI.ImageColor3 = SelectedTheme["Color Text"]
-					else
-						UI.TextColor3 = SelectedTheme["Color Text"]
-					end
-					
-				elseif UIType == "DarkText" then
-					if UI:IsA("ImageLabel") or UI:IsA("ImageButton") then
-						UI.ImageColor3 = SelectedTheme["Color Dark Text"]
-					else
-						UI.TextColor3 = SelectedTheme["Color Dark Text"]
-					end
-				end
-			end)
-		end
-	end
 end
-	
-function redzlib:SetScale(NewScale)
-	NewScale = ViewportSize.Y / math.clamp(NewScale, 300, 2000)
-	UIScale, ScreenGui.Scale.Scale = NewScale, NewScale
+)
+local
+aL
+=
+
+o(
+
+p(
+'Frame'
+,
+aI
+,
+{
+Size
+=
+UDim2
+.
+
+new(
+0
+,
+150
+,
+0
+,
+18
+)
+,
+Position
+=
+UDim2
+.
+
+new(
+1
+,
+-
+10
+,
+0.5
+)
+,
+AnchorPoint
+=
+Vector2
+.
+
+new(
+1
+,
+0.5
+)
+,
+BackgroundColor3
+=
+E
+[
+'Color Stroke'
+]
+}
+)
+,
+'Stroke'
+)
+
+G(
+'Corner'
+,
+aL
+,
+UDim
+.
+
+new(
+0
+,
+4
+)
+)
+local
+aM
+=
+
+o(
+
+p(
+'TextBox'
+,
+aL
+,
+{
+Size
+=
+UDim2
+.
+
+new(
+0.85
+,
+0
+,
+0.85
+,
+0
+)
+,
+AnchorPoint
+=
+Vector2
+.
+
+new(
+0.5
+,
+0.5
+)
+,
+Position
+=
+UDim2
+.
+
+new(
+0.5
+,
+0
+,
+0.5
+,
+0
+)
+,
+BackgroundTransparency
+=
+1
+,
+Font
+=
+Enum
+.
+Font
+.
+GothamBold
+,
+TextScaled
+=
+true
+,
+TextColor3
+=
+E
+[
+'Color Text'
+]
+,
+ClearTextOnFocus
+=
+aF
+,
+PlaceholderText
+=
+aE
+,
+Text
+=
+''
+}
+)
+,
+'Text'
+)
+local
+aN
+=
+
+p(
+'ImageLabel'
+,
+aL
+,
+{
+Size
+=
+UDim2
+.
+
+new(
+0
+,
+12
+,
+0
+,
+12
+)
+,
+Position
+=
+UDim2
+.
+
+new(
+0
+,
+-
+5
+,
+0.5
+)
+,
+AnchorPoint
+=
+Vector2
+.
+
+new(
+1
+,
+0.5
+)
+,
+Image
+=
+'rbxassetid://15637081879'
+,
+BackgroundTransparency
+=
+1
+}
+)
+local
+aO
+=
+{
+}
+local 
+function 
+aP
+(
+)
+local
+aQ
+=
+aM
+.
+Text
+if
+
+type(
+aQ
+)
+~=
+'string'
+then
+aQ
+=
+''
 end
+if
+aO
+.
+OnChanging
+then
+aQ
+=
+aO
+.
 
-function redzlib:MakeWindow(Configs)
-    local WTitle = Configs[1] or Configs.Name or Configs.Title
-    local WMiniText = Configs[2] or Configs.SubTitle
-
-    local IntroductionEnabled = Configs.Introduction or false
-    local IntroductionTitle = Configs.IntroductionTitle or WTitle or ""
-    local IntroductionDescription = Configs.IntroductionDescription or ""
-    local IntroductionImage = Configs.IntroductionImage or ""
-
-    if IntroductionImage and IntroductionImage ~= "" then
-        IntroductionImage = redzlib:GetIcon(IntroductionImage)
-    end
-
-    Settings.ScriptFile = Configs[3] or Configs.SaveFolder or false
-	
-	local function LoadFile()
-		local File = Settings.ScriptFile
-		if type(File) ~= "string" then return end
-		if not readfile or not isfile then return end
-		local s, r = pcall(isfile, File)
-		
-		if s and r then
-			local s, _Flags = pcall(readfile, File)
-			
-			if s and type(_Flags) == "string" then
-				local s,r = pcall(function() return HttpService:JSONDecode(_Flags) end)
-				Flags = s and r or {}
-			end
-		end
-	end;LoadFile()
-	
-	local UISizeX, UISizeY = unpack(redzlib.Save.UISize)
-	local MainFrame = InsertTheme(Create("ImageButton", ScreenGui, {
-		Size = UDim2.fromOffset(UISizeX, UISizeY),
-		Position = UDim2.new(0.5, -UISizeX/2, 0.5, -UISizeY/2),
-		BackgroundTransparency = 0.03,
-		Name = "Hub"
-	}), "Main")
-	Make("Gradient", MainFrame, {
-		Rotation = 45
-	})MakeDrag(MainFrame)
-	
-	local MainCorner = Make("Corner", MainFrame)
-	
-	local Components = Create("Folder", MainFrame, {
-		Name = "Components"
-	})
-	
-	local DropdownHolder = Create("Folder", ScreenGui, {
-		Name = "Dropdown"
-	})
-	if IntroductionEnabled then
-        local Overlay = Create("Frame", MainFrame, {
-            Name = "IntroductionOverlay",
-            Size = UDim2.fromScale(1, 1),
-            Position = UDim2.fromScale(0, 0),
-            BackgroundTransparency = 1, 
-            BackgroundColor3 = Color3.fromRGB(0, 0, 0),
-			BorderSizePixel = 0,
-            ZIndex = 10
-        })
-        Make("Corner", Overlay, UDim.new(0, 8)) 
-
-        if IntroductionImage and IntroductionImage ~= "" then
-            Logo = Create("ImageLabel", Overlay, {
-                Name = "StartLogo",
-                BackgroundTransparency = 1,
-                Size = UDim2.fromOffset(80, 80), 
-                AnchorPoint = Vector2.new(0.5, 1),
-                Position = UDim2.new(0.5, 0, 0.5, -8),
-                Image = IntroductionImage,
-                ImageTransparency = 1,
-                ZIndex = 11
-            })
-        end
-
-        local TitleLabel = InsertTheme(Create("TextLabel", Overlay, {
-            Name = "StartTitle",
-            BackgroundTransparency = 1,
-            AnchorPoint = Vector2.new(0.5, 0),
-            Position = UDim2.new(0.5, 0, 0.5, 12),
-            AutomaticSize = Enum.AutomaticSize.XY,
-            Text = IntroductionTitle,
-            Font = Enum.Font.GothamMedium,
-            TextSize = 14, 
-            TextXAlignment = Enum.TextXAlignment.Center,
-            TextYAlignment = Enum.TextYAlignment.Top,
-            TextColor3 = Theme["Color Text"],
-            TextTransparency = 1,
-            ZIndex = 11
-        }), "Text")
-
-
-        if IntroductionDescription ~= "" then
-            DescriptionLabel = Create("TextLabel", Overlay, {
-                Name = "StartDescription",
-                BackgroundTransparency = 1,
-                AnchorPoint = Vector2.new(0.5, 0),
-                Position = UDim2.new(0.5, 0, 0.5, 32),
-                AutomaticSize = Enum.AutomaticSize.XY,
-                Text = IntroductionDescription,
-                Font = Enum.Font.Gotham,
-                TextSize = 12,
-                TextXAlignment = Enum.TextXAlignment.Center,
-                TextYAlignment = Enum.TextYAlignment.Top,
-                TextColor3 = Theme["Color Dark Text"], 
-                TextTransparency = 1,
-                ZIndex = 11
-            })
-        end
-
-      
-        task.spawn(function()
-            
-            CreateTween({ Overlay, "BackgroundTransparency", 0.45, 0.35 })
-
-            if Logo then
-                CreateTween({ Logo, "ImageTransparency", 0, 0.3 })
-            end
-            CreateTween({ TitleLabel, "TextTransparency", 0, 0.3 })
-            if DescriptionLabel then
-                CreateTween({ DescriptionLabel, "TextTransparency", 0, 0.3 })
-            end
-
-            task.wait(1.5) 
-
-  
-            if Logo then
-                CreateTween({ Logo, "ImageTransparency", 1, 0.4 })
-            end
-            CreateTween({ TitleLabel, "TextTransparency", 1, 0.4 })
-            if DescriptionLabel then
-                CreateTween({ DescriptionLabel, "TextTransparency", 1, 0.4 })
-            end
-            CreateTween({ Overlay, "BackgroundTransparency", 1, 0.4 })
-
-            task.wait(0.4)
-            if Overlay and Overlay.Parent then
-                Overlay:Destroy()
-            end
-        end)
-    end
-
-	local TopBar = Create("Frame", Components, {
-		Size = UDim2.new(1, 0, 0, 28),
-		BackgroundTransparency = 1,
-		Name = "Top Bar"
-	})
-
-    local NotificationsHolder = Create("Frame", ScreenGui, {
-        Name = "NotificationsHolder",
-        AnchorPoint = Vector2.new(1, 1),
-        Position = UDim2.new(1, -10, 1, -10),
-        Size = UDim2.new(0, 300, 1, -20),
-        BackgroundTransparency = 1,
-        ClipsDescendants = false
-    })
-	
-	local Title = InsertTheme(Create("TextLabel", TopBar, {
-		Position = UDim2.new(0, 15, 0.5),
-		AnchorPoint = Vector2.new(0, 0.5),
-		AutomaticSize = "XY",
-		Text = WTitle,
-		TextXAlignment = "Left",
-		TextSize = 12,
-		TextColor3 = Theme["Color Text"],
-		BackgroundTransparency = 1,
-		Font = Enum.Font.GothamBold,
-		Name = "Title"
-	}, {
-		InsertTheme(Create("TextLabel", {
-			Size = UDim2.fromScale(0, 1),
-			AutomaticSize = "X",
-			AnchorPoint = Vector2.new(0, 1),
-			Position = UDim2.new(1, 5, 0.9),
-			Text = WMiniText,
-			TextColor3 = Theme["Color Dark Text"],
-			BackgroundTransparency = 1,
-			TextXAlignment = "Left",
-			TextYAlignment = "Bottom",
-			TextSize = 8,
-			Font = Enum.Font.GothamMedium,
-			Name = "SubTitle"
-		}), "DarkText")
-	}), "Text")
-	
-	local MainScroll = InsertTheme(Create("ScrollingFrame", Components, {
-		Size = UDim2.new(0, redzlib.Save.TabSize, 1, -TopBar.Size.Y.Offset),
-		ScrollBarImageColor3 = Theme["Color Theme"],
-		Position = UDim2.new(0, 0, 1, 0),
-		AnchorPoint = Vector2.new(0, 1),
-		ScrollBarThickness = 1.5,
-		BackgroundTransparency = 1,
-		ScrollBarImageTransparency = 0.2,
-		CanvasSize = UDim2.new(),
-		AutomaticCanvasSize = "Y",
-		ScrollingDirection = "Y",
-		BorderSizePixel = 0,
-		Name = "Tab Scroll"
-	}, {
-		Create("UIPadding", {
-			PaddingLeft = UDim.new(0, 10),
-			PaddingRight = UDim.new(0, 10),
-			PaddingTop = UDim.new(0, 10),
-			PaddingBottom = UDim.new(0, 10)
-		}), Create("UIListLayout", {
-			Padding = UDim.new(0, 5)
-		})
-	}), "ScrollBar")
-	
-	local Containers = Create("Frame", Components, {
-		Size = UDim2.new(1, -MainScroll.Size.X.Offset, 1, -TopBar.Size.Y.Offset),
-		AnchorPoint = Vector2.new(1, 1),
-		Position = UDim2.new(1, 0, 1, 0),
-		BackgroundTransparency = 1,
-		ClipsDescendants = true,
-		Name = "Containers"
-	})
-	
-	local ControlSize1, ControlSize2 = MakeDrag(Create("ImageButton", MainFrame, {
-		Size = UDim2.new(0, 35, 0, 35),
-		Position = MainFrame.Size,
-		Active = true,
-		AnchorPoint = Vector2.new(0.8, 0.8),
-		BackgroundTransparency = 1,
-		Name = "Control Hub Size"
-	})), MakeDrag(Create("ImageButton", MainFrame, {
-		Size = UDim2.new(0, 20, 1, -30),
-		Position = UDim2.new(0, MainScroll.Size.X.Offset, 1, 0),
-		AnchorPoint = Vector2.new(0.5, 1),
-		Active = true,
-		BackgroundTransparency = 1,
-		Name = "Control Tab Size"
-	}))
-	
-	local function ControlSize()
-		local Pos1, Pos2 = ControlSize1.Position, ControlSize2.Position
-		ControlSize1.Position = UDim2.fromOffset(math.clamp(Pos1.X.Offset, 430, 1000), math.clamp(Pos1.Y.Offset, 200, 500))
-		ControlSize2.Position = UDim2.new(0, math.clamp(Pos2.X.Offset, 135, 250), 1, 0)
-		
-		MainScroll.Size = UDim2.new(0, ControlSize2.Position.X.Offset, 1, -TopBar.Size.Y.Offset)
-		Containers.Size = UDim2.new(1, -MainScroll.Size.X.Offset, 1, -TopBar.Size.Y.Offset)
-		MainFrame.Size = ControlSize1.Position
-	end
-	
-	ControlSize1:GetPropertyChangedSignal("Position"):Connect(ControlSize)
-	ControlSize2:GetPropertyChangedSignal("Position"):Connect(ControlSize)
-	
-	ConnectSave(ControlSize1, function()
-		if not Minimized then
-			redzlib.Save.UISize = {MainFrame.Size.X.Offset, MainFrame.Size.Y.Offset}
-			SaveJson("redz library V7.json", redzlib.Save)
-		end
-	end)
-	
-	ConnectSave(ControlSize2, function()
-		redzlib.Save.TabSize = MainScroll.Size.X.Offset
-		SaveJson("redz library V7.json", redzlib.Save)
-	end)
-	
-	local ButtonsFolder = Create("Folder", TopBar, {
-		Name = "Buttons"
-	})
-	
-    local CloseButton = Instance.new("ImageButton")
-    CloseButton.Size = UDim2.new(0, 18, 0, 18) 
-    CloseButton.Position = UDim2.new(1, -10, 0.5)
-    CloseButton.AnchorPoint = Vector2.new(1, 0.5)
-    CloseButton.BackgroundTransparency = 1
-    CloseButton.Image = "rbxassetid://10747384394"
-    CloseButton.ImageColor3 = Color3.fromRGB(255, 255, 255)
-    CloseButton.AutoButtonColor = false
-    CloseButton.Name = "Close"
-    CloseButton.Parent = parentFrame
-
-    local corner = Instance.new("UICorner")
-    corner.CornerRadius = UDim.new(0, 3)
-    corner.Parent = CloseButton
-
-    local overlay = Instance.new("TextLabel")
-    overlay.Size = UDim2.new(1,0,1,0)
-    overlay.BackgroundTransparency = 1
-    overlay.Text = ""
-    overlay.TextColor3 = Color3.fromRGB(255,255,255)
-    overlay.Font = Enum.Font.GothamBold
-    overlay.TextSize = 14
-    overlay.Parent = CloseButton
-
-    local stroke = Instance.new("UIStroke")
-    stroke.Parent = overlay
-    stroke.Color = Color3.fromRGB(0,0,0)
-    stroke.Thickness = 1
-
-    CloseButton.MouseEnter:Connect(function()
-	    CloseButton.BackgroundColor3 = Color3.fromRGB(92, 21, 21) 
-	    CloseButton.BackgroundTransparency = 0
-    end)
-
-    CloseButton.MouseLeave:Connect(function()
-	    CloseButton.BackgroundTransparency = 1
-    end)
-
-    CloseButton.MouseButton1Down:Connect(function()
-	    CloseButton.BackgroundColor3 = Color3.fromRGB(170, 40, 40) 
-	    CloseButton.BackgroundTransparency = 0
-    end)
-
-    CloseButton.MouseButton1Up:Connect(function()
-	    if CloseButton:IsMouseOver() then
-	    	CloseButton.BackgroundColor3 = Color3.fromRGB(92, 21, 21) 
-	    	CloseButton.BackgroundTransparency = 0
-	    else
-	    	CloseButton.BackgroundTransparency = defaultBgTransparency
-	    end
-    end)
-
-	local MinimizeButton = SetProps(CloseButton:Clone(), {
-	Position = UDim2.new(1, -35, 0.5),
-	Image = "rbxassetid://10734896206",
-	Name = "Minimize"
-})
-
-    for _, conn in pairs(getconnections(MinimizeButton.MouseEnter)) do
-        conn:Disconnect()
-    end
-    for _, conn in pairs(getconnections(MinimizeButton.MouseLeave)) do
-        conn:Disconnect()
-    end
-    for _, conn in pairs(getconnections(MinimizeButton.MouseButton1Down)) do
-        conn:Disconnect()
-    end
-    for _, conn in pairs(getconnections(MinimizeButton.MouseButton1Up)) do
-        conn:Disconnect()
-    end
-
-    MinimizeButton.MouseEnter:Connect(function()
-	    MinimizeButton.BackgroundColor3 = Color3.fromRGB(111, 111, 117) 
-	    MinimizeButton.BackgroundTransparency = 0
-    end)
-
-    MinimizeButton.MouseLeave:Connect(function()
-	    MinimizeButton.BackgroundTransparency = 1
-    end)
-
-    MinimizeButton.MouseButton1Down:Connect(function()
-	    MinimizeButton.BackgroundColor3 = Color3.fromRGB(170, 170, 170)
-	    MinimizeButton.BackgroundTransparency = 0
-    end)
-
-    MinimizeButton.MouseButton1Up:Connect(function()
-	    if MinimizeButton:IsMouseOver() then
-	    	MinimizeButton.BackgroundColor3 = Color3.fromRGB(111, 111, 117) 
-	    	MinimizeButton.BackgroundTransparency = 0
-	    else
-	    	MinimizeButton.BackgroundTransparency = 1
-	    end
-    end)
-
-	SetChildren(ButtonsFolder, {
-		CloseButton,
-		MinimizeButton
-	})
-	
-	local Minimized, SaveSize, WaitClick
-	local Window, FirstTab = {}, false
-	function Window:CloseBtn()
-		local Dialog = Window:Dialog({
-			Title = "Close Window",
-			Text = "You Want Close Window?",
-			Options = {
-				{"No"},
-
-				{"Yes", function()
-					ScreenGui:Destroy()
-				end},
-			}
-		})
-	end
-	function Window:MinimizeBtn()
-		if MainFrame:FindFirstChild("Dialog") then return end
-		if WaitClick then return end
-		WaitClick = true
-		
-		if Minimized then
-			MinimizeButton.Image = "rbxassetid://10734896206"
-			CreateTween({MainFrame, "Size", SaveSize, 0.25, true})
-			ControlSize1.Visible = true
-			ControlSize2.Visible = true
-			Minimized = false
-		else
-			MinimizeButton.Image = "rbxassetid://10734924532"
-			SaveSize = MainFrame.Size
-			ControlSize1.Visible = false
-			ControlSize2.Visible = false
-			CreateTween({MainFrame, "Size", UDim2.fromOffset(MainFrame.Size.X.Offset, 28), 0.25, true})
-			Minimized = true
-		end
-		
-		WaitClick = false
-	end
-	function Window:Minimize()
-		MainFrame.Visible = not MainFrame.Visible
-	end
-
-	  function Window:NewMinimizer(Configs)
-	  local KeyCode = Configs[1] or Configs.KeyCode
-    
-          UserInputService.InputBegan:Connect(function(input)
-     
-          if input.KeyCode == KeyCode or input.UserInputType == KeyCode then
-              if UserInputService.KeyboardEnabled then
-                  Window:Minimize()
-              end
-          end
-      end)
-  end
-
-	function Window:AddMinimizeButton(Configs)
-		local Button = MakeDrag(Create("ImageButton", ScreenGui, {
-			Size = UDim2.fromOffset(35, 35),
-			Position = UDim2.fromScale(0.15, 0.15),
-			BackgroundTransparency = 1,
-			BackgroundColor3 = Theme["Color Hub 2"],
-			AutoButtonColor = false
-		}))
-		
-		local Stroke, Corner
-		if Configs.Corner then
-			Corner = Make("Corner", Button)
-			SetProps(Corner, Configs.Corner)
-		end
-		if Configs.Stroke then
-			Stroke = Make("Stroke", Button)
-			SetProps(Stroke, Configs.Corner)
-		end
-		
-		SetProps(Button, Configs.Button)
-		Button.Activated:Connect(Window.Minimize)
-		
-		return {
-			Stroke = Stroke,
-			Corner = Corner,
-			Button = Button
-		}
-	end
-	function Window:Set(Val1, Val2)
-		if type(Val1) == "string" and type(Val2) == "string" then
-			Title.Text = Val1
-			Title.SubTitle.Text = Val2
-		elseif type(Val1) == "string" then
-			Title.Text = Val1
-		end
-	end
-
-local ActiveNotifications = {}
-
-function Window:Notify(Configs)
-    local Title = Configs.Title or "Notification"
-    local Content = Configs.Content or "This is a Notification"
-    local Image = Configs.Image or ""
-    local Duration = Configs.Duration or 5
-
-	Image = redzlib:GetIcon(Image)
-	  if not Image:find("rbxassetid://") or Image:gsub("rbxassetid://", ""):len() < 6 then
-		  Image = ""
-	  end
-    
-    local leftOffset = (Image ~= "" ) and (10 + 32 + 8) or 15
-    local rightPad = (Image ~= "" ) and 62 or 20
-    local maxTextWidth = math.max(10, 280 - leftOffset - rightPad)
-
-    local neededHeight = math.ceil(8 + math.max(1, math.ceil(TextService:GetTextSize(tostring(Title), 16, Enum.Font.GothamBold, Vector2.new(maxTextWidth, math.huge)).Y / math.max(1, TextService:GetTextSize("Ay", 16, Enum.Font.GothamBold, Vector2.new(1000, 1000)).Y))) * TextService:GetTextSize("Ay", 16, Enum.Font.GothamBold, Vector2.new(1000, 1000)).Y + math.ceil(TextService:GetTextSize("Ay", 14, Enum.Font.Gotham, Vector2.new(1000, 1000)).Y * 0.25) + math.max(1, math.ceil(TextService:GetTextSize(tostring(Content), 14, Enum.Font.Gotham, Vector2.new(maxTextWidth, math.huge)).Y / math.max(1, TextService:GetTextSize("Ay", 14, Enum.Font.Gotham, Vector2.new(1000, 1000)).Y))) * TextService:GetTextSize("Ay", 14, Enum.Font.Gotham, Vector2.new(1000, 1000)).Y + 8)
-    if neededHeight < 60 then neededHeight = 60 end
-    
-	local function updatePositions()
-    local yOffset = 0
-    for i, v in ipairs(ActiveNotifications) do
-        
-        local h = 60
-        pcall(function()
-            if v and v.Size and v.Size.Y and typeof(v.Size.Y.Offset) == "number" then
-                h = v.Size.Y.Offset
-            end
-        end)
-        local y = -yOffset
-        CreateTween({v, "Position", UDim2.new(1, -10, 1, y), 0.25})
-        yOffset = yOffset + h + 10
-    end
+OnChanging(
+aQ
+)
+or
+aQ
 end
+aM
+.
+Text
+=
+aQ
+if
+aH
+then
 
-    local function formatTimeSeconds(totalSeconds)
-        totalSeconds = math.max(0, math.floor(totalSeconds + 0.0001))
-
-        if math.floor(totalSeconds / 3600) > 0 then
-            if math.floor((totalSeconds % 3600) / 60) > 0 then
-                return string.format("%dh %dm %ds", math.floor(totalSeconds / 3600), math.floor((totalSeconds % 3600) / 60), totalSeconds % 60)
-            else
-                return string.format("%dh %dm %ds", math.floor(totalSeconds / 3600), math.floor((totalSeconds % 3600) / 60), totalSeconds % 60) 
-            end
-        elseif math.floor((totalSeconds % 3600) / 60) > 0 then
-           return string.format("%dm %ds", math.floor((totalSeconds % 3600) / 60), totalSeconds % 60)
-        else
-            return string.format("%ds", totalSeconds % 60)
-        end
-    end
-
-    local Notif = InsertTheme(Create("Frame", NotificationsHolder, {
-        Size = UDim2.fromOffset(280, neededHeight),
-        Position = UDim2.new(1, 300, 1, 0),
-        BackgroundTransparency = 0.1,
-        BackgroundColor3 = Theme["Color Hub 2"],
-        BorderSizePixel = 0
-    }), "Hub2")
-    Make("Corner", Notif)
-    Make("Gradient", Notif, {Rotation = 45})
-    
-    if Image ~= "" then
-        Create("ImageLabel", Notif, {
-            Image = Image,
-            Size = UDim2.fromOffset(32, 32),
-            Position = UDim2.new(0, 10, 0.5, -32/2),
-            BackgroundTransparency = 1
-        })
-    end
-    
-    local TitleLabel = InsertTheme(Create("TextLabel", Notif, {
-        Text = Title,
-        Font = Enum.Font.GothamBold,
-        TextSize = 16,
-        TextColor3 = Theme["Color Text"],
-        BackgroundTransparency = 1,
-        Position = UDim2.fromOffset(leftOffset, 8),
-        Size = UDim2.fromOffset(maxTextWidth, math.ceil(math.max(1, math.ceil(TextService:GetTextSize(tostring(Title), 16, Enum.Font.GothamBold, Vector2.new(maxTextWidth, math.huge)).Y / math.max(1, TextService:GetTextSize("Ay", 16, Enum.Font.GothamBold, Vector2.new(1000, 1000)).Y))) * TextService:GetTextSize("Ay", 16, Enum.Font.GothamBold, Vector2.new(1000, 1000)).Y)),
-        TextXAlignment = Enum.TextXAlignment.Left,
-        TextYAlignment = Enum.TextYAlignment.Top,
-        TextWrapped = true
-    }), "Text")
-
-    local ContentLabel = InsertTheme(Create("TextLabel", Notif, {
-        Text = Content,
-        Font = Enum.Font.Gotham,
-        TextSize = 14,
-        TextColor3 = Theme["Color Dark Text"],
-        BackgroundTransparency = 1,
-        Position = UDim2.fromOffset(leftOffset, 8 + math.max(1, math.ceil(TextService:GetTextSize(tostring(Title), 16, Enum.Font.GothamBold, Vector2.new(maxTextWidth, math.huge)).Y / math.max(1, TextService:GetTextSize("Ay", 16, Enum.Font.GothamBold, Vector2.new(1000, 1000)).Y))) * TextService:GetTextSize("Ay", 16, Enum.Font.GothamBold, Vector2.new(1000, 1000)).Y + math.ceil(TextService:GetTextSize("Ay", 14, Enum.Font.Gotham, Vector2.new(1000, 1000)).Y * 0.25)),
-        Size = UDim2.fromOffset(maxTextWidth, math.ceil(math.max(1, math.ceil(TextService:GetTextSize(tostring(Content), 14, Enum.Font.Gotham, Vector2.new(maxTextWidth, math.huge)).Y / math.max(1, TextService:GetTextSize("Ay", 14, Enum.Font.Gotham, Vector2.new(1000, 1000)).Y))) * TextService:GetTextSize("Ay", 14, Enum.Font.Gotham, Vector2.new(1000, 1000)).Y)),
-        TextXAlignment = Enum.TextXAlignment.Left,
-        TextYAlignment = Enum.TextYAlignment.Top,
-        TextWrapped = true
-    }), "DarkText")
-
-    local TimerLabel = InsertTheme(Create("TextLabel", Notif, {
-        Text = formatTimeSeconds(Duration),
-        Font = Enum.Font.Gotham,
-        TextSize = 14,
-        TextColor3 = Theme["Color Dark Text"],
-        BackgroundTransparency = 1,
-        Position = UDim2.fromOffset(280 - 62, 6),
-        Size = UDim2.fromOffset(44, 18),
-        TextXAlignment = Enum.TextXAlignment.Right
-    }), "DarkText")
-
-    Notif.AnchorPoint = Vector2.new(1, 1)
-    table.insert(ActiveNotifications, 1, Notif)
-    
-    updatePositions()
-
-    local targetY = Notif.Position.Y.Offset
-    CreateTween({Notif, "Position", UDim2.new(1, -10, 1, targetY), 0.40})
-
-    task.spawn(function()
-        local endTime = tick() + Duration + 1
-        while true do
-            if not TimerLabel or not TimerLabel.Parent then break end
-            local remain = math.max(0, endTime - tick())
-            pcall(function() TimerLabel.Text = formatTimeSeconds(remain) end)
-            if remain <= 0 then break end
-            task.wait()
-        end
-
-        if not Notif or not Notif.Parent then return end
-        CreateTween({Notif, "Transparency", 1, 0.35})
-        for _, child in ipairs(Notif:GetDescendants()) do
-            if child:IsA("TextLabel") then
-                CreateTween({child, "TextTransparency", 1, 0.35})
-            elseif child:IsA("ImageLabel") then
-                CreateTween({child, "ImageTransparency", 1, 0.35})
-            end
-        end
-        task.wait(0.35)
-
-        local idx = table.find(ActiveNotifications, Notif)
-        if idx then table.remove(ActiveNotifications, idx) end
-        if Notif and Notif.Parent then Notif:Destroy() end
-        updatePositions()
-    end)
+u(
+aH
+,
+aQ
+)
 end
+q
+:
 
-
-	function Window:Dialog(Configs)
-    if MainFrame:FindFirstChild("Dialog") then return end
-
-    if Minimized then Window:MinimizeBtn() end
-
-    local DTitle = Configs[1] or Configs.Title or "Dialog"
-    local DText = Configs[2] or Configs.Text or "This is a Dialog"
-    local DOptions = Configs[3] or Configs.Options or {}
-
-    local Screen = InsertTheme(Create("TextButton", MainFrame, {
-        Name = "Dialog",
-        Size = UDim2.new(1, 0, 1, 0),
-        Position = UDim2.fromScale(0.5, 0.5),
-        AnchorPoint = Vector2.new(0.5, 0.5),
-
-        BackgroundTransparency = 1, 
-        AutoButtonColor = false,
-        Text = "",
-        BackgroundColor3 = Theme["Color Stroke"],
-    }), "Stroke")
-
-    MainCorner:Clone().Parent = Screen
-
-    local originalSize = UDim2.new(0.35, 60, 0.20, 80)
-    local openSize = UDim2.new(
-        originalSize.X.Scale * 1.2, originalSize.X.Offset,
-        originalSize.Y.Scale * 1.2, originalSize.Y.Offset
-    )
-
-    local Frame = Create("Frame", {
-        Name = "Template",
-        Active = true,
-        Size = openSize,
-        Position = UDim2.fromScale(0.5, 0.5),
-        AnchorPoint = Vector2.new(0.5, 0.5),
-        BackgroundTransparency = 0,
-        BackgroundColor3 = Theme["Color Hub 3"],
-    })
-
-    local corner = Make("Corner", Frame)
-    corner.CornerRadius = UDim.new(0, 6)
-    Make("Gradient", Frame, { Rotation = 45 })
-
-    local TitleLabel = Create("TextLabel", Frame, {
-        Name = "Title",
-        Size = UDim2.new(1, -20, 0, 20),
-        Position = UDim2.new(0.5, 0, 0, 28),
-        AnchorPoint = Vector2.new(0.5, 0),
-
-        BackgroundTransparency = 1,
-        TextTruncate = Enum.TextTruncate.AtEnd,
-
-        Text = DTitle,
-        TextSize = 15,
-        Font = Enum.Font.GothamBlack,
-        TextColor3 = Color3.fromRGB(255, 255, 255),
-        TextXAlignment = Enum.TextXAlignment.Center,
-        TextYAlignment = Enum.TextYAlignment.Center,
-        TextTransparency = 0,
-    })
-
-    local DescLabel = Create("TextLabel", Frame, {
-        Name = "Description",
-        Position = UDim2.new(0.5, 0, 0, 46),
-        Size = UDim2.new(1, -20, 0, 0),
-        AnchorPoint = Vector2.new(0.5, 0),
-
-        BackgroundTransparency = 1,
-        TextWrapped = true,
-        AutomaticSize = Enum.AutomaticSize.Y,
-
-        Text = DText,
-        TextSize = 11,
-        Font = Enum.Font.GothamMedium,
-        TextColor3 = Color3.fromRGB(175, 175, 175),
-        TextXAlignment = Enum.TextXAlignment.Center,
-        TextYAlignment = Enum.TextYAlignment.Top,
-        TextTransparency = 0,
-    })
-
-    local ButtonsHolder = Create("Frame", Frame, {
-        Name = "Options",
-        Size = UDim2.new(1, -20, 0.15, 18),
-        Position = UDim2.new(0.5, 0, 1, -10),
-        AnchorPoint = Vector2.new(0.5, 1),
-        BackgroundTransparency = 1,
-    }, {
-        Create("UIPadding", {
-            PaddingLeft = UDim.new(0, 10),
-            PaddingRight = UDim.new(0, 10),
-            PaddingBottom = UDim.new(0, 30),
-            PaddingTop = UDim.new(0, 30),
-        }),
-        Create("UIListLayout", {
-            HorizontalAlignment = Enum.HorizontalAlignment.Right,
-            VerticalAlignment = Enum.VerticalAlignment.Center,
-            FillDirection = Enum.FillDirection.Horizontal,
-            Padding = UDim.new(0, 10),
-        }),
-    })
-
-    Frame.Parent = Screen
-
-    CreateTween({Frame, "Size", originalSize, 0.3})
-    CreateTween({Screen, "Transparency", 0.6, 0.3}) 
-    CreateTween({Frame, "Transparency", 0, 0.15})
-
-    local Dialog = {}
-    local closed  = false
-    local closing = false
-
-    function Dialog:Button(Config)
-        if closed then return end
-
-        local Name = Config[1] or Config.Name or Config.Title or ""
-        local Callback = Config[2] or Config.Callback or function() end
-
-        local Button = Make("Button", ButtonsHolder)
-        Make("Corner", Button).CornerRadius = UDim.new(1, 0)
-
-        SetProps(Button, {
-            AutoButtonColor = false,
-            Size = UDim2.fromScale(0.2, 1),
-            BackgroundTransparency = 1,
-
-            Text = Name,
-            TextSize = 10,
-            Font = Enum.Font.GothamMedium,
-            TextColor3 = Color3.fromRGB(200, 200, 200),
-        })
-
-        local tweenIn  = CreateTween({Button, "BackgroundTransparency", 0, 0.3})
-        local tweenOut = CreateTween({Button, "BackgroundTransparency", 1, 0.3})
-
-        Button.MouseEnter:Connect(function() tweenIn:Play() end)
-        Button.MouseLeave:Connect(function() tweenOut:Play() end)
-
-        Button.Activated:Connect(function()
-            Dialog:Close()
-            Callback()
-        end)
-    end
-
-    function Dialog:Close(noAnim)
-        if closed or closing then return end
-        closing = true
-
-        local sizeTween = CreateTween({Frame, "Size", openSize, 0.1})
-        sizeTween:Play()
-
-        local function destroy()
-            closed = true
-            Screen:Destroy()
-        end
-
-        if noAnim then
-            destroy()
-        else
-            sizeTween.Completed:Connect(destroy)
-            CreateTween({Screen, "Transparency", 1, 0.1})
-            CreateTween({Frame, "Transparency", 1, 0.1})
-        end
-    end
-
-    for _, btn in ipairs(DOptions) do
-        Dialog:Button(btn)
-    end
-    return Dialog
+FireCallback(
+aG
+,
+aQ
+)
 end
-	function Window:SelectTab(TabSelect)
-		if type(TabSelect) == "number" then
-			redzlib.Tabs[TabSelect].func:Enable()
-		else
-			for _,Tab in pairs(redzlib.Tabs) do
-				if Tab.Cont == TabSelect.Cont then
-					Tab.func:Enable()
-				end
-			end
-		end
-	end
-	
-	local ContainerList = {}
-	function Window:MakeTab(paste, Configs)
-		if type(paste) == "table" then Configs = paste end
-		local TName = Configs[1] or Configs.Title or "Tab!"
-		local TIcon = Configs[2] or Configs.Icon or ""
-		
-		TIcon = redzlib:GetIcon(TIcon)
-		if not TIcon:find("rbxassetid://") or TIcon:gsub("rbxassetid://", ""):len() < 6 then
-			TIcon = false
-		end
-		
-		local TabSelect = Make("Button", MainScroll, {
-			Size = UDim2.new(1, 0, 0, 24)
-		})Make("Corner", TabSelect)
-		
-		local LabelTitle = InsertTheme(Create("TextLabel", TabSelect, {
-			Size = UDim2.new(1, TIcon and -25 or -15, 1),
-			Position = UDim2.fromOffset(TIcon and 25 or 15),
-			BackgroundTransparency = 1,
-			Font = Enum.Font.GothamMedium,
-			Text = TName,
-			TextColor3 = Theme["Color Text"],
-			TextSize = 10,
-			TextXAlignment = Enum.TextXAlignment.Left,
-			TextTransparency = (FirstTab and 0.3) or 0,
-			TextTruncate = "AtEnd"
-		}), "Text")
-		
-		local LabelIcon = InsertTheme(Create("ImageLabel", TabSelect, {
-			Position = UDim2.new(0, 8, 0.5),
-			Size = UDim2.new(0, 13, 0, 13),
-			AnchorPoint = Vector2.new(0, 0.5),
-			Image = TIcon or "",
-			BackgroundTransparency = 1,
-			ImageTransparency = (FirstTab and 0.3) or 0
-		}), "Text")
-		
-		local Selected = InsertTheme(Create("Frame", TabSelect, {
-			Size = FirstTab and UDim2.new(0, 4, 0, 4) or UDim2.new(0, 4, 0, 13),
-			Position = UDim2.new(0, 1, 0.5),
-			AnchorPoint = Vector2.new(0, 0.5),
-			BackgroundColor3 = Theme["Color Theme"],
-			BackgroundTransparency = FirstTab and 1 or 0
-		}), "Theme")Make("Corner", Selected, UDim.new(0.5, 0))
-		
-		local Container = InsertTheme(Create("ScrollingFrame", {
-			Size = UDim2.new(1, 0, 1, 0),
-			Position = UDim2.new(0, 0, 1),
-			AnchorPoint = Vector2.new(0, 1),
-			ScrollBarThickness = 1.5,
-			BackgroundTransparency = 1,
-			ScrollBarImageTransparency = 0.2,
-			ScrollBarImageColor3 = Theme["Color Theme"],
-			AutomaticCanvasSize = "Y",
-			ScrollingDirection = "Y",
-			BorderSizePixel = 0,
-			CanvasSize = UDim2.new(),
-			Name = ("Container %i [ %s ]"):format(#ContainerList + 1, TName)
-		}, {
-			Create("UIPadding", {
-				PaddingLeft = UDim.new(0, 10),
-				PaddingRight = UDim.new(0, 10),
-				PaddingTop = UDim.new(0, 10),
-				PaddingBottom = UDim.new(0, 10)
-			}), Create("UIListLayout", {
-				Padding = UDim.new(0, 5)
-			})
-		}), "ScrollBar")
-		
-		table.insert(ContainerList, Container)
-		
-		if not FirstTab then Container.Parent = Containers end
-		
-		local function Tabs()
-			if Container.Parent then return end
-			for _,Frame in pairs(ContainerList) do
-				if Frame:IsA("ScrollingFrame") and Frame ~= Container then
-					Frame.Parent = nil
-				end
-			end
-			Container.Parent = Containers
-			Container.Size = UDim2.new(1, 0, 1, 150)
-			table.foreach(redzlib.Tabs, function(_,Tab)
-				if Tab.Cont ~= Container then
-					Tab.func:Disable()
-				end
-			end)
-			CreateTween({Container, "Size", UDim2.new(1, 0, 1, 0), 0.3})
-			CreateTween({LabelTitle, "TextTransparency", 0, 0.35})
-			CreateTween({LabelIcon, "ImageTransparency", 0, 0.35})
-			CreateTween({Selected, "Size", UDim2.new(0, 4, 0, 13), 0.35})
-			CreateTween({Selected, "BackgroundTransparency", 0, 0.35})
-		end
-		TabSelect.Activated:Connect(Tabs)
-		
-		FirstTab = true
-		local Tab = {}
-		table.insert(redzlib.Tabs, {TabInfo = {Name = TName, Icon = TIcon}, func = Tab, Cont = Container})
-		Tab.Cont = Container
-		
-		function Tab:Disable()
-			Container.Parent = nil
-			CreateTween({LabelTitle, "TextTransparency", 0.3, 0.35})
-			CreateTween({LabelIcon, "ImageTransparency", 0.3, 0.35})
-			CreateTween({Selected, "Size", UDim2.new(0, 4, 0, 4), 0.35})
-			CreateTween({Selected, "BackgroundTransparency", 1, 0.35})
-		end
-		function Tab:Enable()
-			Tabs()
-		end
-		function Tab:Visible(Bool)
-			Funcs:ToggleVisible(TabSelect, Bool)
-			Funcs:ToggleParent(Container, Bool, Containers)
-		end
-		function Tab:Destroy() TabSelect:Destroy() Container:Destroy() end
-		
-		function Tab:AddSection(Configs)
-			local SectionName = type(Configs) == "string" and Configs or Configs[1] or Configs.Name or Configs.Title or Configs.Section
-			
-			local SectionFrame = Create("Frame", Container, {
-				Size = UDim2.new(1, 0, 0, 20),
-				BackgroundTransparency = 1,
-				Name = "Option"
-			})
-			
-			local SectionLabel = InsertTheme(Create("TextLabel", SectionFrame, {
-				Font = Enum.Font.GothamBold,
-				Text = SectionName,
-				TextColor3 = Theme["Color Text"],
-				Size = UDim2.new(1, -25, 1, 0),
-				Position = UDim2.new(0, 5),
-				BackgroundTransparency = 1,
-				TextTruncate = "AtEnd",
-				TextSize = 14,
-				TextXAlignment = "Left"
-			}), "Text")
-			
-			local Section = {}
-			table.insert(redzlib.Options, {type = "Section", Name = SectionName, func = Section})
-			function Section:Visible(Bool)
-				if Bool == nil then SectionFrame.Visible = not SectionFrame.Visible return end
-				SectionFrame.Visible = Bool
-			end
-			function Section:Destroy()
-				SectionFrame:Destroy()
-			end
-			function Section:Set(New)
-				if New then
-					SectionLabel.Text = GetStr(New)
-				end
-			end
-			return Section
-		end
-		function Tab:AddParagraph(Configs)
-			local PName = Configs[1] or Configs.Title or "Paragraph"
-			local PDesc = Configs[2] or Configs.Text or ""
-			
-			local Frame, LabelFunc = ButtonFrame(Container, PName, PDesc, UDim2.new(1, -20))
-			
-			local Paragraph = {}
-			function Paragraph:Visible(...) Funcs:ToggleVisible(Frame, ...) end
-			function Paragraph:Destroy() Frame:Destroy() end
-			function Paragraph:SetTitle(Val)
-				LabelFunc:SetTitle(GetStr(Val))
-			end
-			function Paragraph:SetDesc(Val)
-				LabelFunc:SetDesc(GetStr(Val))
-			end
-			function Paragraph:Set(Val1, Val2)
-				if Val1 and Val2 then
-					LabelFunc:SetTitle(GetStr(Val1))
-					LabelFunc:SetDesc(GetStr(Val2))
-				elseif Val1 then
-					LabelFunc:SetDesc(GetStr(Val1))
-				end
-			end
-			return Paragraph
-		end
-		function Tab:AddButton(Configs)
-			local BName = Configs[1] or Configs.Name or Configs.Title or "Button!"
-			local BDescription = Configs.Desc or Configs.Description or ""
-			local Callback = Funcs:GetCallback(Configs, 2)
-			
-			local FButton, LabelFunc = ButtonFrame(Container, BName, BDescription, UDim2.new(1, -20))
-			
-			local ButtonIcon = Create("ImageLabel", FButton, {
-				Size = UDim2.new(0, 14, 0, 14),
-				Position = UDim2.new(1, -10, 0.5),
-				AnchorPoint = Vector2.new(1, 0.5),
-				BackgroundTransparency = 1,
-				Image = "rbxassetid://10709791437"
-			})
-			
-			FButton.Activated:Connect(function()
-				Funcs:FireCallback(Callback)
-			end)
-			
-			local Button = {}
-			function Button:Visible(...) Funcs:ToggleVisible(FButton, ...) end
-			function Button:Destroy() FButton:Destroy() end
-			function Button:Callback(...) Funcs:InsertCallback(Callback, ...) end
-			function Button:Set(Val1, Val2)
-				if type(Val1) == "string" and type(Val2) == "string" then
-					LabelFunc:SetTitle(Val1)
-					LabelFunc:SetDesc(Val2)
-				elseif type(Val1) == "string" then
-					LabelFunc:SetTitle(Val1)
-				elseif type(Val1) == "function" then
-					Callback = Val1
-				end
-			end
-			return Button
-		end
-		function Tab:AddToggle(Configs)
-			local TName = Configs[1] or Configs.Name or Configs.Title or "Toggle"
-			local TDesc = Configs.Desc or Configs.Description or ""
-			local Callback = Funcs:GetCallback(Configs, 3)
-			local Flag = Configs[4] or Configs.Flag or false
-			local Default = Configs[2] or Configs.Default or false
-			if CheckFlag(Flag) then Default = GetFlag(Flag) end
-			
-			local Button, LabelFunc = ButtonFrame(Container, TName, TDesc, UDim2.new(1, -38))
-			
-			local ToggleHolder = InsertTheme(Create("Frame", Button, {
-				Size = UDim2.new(0, 35, 0, 18),
-				Position = UDim2.new(1, -10, 0.5),
-				AnchorPoint = Vector2.new(1, 0.5),
-				BackgroundColor3 = Theme["Color Stroke"]
-			}), "Stroke")Make("Corner", ToggleHolder, UDim.new(0.5, 0))
-			
-			local Slider = Create("Frame", ToggleHolder, {
-				BackgroundTransparency = 1,
-				Size = UDim2.new(0.8, 0, 0.8, 0),
-				Position = UDim2.new(0.5, 0, 0.5, 0),
-				AnchorPoint = Vector2.new(0.5, 0.5)
-			})
-			
-			local Toggle = InsertTheme(Create("Frame", Slider, {
-				Size = UDim2.new(0, 12, 0, 12),
-				Position = UDim2.new(0, 0, 0.5),
-				AnchorPoint = Vector2.new(0, 0.5),
-				BackgroundColor3 = Theme["Color Theme"]
-			}), "Theme")Make("Corner", Toggle, UDim.new(0.5, 0))
-			
-			local WaitClick
-			local function SetToggle(Val)
-				if WaitClick then return end
-				
-				WaitClick, Default = true, Val
-				SetFlag(Flag, Default)
-				Funcs:FireCallback(Callback, Default)
-				if Default then
-					CreateTween({Toggle, "Position", UDim2.new(1, 0, 0.5), 0.25})
-					CreateTween({Toggle, "BackgroundTransparency", 0, 0.25})
-					CreateTween({Toggle, "AnchorPoint", Vector2.new(1, 0.5), 0.25, Wait or false})
-				else
-					CreateTween({Toggle, "Position", UDim2.new(0, 0, 0.5), 0.25})
-					CreateTween({Toggle, "BackgroundTransparency", 0.8, 0.25})
-					CreateTween({Toggle, "AnchorPoint", Vector2.new(0, 0.5), 0.25, Wait or false})
-				end
-				WaitClick = false
-			end;task.spawn(SetToggle, Default)
-			
-			Button.Activated:Connect(function()
-				SetToggle(not Default)
-			end)
-			
-			local Toggle = {}
-			function Toggle:Visible(...) Funcs:ToggleVisible(Button, ...) end
-			function Toggle:Destroy() Button:Destroy() end
-			function Toggle:Callback(...) Funcs:InsertCallback(Callback, ...)() end
-			function Toggle:Set(Val1, Val2)
-				if type(Val1) == "string" and type(Val2) == "string" then
-					LabelFunc:SetTitle(Val1)
-					LabelFunc:SetDesc(Val2)
-				elseif type(Val1) == "string" then
-					LabelFunc:SetTitle(Val1, false, true)
-				elseif type(Val1) == "boolean" then
-					if WaitClick and Val2 then
-						repeat task.wait() until not WaitClick
-					end
-					task.spawn(SetToggle, Val1)
-				elseif type(Val1) == "function" then
-					Callback = Val1
-				end
-			end
-			return Toggle
-		end
-		function Tab:AddDropdown(Configs)
-			local DName = Configs[1] or Configs.Name or Configs.Title or "Dropdown"
-			local DDesc = Configs.Desc or Configs.Description or ""
-			local DOptions = Configs[2] or Configs.Options or {}
-			local OpDefault = Configs[3] or Configs.Default or {}
-			local Flag = Configs[5] or Configs.Flag or false
-			local DMultiSelect = Configs.MultiSelect or false
-			local Callback = Funcs:GetCallback(Configs, 4)
-			
-			local Button, LabelFunc = ButtonFrame(Container, DName, DDesc, UDim2.new(1, -180))
-			
-			local SelectedFrame = InsertTheme(Create("Frame", Button, {
-				Size = UDim2.new(0, 150, 0, 18),
-				Position = UDim2.new(1, -10, 0.5),
-				AnchorPoint = Vector2.new(1, 0.5),
-				BackgroundColor3 = Theme["Color Stroke"]
-			}), "Stroke")Make("Corner", SelectedFrame, UDim.new(0, 4))
-			
-			local ActiveLabel = InsertTheme(Create("TextLabel", SelectedFrame, {
-				Size = UDim2.new(0.85, 0, 0.85, 0),
-				AnchorPoint = Vector2.new(0.5, 0.5),
-				Position = UDim2.new(0.5, 0, 0.5, 0),
-				BackgroundTransparency = 1,
-				Font = Enum.Font.GothamBold,
-				TextScaled = true,
-				TextColor3 = Theme["Color Text"],
-				Text = "..."
-			}), "Text")
-			
-			local Arrow = Create("ImageLabel", SelectedFrame, {
-				Size = UDim2.new(0, 15, 0, 15),
-				Position = UDim2.new(0, -5, 0.5),
-				AnchorPoint = Vector2.new(1, 0.5),
-				Image = "rbxassetid://10709791523",
-				BackgroundTransparency = 1
-			})
-			
-			local NoClickFrame = Create("TextButton", DropdownHolder, {
-				Name = "AntiClick",
-				Size = UDim2.new(1, 0, 1, 0),
-				BackgroundTransparency = 1,
-				Visible = false,
-				Text = ""
-			})
-			
-			local DropFrame = Create("Frame", NoClickFrame, {
-				Size = UDim2.new(SelectedFrame.Size.X, 0, 0),
-				BackgroundTransparency = 0.1,
-				BackgroundColor3 = Color3.fromRGB(255, 255, 255),
-				AnchorPoint = Vector2.new(0, 1),
-				Name = "DropdownFrame",
-				ClipsDescendants = true,
-				Active = true
-			})Make("Corner", DropFrame)Make("Stroke", DropFrame)Make("Gradient", DropFrame, {Rotation = 60})
-			
-			local ScrollFrame = InsertTheme(Create("ScrollingFrame", DropFrame, {
-				ScrollBarImageColor3 = Theme["Color Theme"],
-				Size = UDim2.new(1, 0, 1, 0),
-				ScrollBarThickness = 1.5,
-				BackgroundTransparency = 1,
-				BorderSizePixel = 0,
-				CanvasSize = UDim2.new(),
-				ScrollingDirection = "Y",
-				AutomaticCanvasSize = "Y",
-				Active = true
-			}, {
-				Create("UIPadding", {
-					PaddingLeft = UDim.new(0, 8),
-					PaddingRight = UDim.new(0, 8),
-					PaddingTop = UDim.new(0, 5),
-					PaddingBottom = UDim.new(0, 5)
-				}), Create("UIListLayout", {
-					Padding = UDim.new(0, 4)
-				})
-			}), "ScrollBar")
-			
-			local ScrollSize, WaitClick = 5
-			local function Disable()
-				WaitClick = true
-				CreateTween({Arrow, "Rotation", 0, 0.2})
-				CreateTween({DropFrame, "Size", UDim2.new(0, 152, 0, 0), 0.2, true})
-				CreateTween({Arrow, "ImageColor3", Color3.fromRGB(255, 255, 255), 0.2})
-				Arrow.Image = "rbxassetid://10709791523"
-				NoClickFrame.Visible = false
-				WaitClick = false
-			end
-			
-			local function GetFrameSize()
-				return UDim2.fromOffset(152, ScrollSize)
-			end
-			
-			local function CalculateSize()
-				local Count = 0
-				for _,Frame in pairs(ScrollFrame:GetChildren()) do
-					if Frame:IsA("Frame") or Frame.Name == "Option" then
-						Count = Count + 1
-					end
-				end
-				ScrollSize = (math.clamp(Count, 0, 10) * 25) + 10
-				if NoClickFrame.Visible then
-					NoClickFrame.Visible = true
-					CreateTween({DropFrame, "Size", GetFrameSize(), 0.2, true})
-				end
-			end
-			
-			local function Minimize()
-				if WaitClick then return end
-				WaitClick = true
-				if NoClickFrame.Visible then
-					Arrow.Image = "rbxassetid://10709791523"
-					CreateTween({Arrow, "ImageColor3", Color3.fromRGB(255, 255, 255), 0.2})
-					CreateTween({DropFrame, "Size", UDim2.new(0, 152, 0, 0), 0.2, true})
-					NoClickFrame.Visible = false
-				else
-					NoClickFrame.Visible = true
-					Arrow.Image = "rbxassetid://10709790948"
-					CreateTween({Arrow, "ImageColor3", Theme["Color Theme"], 0.2})
-					CreateTween({DropFrame, "Size", GetFrameSize(), 0.2, true})
-				end
-				WaitClick = false
-			end
-			
-			local function CalculatePos()
-				local FramePos = SelectedFrame.AbsolutePosition
-				local ScreenSize = ScreenGui.AbsoluteSize
-				local ClampX = math.clamp((FramePos.X / UIScale), 0, ScreenSize.X / UIScale - DropFrame.Size.X.Offset)
-				local ClampY = math.clamp((FramePos.Y / UIScale) , 0, ScreenSize.Y / UIScale)
-				
-				local NewPos = UDim2.fromOffset(ClampX, ClampY)
-				local AnchorPoint = FramePos.Y > ScreenSize.Y / 1.4 and 1 or ScrollSize > 80 and 0.5 or 0
-				DropFrame.AnchorPoint = Vector2.new(0, AnchorPoint)
-				CreateTween({DropFrame, "Position", NewPos, 0.1})
-			end
-			
-			local AddNewOptions, GetOptions, AddOption, RemoveOption, Selected do
-				local Default = type(OpDefault) ~= "table" and {OpDefault} or OpDefault
-				local MultiSelect = DMultiSelect
-				local Options = {}
-				Selected = MultiSelect and {} or CheckFlag(Flag) and GetFlag(Flag) or Default[1]
-				
-				if MultiSelect then
-					for index, Value in pairs(CheckFlag(Flag) and GetFlag(Flag) or Default) do
-						if type(index) == "string" and (DOptions[index] or table.find(DOptions, index)) then
-							Selected[index] = Value
-						elseif DOptions[Value] then
-							Selected[Value] = true
-						end
-					end
-				end
-				
-				local function CallbackSelected()
-					SetFlag(Flag, MultiSelect and Selected or tostring(Selected))
-					Funcs:FireCallback(Callback, Selected)
-				end
-				
-				local function UpdateLabel()
-					if MultiSelect then
-						local list = {}
-						for index, Value in pairs(Selected) do
-							if Value then
-								table.insert(list, index)
-							end
-						end
-						ActiveLabel.Text = #list > 0 and table.concat(list, ", ") or "..."
-					else
-						ActiveLabel.Text = tostring(Selected or "...")
-					end
-				end
-				
-				local function UpdateSelected()
-					if MultiSelect then
-						for _,v in pairs(Options) do
-							local nodes, Stats = v.nodes, v.Stats
-							CreateTween({nodes[2], "BackgroundTransparency", Stats and 0 or 0.8, 0.35})
-							CreateTween({nodes[2], "Size", Stats and UDim2.fromOffset(4, 12) or UDim2.fromOffset(4, 4), 0.35})
-							CreateTween({nodes[3], "TextTransparency", Stats and 0 or 0.4, 0.35})
-						end
-					else
-						for _,v in pairs(Options) do
-							local Slt = v.Value == Selected
-							local nodes = v.nodes
-							CreateTween({nodes[2], "BackgroundTransparency", Slt and 0 or 1, 0.35})
-							CreateTween({nodes[2], "Size", Slt and UDim2.fromOffset(4, 14) or UDim2.fromOffset(4, 4), 0.35})
-							CreateTween({nodes[3], "TextTransparency", Slt and 0 or 0.4, 0.35})
-						end
-					end
-					UpdateLabel()
-				end
-				
-				local function Select(Option)
-					if MultiSelect then
-						Option.Stats = not Option.Stats
-						Option.LastCB = tick()
-						
-						Selected[Option.Name] = Option.Stats
-						CallbackSelected()
-					else
-						Option.LastCB = tick()
-						
-						Selected = Option.Value
-						CallbackSelected()
-					end
-					UpdateSelected()
-				end
-				
-				AddOption = function(index, Value)
-					local Name = tostring(type(index) == "string" and index or Value)
-					
-					if Options[Name] then return end
-					Options[Name] = {
-						index = index,
-						Value = Value,
-						Name = Name,
-						Stats = false,
-						LastCB = 0
-					}
-					
-					if MultiSelect then
-						local Stats = Selected[Name]
-						Selected[Name] = Stats or false
-						Options[Name].Stats = Stats
-					end
-					
-					local Button = Make("Button", ScrollFrame, {
-						Name = "Option",
-						Size = UDim2.new(1, 0, 0, 21),
-						Position = UDim2.new(0, 0, 0.5),
-						AnchorPoint = Vector2.new(0, 0.5)
-					})Make("Corner", Button, UDim.new(0, 4))
-					
-					local IsSelected = InsertTheme(Create("Frame", Button, {
-						Position = UDim2.new(0, 1, 0.5),
-						Size = UDim2.new(0, 4, 0, 4),
-						BackgroundColor3 = Theme["Color Theme"],
-						BackgroundTransparency = 1,
-						AnchorPoint = Vector2.new(0, 0.5)
-					}), "Theme")Make("Corner", IsSelected, UDim.new(0.5, 0))
-					
-					local OptioneName = InsertTheme(Create("TextLabel", Button, {
-						Size = UDim2.new(1, 0, 1),
-						Position = UDim2.new(0, 10),
-						Text = Name,
-						TextColor3 = Theme["Color Text"],
-						Font = Enum.Font.GothamBold,
-						TextXAlignment = "Left",
-						BackgroundTransparency = 1,
-						TextTransparency = 0.4
-					}), "Text")
-					
-					Button.Activated:Connect(function()
-						Select(Options[Name])
-					end)
-					
-					Options[Name].nodes = {Button, IsSelected, OptioneName}
-				end
-				
-				RemoveOption = function(index, Value)
-					local Name = tostring(type(index) == "string" and index or Value)
-					if Options[Name] then
-						if MultiSelect then Selected[Name] = nil else Selected = nil end
-						Options[Name].nodes[1]:Destroy()
-						table.clear(Options[Name])
-						Options[Name] = nil
-					end
-				end
-				
-				GetOptions = function()
-					return Options
-				end
-				
-				AddNewOptions = function(List, Clear)
-					if Clear then
-						table.foreach(Options, RemoveOption)
-					end
-					table.foreach(List, AddOption)
-					CallbackSelected()
-					UpdateSelected()
-				end
-				
-				table.foreach(DOptions, AddOption)
-				CallbackSelected()
-				UpdateSelected()
-			end
-			
-			Button.Activated:Connect(Minimize)
-			NoClickFrame.MouseButton1Down:Connect(Disable)
-			NoClickFrame.MouseButton1Click:Connect(Disable)
-			MainFrame:GetPropertyChangedSignal("Visible"):Connect(Disable)
-			SelectedFrame:GetPropertyChangedSignal("AbsolutePosition"):Connect(CalculatePos)
-			
-			Button.Activated:Connect(CalculateSize)
-			ScrollFrame.ChildAdded:Connect(CalculateSize)
-			ScrollFrame.ChildRemoved:Connect(CalculateSize)
-			CalculatePos()
-			CalculateSize()
-			
-			local Dropdown = {}
-			function Dropdown:Visible(...) Funcs:ToggleVisible(Button, ...) end
-			function Dropdown:Destroy() Button:Destroy() end
-			function Dropdown:Callback(...) Funcs:InsertCallback(Callback, ...)(Selected) end
-			
-			function Dropdown:Add(...)
-				local NewOptions = {...}
-				if type(NewOptions[1]) == "table" then
-					table.foreach(Option, function(_,Name)
-						AddOption(Name)
-					end)
-				else
-					table.foreach(NewOptions, function(_,Name)
-						AddOption(Name)
-					end)
-				end
-			end
-			function Dropdown:Remove(Option)
-				for index, Value in pairs(GetOptions()) do
-					if type(Option) == "number" and index == Option or Value.Name == "Option" then
-						RemoveOption(index, Value.Value)
-					end
-				end
-			end
-			function Dropdown:Select(Option)
-				if type(Option) == "string" then
-					for _,Val in pairs(Options) do
-						if Val.Name == Option then
-							Val.Active()
-						end
-					end
-				elseif type(Option) == "number" then
-					for ind,Val in pairs(Options) do
-						if ind == Option then
-							Val.Active()
-						end
-					end
-				end
-			end
-			function Dropdown:Set(Val1, Clear)
-				if type(Val1) == "table" then
-					AddNewOptions(Val1, not Clear)
-				elseif type(Val1) == "function" then
-					Callback = Val1
-				end
-			end
-			return Dropdown
-		end
-		function Tab:AddSlider(Configs)
-			local SName = Configs[1] or Configs.Name or Configs.Title or "Slider!"
-			local SDesc = Configs.Desc or Configs.Description or ""
-			local Min = Configs[2] or Configs.MinValue or Configs.Min or 10
-			local Max = Configs[3] or Configs.MaxValue or Configs.Max or 100
-			local Increase = Configs[4] or Configs.Increase or 1
-			local Callback = Funcs:GetCallback(Configs, 6)
-			local Flag = Configs[7] or Configs.Flag or false
-			local Default = Configs[5] or Configs.Default or 25
-			if CheckFlag(Flag) then Default = GetFlag(Flag) end
-			Min, Max = Min / Increase, Max / Increase
-			
-			local Button, LabelFunc = ButtonFrame(Container, SName, SDesc, UDim2.new(1, -180))
-			
-			local SliderHolder = Create("TextButton", Button, {
-				Size = UDim2.new(0.45, 0, 1),
-				Position = UDim2.new(1),
-				AnchorPoint = Vector2.new(1, 0),
-				AutoButtonColor = false,
-				Text = "",
-				BackgroundTransparency = 1
-			})
-			
-			local SliderBar = InsertTheme(Create("Frame", SliderHolder, {
-				BackgroundColor3 = Theme["Color Stroke"],
-				Size = UDim2.new(1, -20, 0, 6),
-				Position = UDim2.new(0.5, 0, 0.5),
-				AnchorPoint = Vector2.new(0.5, 0.5)
-			}), "Stroke")Make("Corner", SliderBar)
-			
-			local Indicator = InsertTheme(Create("Frame", SliderBar, {
-				BackgroundColor3 = Theme["Color Theme"],
-				Size = UDim2.fromScale(0.3, 1),
-				BorderSizePixel = 0
-			}), "Theme")Make("Corner", Indicator)
-			
-			local SliderIcon = Create("Frame", SliderBar, {
-				Size = UDim2.new(0, 6, 0, 12),
-				BackgroundColor3 = Color3.fromRGB(220, 220, 220),
-				Position = UDim2.fromScale(0.3, 0.5),
-				AnchorPoint = Vector2.new(0.5, 0.5),
-				BackgroundTransparency = 0.2
-			})Make("Corner", SliderIcon)
-			
-			local LabelVal = InsertTheme(Create("TextLabel", SliderHolder, {
-				Size = UDim2.new(0, 14, 0, 14),
-				AnchorPoint = Vector2.new(1, 0.5),
-				Position = UDim2.new(0, 0, 0.5),
-				BackgroundTransparency = 1,
-				TextColor3 = Theme["Color Text"],
-				Font = Enum.Font.FredokaOne,
-				TextSize = 12
-			}), "Text")
-			
-			local UIScale = Create("UIScale", LabelVal)
-			
-			local BaseMousePos = Create("Frame", SliderBar, {
-				Position = UDim2.new(0, 0, 0.5, 0),
-				Visible = false
-			})
-			
-			local function UpdateLabel(NewValue)
-				local Number = tonumber(NewValue * Increase)
-				Number = math.floor(Number * 100) / 100
-				
-				Default, LabelVal.Text = Number, tostring(Number)
-				Funcs:FireCallback(Callback, Default)
-			end
-			
-			local function ControlPos()
-				local MousePos = Player:GetMouse()
-				local APos = MousePos.X - BaseMousePos.AbsolutePosition.X
-				local ConfigureDpiPos = APos / SliderBar.AbsoluteSize.X
-				
-				SliderIcon.Position = UDim2.new(math.clamp(ConfigureDpiPos, 0, 1), 0, 0.5, 0)
-			end
-			
-			local function UpdateValues()
-				Indicator.Size = UDim2.new(SliderIcon.Position.X.Scale, 0, 1, 0)
-				local SliderPos = SliderIcon.Position.X.Scale
-				local NewValue = math.floor(((SliderPos * Max) / Max) * (Max - Min) + Min)
-				UpdateLabel(NewValue)
-			end
-			
-			SliderHolder.MouseButton1Down:Connect(function()
-				CreateTween({SliderIcon, "Transparency", 0, 0.3})
-				Container.ScrollingEnabled = false
-				while UserInputService:IsMouseButtonPressed(Enum.UserInputType.MouseButton1) do task.wait()
-					ControlPos()
-				end
-				CreateTween({SliderIcon, "Transparency", 0.2, 0.3})
-				Container.ScrollingEnabled = true
-				SetFlag(Flag, Default)
-			end)
-			
-			LabelVal:GetPropertyChangedSignal("Text"):Connect(function()
-				UIScale.Scale = 0.3
-				CreateTween({UIScale, "Scale", 1.2, 0.1})
-				CreateTween({LabelVal, "Rotation", math.random(-1, 1) * 5, 0.15, true})
-				CreateTween({UIScale, "Scale", 1, 0.2})
-				CreateTween({LabelVal, "Rotation", 0, 0.1})
-			end)
-			
-			function SetSlider(NewValue)
-				if type(NewValue) ~= "number" then return end
-				
-				local Min, Max = Min * Increase, Max * Increase
-				
-				local SliderPos = (NewValue - Min) / (Max - Min)
-				
-				SetFlag(Flag, NewValue)
-				CreateTween({ SliderIcon, "Position", UDim2.fromScale(math.clamp(SliderPos, 0, 1), 0.5), 0.3, true })
-			end;SetSlider(Default)
-			
-			SliderIcon:GetPropertyChangedSignal("Position"):Connect(UpdateValues)UpdateValues()
-			
-			local Slider = {}
-			function Slider:Set(NewVal1, NewVal2)
-				if NewVal1 and NewVal2 then
-					LabelFunc:SetTitle(NewVal1)
-					LabelFunc:SetDesc(NewVal2)
-				elseif type(NewVal1) == "string" then
-					LabelFunc:SetTitle(NewVal1)
-				elseif type(NewVal1) == "function" then
-					Callback = NewVal1
-				elseif type(NewVal1) == "number" then
-					SetSlider(NewVal1)
-				end
-			end
-			function Slider:Callback(...) Funcs:InsertCallback(Callback, ...)(tonumber(Default)) end
-			function Slider:Visible(...) Funcs:ToggleVisible(Button, ...) end
-			function Slider:Destroy() Button:Destroy() end
-			return Slider
-		end
-		function Tab:AddTextBox(Configs)
-		local TName = Configs[1] or Configs.Name or Configs.Title or "Text Box"
-		local TDesc = Configs.Desc or Configs.Description or ""
-		local TDefault = Configs[2] or Configs.Default or ""
-		local TPlaceholderText = Configs[5] or Configs.PlaceholderText or "Input"
-		local TClearText = Configs[3] or Configs.ClearText or false
-		local Callback = Funcs:GetCallback(Configs, 4)
-		local Flag = Configs[6] or Configs.Flag or false
+aM
+.
+FocusLost
+:
 
-		if type(TDefault) ~= "string" then
-			TDefault = ""
-		end
+Connect(
+aP
+)
+aM
+.
+FocusLost
+:
 
-		if Flag and CheckFlag(Flag) and type(GetFlag(Flag)) == "string" then
-			TDefault = GetFlag(Flag)
-		end
-		if Flag and (not CheckFlag(Flag) or GetFlag(Flag) == nil) then
-			SetFlag(Flag, TDefault)
-		end
+Connect(
+function
+(
+)
 
-		local Button, LabelFunc = ButtonFrame(Container, TName, TDesc, UDim2.new(1, -170))
+A(
+{
+aN
+,
+'ImageColor3'
+,
+Color3
+.
 
-		task.defer(function()
-			for _, obj in ipairs(Button:GetDescendants()) do
-				if obj:IsA("TextLabel") then
-					obj.TextWrapped = true
-					obj.TextTruncate = Enum.TextTruncate.None
-				end
-			end
-		end)
-
-		local SelectedFrame = InsertTheme(Create("Frame", Button, {
-			Size = UDim2.new(0, 150, 0, 18),
-			Position = UDim2.new(1, -10, 0.5),
-			AnchorPoint = Vector2.new(1, 0.5),
-			BackgroundColor3 = Theme["Color Stroke"]
-		}), "Stroke")Make("Corner", SelectedFrame, UDim.new(0, 4))
-
-		local TextBoxInput = InsertTheme(Create("TextBox", SelectedFrame, {
-			Size = UDim2.new(0.85, 0, 0.85, 0),
-			AnchorPoint = Vector2.new(0.5, 0.5),
-			Position = UDim2.new(0.5, 0, 0.5, 0),
-			BackgroundTransparency = 1,
-			Font = Enum.Font.GothamBold,
-			TextScaled = true,
-			TextColor3 = Theme["Color Text"],
-			ClearTextOnFocus = TClearText,
-			PlaceholderText = TPlaceholderText,
-			Text = ""
-		}), "Text")
-
-		local Pencil = Create("ImageLabel", SelectedFrame, {
-			Size = UDim2.new(0, 12, 0, 12),
-			Position = UDim2.new(0, -5, 0.5),
-			AnchorPoint = Vector2.new(1, 0.5),
-			Image = "rbxassetid://15637081879",
-			BackgroundTransparency = 1
-		})
-
-		local TextBox = {}
-		local function Input()
-			local Text = TextBoxInput.Text
-			if type(Text) ~= "string" then Text = "" end
-			if TextBox.OnChanging then Text = TextBox.OnChanging(Text) or Text end
-			TextBoxInput.Text = Text
-			if Flag then SetFlag(Flag, Text) end
-			Funcs:FireCallback(Callback, Text)
-		end
-
-		TextBoxInput.FocusLost:Connect(Input)
-		TextBoxInput.FocusLost:Connect(function()
-			CreateTween({Pencil, "ImageColor3", Color3.fromRGB(255, 255, 255), 0.2})
-		end)
-		TextBoxInput.Focused:Connect(function()
-			CreateTween({Pencil, "ImageColor3", Theme["Color Theme"], 0.2})
-		end)
-
-		TextBox.OnChanging = false
-		function TextBox:Set(text) TextBoxInput.Text = tostring(text or "") Input() end
-		function TextBox:Get() return TextBoxInput.Text end
-		function TextBox:Callback(Func) Funcs:InsertCallback(Callback, Func) end
-		function TextBox:Visible(...) Funcs:ToggleVisible(Button, ...) end
-		function TextBox:Destroy() Button:Destroy() end
-
-		TextBoxInput.Text = TDefault
-		Input()
-		return TextBox
-	end
-	function Tab:AddDiscordInvite(Configs)
-        local Title = Configs[1] or Configs.Name or Configs.Title or "Discord"
-        local Desc = Configs.Desc or Configs.Description or ""
-        local Logo = Configs[2] or Configs.Logo or Configs.Icon or Configs.Image or ""
-        local Invite = Configs[3] or Configs.Invite or Configs.Link or ""
-        local Banner = Configs.Banner or Configs.BannerColor
-        local OnlineCount = Configs.Online or Configs.MembersOnline
-        local MemberCount = Configs.Members or Configs.TotalMembers
-
-    local function FormatNum(n)
-        n = tonumber(n)
-        if not n then return "0" end
-        local s = tostring(math.floor(n + 0.5))
-        return s:reverse():gsub("(%d%d%d)", "%1,"):reverse():gsub("^,", "")
-    end
-
-    local InviteHolder = Create("Frame", Container, {
-        Size = UDim2.new(1, 0, 0, 148),
-        Name = "Option",
-        BackgroundTransparency = 1
-    })
-
-    local InviteLabel = Create("TextLabel", InviteHolder, {
-        Size = UDim2.new(1, -10, 0, 15),
-        Position = UDim2.new(0, 5, 0, 0),
-        TextColor3 = Color3.fromRGB(40, 150, 255),
-        Font = Enum.Font.GothamMedium,
-        TextXAlignment = Enum.TextXAlignment.Left,
-        BackgroundTransparency = 1,
-        TextSize = 9,
-        Text = Invite ~= "" and Invite or "https://discord.gg/"
-    })
-
-    local FrameHolder = InsertTheme(Create("Frame", InviteHolder, {
-        Size = UDim2.new(0, 178, 1, -15),
-        AnchorPoint = Vector2.new(0, 1),
-        Position = UDim2.new(0, 5, 1, 0),
-        BackgroundColor3 = Theme["Color Hub 2"],
-        ClipsDescendants = true
-    }), "Frame")
-
-    Make("Corner", FrameHolder, UDim.new(0, 9))
-    Make("Stroke", FrameHolder)
-
-    local FrameHolder = InsertTheme(Create("Frame", InviteHolder, {
-    Size = UDim2.new(0, 178, 1, -15),
-    AnchorPoint = Vector2.new(0, 1),
-    Position = UDim2.new(0, 5, 1, 0),
-    BackgroundColor3 = Theme["Color Hub 2"],
-    ClipsDescendants = true,
-}), "Frame")
-				
-    local cardCorner = Instance.new("UICorner")
-    cardCorner.CornerRadius = UDim.new(0, 10) 
-    cardCorner.Parent = FrameHolder
-
-    Make("Stroke", FrameHolder)
-
-    local BannerFrame = Create("ImageLabel", FrameHolder, {
-        Size = UDim2.new(1, 0, 0.28, 6),
-        BackgroundTransparency = 1,
-        BorderSizePixel = 0
-    })
-  
-    local BannerCorner = Instance.new("UICorner")
-    BannerCorner.CornerRadius = UDim.new(0, 10)
-    BannerCorner.Parent = BannerFrame
-
-    local BannerBottomMask = Instance.new("Frame")
-    BannerBottomMask.Name = "BannerBottomMask"
-    BannerBottomMask.Size = UDim2.new(1, 0, 0, 6)
-    BannerBottomMask.Position = UDim2.new(0, 0, 1, -6)
-    BannerBottomMask.BackgroundColor3 = Theme["Color Hub 2"]       
-    BannerBottomMask.BorderSizePixel = 0
-    BannerBottomMask.Parent = BannerFrame
-
-    if type(Banner) == "string" then
-       
-        BannerFrame.Image = Banner
-        BannerFrame.ScaleType = Enum.ScaleType.Crop
-        BannerFrame.BackgroundTransparency = 1
-
-    elseif typeof(Banner) == "Color3" then
-       
-        BannerFrame.BackgroundTransparency = 0
-        BannerFrame.BackgroundColor3 = Banner
-
-        Create("UIGradient", BannerFrame, {
-            Rotation = -15,
-            Color = ColorSequence.new({
-                ColorSequenceKeypoint.new(0, Banner),
-                ColorSequenceKeypoint.new(1, Banner:lerp(Color3.new(1,1,1), 0.2))
-            })
-        })
-    end
-
-    local ImageLabel = Create("ImageLabel", FrameHolder, {
-        Size = UDim2.new(0, 33, 0, 33),
-        Position = UDim2.new(0, 10, 0.28, 0),
-        AnchorPoint = Vector2.new(0, 0.5),
-        Image = Logo,
-        BackgroundTransparency = 0,
-        BackgroundColor3 = Theme["Color Hub 2"]
-    })
-
-    Make("Corner", ImageLabel, UDim.new(0, 8))
-    Make("Stroke", ImageLabel, {
-        Thickness = 2.2,
-        ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-    })
-    
-    local LTitle = InsertTheme(Create("TextLabel", FrameHolder, {
-        Size = UDim2.new(1, -10, 0, 10),
-        Position = UDim2.new(0, 10, 0.44, 0),
-        Font = Enum.Font.GothamBold,
-        TextColor3 = Theme["Color Text"],
-        TextXAlignment = Enum.TextXAlignment.Left,
-        BackgroundTransparency = 1,
-        TextSize = 11,
-        Text = Title
-    }), "Text")
-
-    if OnlineCount or MemberCount then
-        StatsFrame = Create("Frame", FrameHolder, {
-            Size = UDim2.new(1, -10, 0, 9),
-            Position = UDim2.new(0, 0, 0.52, 0),
-            BackgroundTransparency = 1
-        })
-
-        Create("UIPadding", StatsFrame, {
-            PaddingLeft = UDim.new(0, 7),
-            PaddingRight = UDim.new(0, 10)
-        })
-
-        Create("UIListLayout", StatsFrame, {
-            HorizontalAlignment = Enum.HorizontalAlignment.Left,
-            VerticalAlignment = Enum.VerticalAlignment.Center,
-            FillDirection = Enum.FillDirection.Horizontal,
-            Padding = UDim.new(0, 4)
-        })
-
-        local function MakeStat(color, text)
-            local Holder = Create("Frame", StatsFrame, {
-                Size = UDim2.fromScale(0, 1),
-                AutomaticSize = Enum.AutomaticSize.X,
-                BackgroundTransparency = 1
-
-            })
-
-            local Dot = Create("Frame", Holder, {
-                Size = UDim2.fromOffset(3, 3),
-                Position = UDim2.new(0, 5, 0.5, 0),
-                AnchorPoint = Vector2.new(0, 0.5),
-                BackgroundColor3 = color
-            })
-
-            Make("Corner", Dot, UDim.new(1, 0))
-
-            local Label = Create("TextLabel", Holder, {
-                Size = UDim2.new(0, 0, 1, 0),
-                Position = UDim2.new(0, 12, 0.5, 0),
-                AnchorPoint = Vector2.new(0, 0.5),
-                AutomaticSize = Enum.AutomaticSize.X,
-                BackgroundTransparency = 1,
-                TextSize = 7,
-                Text = text,
-                TextXAlignment = Enum.TextXAlignment.Left,
-                Font = Enum.Font.GothamMedium,
-                TextColor3 = Color3.fromRGB(210, 215, 220)
-            })
-
-            InsertTheme(Label, "DarkText")
-        end
-
-        if OnlineCount ~= nil then
-            MakeStat(Color3.fromRGB(67, 181, 129), FormatNum(OnlineCount) .. " Online")
-        end
-        if MemberCount ~= nil then
-            MakeStat(Color3.fromRGB(86, 101, 105), FormatNum(MemberCount) .. " Members")
-        end
-    end
-
-    local LDesc = InsertTheme(Create("TextLabel", FrameHolder, {
-        Size = UDim2.new(1, -50, 0, 8),
-        Position = UDim2.new(0, 10, StatsFrame and 0.6 or 0.56, 0),
-        TextWrapped = true,
-        AutomaticSize = Enum.AutomaticSize.Y,
-        Font = Enum.Font.GothamMedium,
-        TextColor3 = Theme["Color Dark Text"],
-        TextXAlignment = Enum.TextXAlignment.Left,
-        BackgroundTransparency = 1,
-        TextSize = 8,
-        Text = Desc
-    }), "DarkText")
-
-    local BottomFrame = Create("Frame", FrameHolder, {
-        Size = UDim2.new(1, 0, 0.28, 0),
-        Position = UDim2.fromScale(0, 1),
-        AnchorPoint = Vector2.new(0, 1),
-        BorderSizePixel = 0,
-        BackgroundColor3 = Theme["Color Hub 2"]
-    })
-
-    local cardCorner = Instance.new("UICorner")
-    cardCorner.CornerRadius = UDim.new(0, 10) 
-    cardCorner.Parent = BottomFrame
-
-    if LDesc.Text and #LDesc.Text > 0 then
-        BottomFrame.Size = UDim2.new(1, 0, 0.42, 0)
-
-        Create("UIGradient", BottomFrame, {
-            Rotation = -90,
-            Transparency = NumberSequence.new{
-                NumberSequenceKeypoint.new(0.00,0.00),
-                NumberSequenceKeypoint.new(0.60,0.00),
-                NumberSequenceKeypoint.new(1.00,1.00)
-            }
-        })
-    end
-
-    local JoinButton = Create("TextButton", BottomFrame, {
-        Size = UDim2.new(1, -18, 0, 18),
-        AnchorPoint = Vector2.new(0.5, 1),
-        Position = UDim2.new(0.5, 0, 1, -9),
-        Text = "Go to Server",
-        Font = Enum.Font.GothamBold,
-        TextSize = 8,
-        TextColor3 = Color3.fromRGB(255, 255, 255),
-        BackgroundColor3 = Color3.fromRGB(37, 128, 69)
-    })
-
-    Make("Corner", JoinButton, UDim.new(0.5, 0))
-
-   
-    local ClickDelay
-    JoinButton.Activated:Connect(function()
-        setclipboard(Invite)
-        if ClickDelay then return end
-
-        ClickDelay = true
-        SetProps(JoinButton, {
-            Text = "Copied to Clipboard",
-            BackgroundColor3 = Color3.fromRGB(100, 100, 100),
-            TextColor3 = Color3.fromRGB(150, 150, 150)
-        })
-
-        task.wait(5)
-
-        SetProps(JoinButton, {
-            Text = "Go to Server",
-            BackgroundColor3 = Color3.fromRGB(37, 128, 69),
-            TextColor3 = Color3.fromRGB(255, 255, 255)
-        })
-
-        ClickDelay = false
-    end)
-
-
-  			   local DiscordInvite = {}
- 			   function DiscordInvite:Destroy()
-   			   InviteHolder:Destroy()
-  			end
- 			   function DiscordInvite:Visible(...)
-   			   Funcs:ToggleVisible(InviteHolder, ...)
- 			end
-
-             return DiscordInvite
-        end 
-		return Tab
-	end
-	
-	CloseButton.Activated:Connect(Window.CloseBtn)
-	MinimizeButton.Activated:Connect(Window.MinimizeBtn)
-	return Window
+fromRGB(
+255
+,
+255
+,
+255
+)
+,
+0.2
+}
+)
 end
+)
+aM
+.
+Focused
+:
 
-return redzlib
+Connect(
+function
+(
+)
+
+A(
+{
+aN
+,
+'ImageColor3'
+,
+E
+[
+'Color Theme'
+]
+,
+0.2
+}
+)
+end
+)
+aO
+.
+OnChanging
+=
+false
+function
+aO
+:
+Set
+(
+aQ
+)
+aM
+.
+Text
+=
+
+tostring(
+aQ
+or
+''
+)
+
+aP(
+)
+end
+function
+aO
+:
+Get
+(
+)
+return
+aM
+.
+Text
+end
+function
+aO
+:
+Callback
+(
+aQ
+)
+q
+:
+
+InsertCallback(
+aG
+,
+aQ
+)
+end
+function
+aO
+:
+Visible
+(
+...
+)
+q
+:
+
+ToggleVisible(
+aI
+,
+...
+)
+end
+function
+aO
+:
+Destroy
+(
+)
+aI
+:
+
+Destroy(
+)
+end
+aM
+.
+Text
+=
+aD
+
+aP(
+)
+return
+aO
+end
+function
+az
+:
+AddDiscordInvite
+(
+aA
+)
+local
+aB
+=
+aA
+[
+1
+]
+or
+aA
+.
+Name
+or
+aA
+.
+Title
+or
+'Discord'
+local
+aC
+=
+aA
+.
+Desc
+or
+aA
+.
+Description
+or
+''
+local
+aD
+=
+aA
+[
+2
+]
+or
+aA
+.
+Logo
+or
+aA
+.
+Icon
+or
+aA
+.
+Image
+or
+''
+local
+aE
+=
+aA
+[
+3
+]
+or
+aA
+.
+Invite
+or
+aA
+.
+Link
+or
+''
+local
+aF
+=
+aA
+.
+Banner
+or
+aA
+.
+BannerColor
+local
+aG
+=
+aA
+.
+Online
+or
+aA
+.
+MembersOnline
+local
+aH
+=
+aA
+.
+Members
+or
+aA
+.
+TotalMembers
+local 
+function 
+aI
+(
+aJ
+)
+aJ
+=
+
+tonumber(
+aJ
+)
+if
+not
+aJ
+then
+return
+'0'
+end
+local
+aL
+=
+
+tostring(
+math
+.
+
+floor(
+aJ
++
+0.0001
+)
+)
+return
+aL
+:
+
+reverse(
+)
+:
+
+gsub(
+'(%d%d%d)'
+,
+'%1,'
+)
+:
+
+reverse(
+)
+:
+
+gsub(
+'^,'
+,
+''
+)
+end
+local
+aJ
+=
+
+p(
+'Frame'
+,
+ax
+,
+{
+Size
+=
+UDim2
+.
+
+new(
+1
+,
+0
+,
+0
+,
+148
+)
+,
+Name
+=
+'Option'
+,
+BackgroundTransparency
+=
+1
+}
+)
+local
+aL
+=
+
+p(
+'TextLabel'
+,
+aJ
+,
+{
+Size
+=
+UDim2
+.
+
+new(
+1
+,
+-
+10
+,
+0
+,
+15
+)
+,
+Position
+=
+UDim2
+.
+
+new(
+0
+,
+5
+,
+0
+,
+0
+)
+,
+TextColor3
+=
+Color3
+.
+
+fromRGB(
+40
+,
+150
+,
+255
+)
+,
+Font
+=
+Enum
+.
+Font
+.
+BuilderSansMedium
+,
+TextXAlignment
+=
+Enum
+.
+TextXAlignment
+.
+Left
+,
+BackgroundTransparency
+=
+1
+,
+TextSize
+=
+9
+,
+Text
+=
+aE
+~=
+''
+and
+aE
+or
+'https://discord.gg/'
+,
+RichText
+=
+false
+}
+)
+local
+aM
+=
+
+o(
+
+p(
+'Frame'
+,
+aJ
+,
+{
+Size
+=
+UDim2
+.
+
+new(
+0
+,
+178
+,
+1
+,
+-
+15
+)
+,
+AnchorPoint
+=
+Vector2
+.
+
+new(
+0
+,
+1
+)
+,
+Position
+=
+UDim2
+.
+
+new(
+0
+,
+5
+,
+1
+,
+0
+)
+,
+BackgroundColor3
+=
+E
+[
+'Color Hub 2'
+]
+,
+ClipsDescendants
+=
+true
+}
+)
+,
+'Frame'
+)
+
+G(
+'Corner'
+,
+aM
+,
+UDim
+.
+
+new(
+0
+,
+9
+)
+)
+
+G(
+'Stroke'
+,
+aM
+)
+local
+aN
+=
+
+p(
+'ImageLabel'
+,
+aM
+,
+{
+Size
+=
+UDim2
+.
+
+new(
+1
+,
+0
+,
+0.28
+,
+6
+)
+,
+BackgroundTransparency
+=
+1
+,
+BorderSizePixel
+=
+0
+}
+)
+
+G(
+'Corner'
+,
+aN
+,
+UDim
+.
+
+new(
+0
+,
+9
+)
+)
+local
+aO
+=
+
+p(
+'Frame'
+,
+aN
+,
+{
+Name
+=
+'BannerBottomMask'
+,
+Size
+=
+UDim2
+.
+
+new(
+1
+,
+0
+,
+0
+,
+6
+)
+,
+Position
+=
+UDim2
+.
+
+new(
+0
+,
+0
+,
+1
+,
+-
+6
+)
+,
+BackgroundColor3
+=
+E
+[
+'Color Hub 2'
+]
+,
+BorderSizePixel
+=
+0
+}
+)
+if
+
+type(
+aF
+)
+==
+'string'
+then
+aN
+.
+Image
+=
+aF
+aN
+.
+ScaleType
+=
+Enum
+.
+ScaleType
+.
+Crop
+aN
+.
+BackgroundTransparency
+=
+1
+elseif
+
+typeof(
+aF
+)
+==
+'Color3'
+then
+aN
+.
+BackgroundTransparency
+=
+0
+aN
+.
+BackgroundColor3
+=
+aF
+
+p(
+'UIGradient'
+,
+aN
+,
+{
+Rotation
+=
+-
+15
+,
+Color
+=
+ColorSequence
+.
+
+new(
+{
+ColorSequenceKeypoint
+.
+
+new(
+0
+,
+aF
+)
+,
+ColorSequenceKeypoint
+.
+
+new(
+1
+,
+aF
+:
+
+lerp(
+Color3
+.
+
+new(
+1
+,
+1
+,
+1
+)
+,
+0.2
+)
+)
+}
+)
+}
+)
+end
+local
+aP
+=
+
+p(
+'ImageLabel'
+,
+aM
+,
+{
+Size
+=
+UDim2
+.
+
+fromOffset(
+33
+,
+33
+)
+,
+Position
+=
+UDim2
+.
+
+new(
+0
+,
+10
+,
+0.28
+,
+0
+)
+,
+AnchorPoint
+=
+Vector2
+.
+
+new(
+0
+,
+0.5
+)
+,
+Image
+=
+aD
+,
+BackgroundTransparency
+=
+0
+,
+BackgroundColor3
+=
+E
+[
+'Color Hub 2'
+]
+}
+)
+
+G(
+'Corner'
+,
+aP
+,
+UDim
+.
+
+new(
+0
+,
+8
+)
+)
+
+G(
+'Stroke'
+,
+aP
+,
+{
+Thickness
+=
+2.2
+,
+ApplyStrokeMode
+=
+Enum
+.
+ApplyStrokeMode
+.
+Border
+}
+)
+local
+aQ
+=
+
+o(
+
+p(
+'TextLabel'
+,
+aM
+,
+{
+Size
+=
+UDim2
+.
+
+new(
+1
+,
+-
+10
+,
+0
+,
+10
+)
+,
+Position
+=
+UDim2
+.
+
+new(
+0
+,
+10
+,
+0.44
+,
+0
+)
+,
+Font
+=
+Enum
+.
+Font
+.
+BuilderSansBold
+,
+TextColor3
+=
+E
+[
+'Color Text'
+]
+,
+TextXAlignment
+=
+Enum
+.
+TextXAlignment
+.
+Left
+,
+BackgroundTransparency
+=
+1
+,
+TextSize
+=
+11
+,
+Text
+=
+aB
+,
+RichText
+=
+false
+}
+)
+,
+'Text'
+)
+local
+aR
+if
+aG
+or
+aH
+then
+aR
+=
+
+p(
+'Frame'
+,
+aM
+,
+{
+Size
+=
+UDim2
+.
+
+new(
+1
+,
+-
+10
+,
+0
+,
+9
+)
+,
+Position
+=
+UDim2
+.
+
+new(
+0
+,
+0
+,
+0.52
+,
+0
+)
+,
+BackgroundTransparency
+=
+1
+}
+,
+{
+
+p(
+'UIPadding'
+,
+{
+PaddingLeft
+=
+UDim
+.
+
+new(
+0
+,
+7
+)
+,
+PaddingRight
+=
+UDim
+.
+
+new(
+0
+,
+10
+)
+}
+)
+,
+
+p(
+'UIListLayout'
+,
+{
+HorizontalAlignment
+=
+Enum
+.
+HorizontalAlignment
+.
+Left
+,
+VerticalAlignment
+=
+Enum
+.
+VerticalAlignment
+.
+Center
+,
+FillDirection
+=
+Enum
+.
+FillDirection
+.
+Horizontal
+,
+Padding
+=
+UDim
+.
+
+new(
+0
+,
+4
+)
+}
+)
+}
+)
+local 
+function 
+aS
+(
+aT
+,
+aU
+)
+local
+aV
+=
+
+p(
+'Frame'
+,
+aR
+,
+{
+Size
+=
+UDim2
+.
+
+fromScale(
+0
+,
+1
+)
+,
+AutomaticSize
+=
+Enum
+.
+AutomaticSize
+.
+X
+,
+BackgroundTransparency
+=
+1
+}
+)
+local
+aW
+=
+
+p(
+'Frame'
+,
+aV
+,
+{
+Size
+=
+UDim2
+.
+
+fromOffset(
+3
+,
+3
+)
+,
+Position
+=
+UDim2
+.
+
+new(
+0
+,
+5
+,
+0.5
+,
+0
+)
+,
+AnchorPoint
+=
+Vector2
+.
+
+new(
+0
+,
+0.5
+)
+,
+BackgroundColor3
+=
+aT
+}
+)
+
+G(
+'Corner'
+,
+aW
+,
+UDim
+.
+
+new(
+1
+,
+0
+)
+)
+local
+aX
+=
+
+o(
+
+p(
+'TextLabel'
+,
+aV
+,
+{
+Size
+=
+UDim2
+.
+
+new(
+0
+,
+0
+,
+1
+,
+0
+)
+,
+Position
+=
+UDim2
+.
+
+new(
+0
+,
+12
+,
+0.5
+,
+0
+)
+,
+AnchorPoint
+=
+Vector2
+.
+
+new(
+0
+,
+0.5
+)
+,
+AutomaticSize
+=
+Enum
+.
+AutomaticSize
+.
+X
+,
+BackgroundTransparency
+=
+1
+,
+TextSize
+=
+7
+,
+Text
+=
+aU
+,
+TextXAlignment
+=
+Enum
+.
+TextXAlignment
+.
+Left
+,
+Font
+=
+Enum
+.
+Font
+.
+BuilderSansMedium
+,
+TextColor3
+=
+Color3
+.
+
+fromRGB(
+210
+,
+215
+,
+220
+)
+,
+RichText
+=
+false
+}
+)
+,
+'DarkText'
+)
+end
+if
+aG
+~=
+nil
+then
+
+aS(
+Color3
+.
+
+fromRGB(
+67
+,
+181
+,
+129
+)
+,
+
+aI(
+aG
+)
+..
+' Online'
+)
+end
+if
+aH
+~=
+nil
+then
+
+aS(
+Color3
+.
+
+fromRGB(
+86
+,
+101
+,
+105
+)
+,
+
+aI(
+aH
+)
+..
+' Members'
+)
+end
+end
+local
+aS
+=
+
+o(
+
+p(
+'TextLabel'
+,
+aM
+,
+{
+Size
+=
+UDim2
+.
+
+new(
+1
+,
+-
+50
+,
+0
+,
+8
+)
+,
+Position
+=
+UDim2
+.
+
+new(
+0
+,
+10
+,
+aR
+and
+0.6
+or
+0.56
+,
+0
+)
+,
+TextWrapped
+=
+true
+,
+AutomaticSize
+=
+Enum
+.
+AutomaticSize
+.
+Y
+,
+Font
+=
+Enum
+.
+Font
+.
+BuilderSansMedium
+,
+TextColor3
+=
+E
+[
+'Color Dark Text'
+]
+,
+TextXAlignment
+=
+Enum
+.
+TextXAlignment
+.
+Left
+,
+BackgroundTransparency
+=
+1
+,
+TextSize
+=
+8
+,
+Text
+=
+aC
+,
+RichText
+=
+false
+}
+)
+,
+'DarkText'
+)
+local
+aT
+=
+
+p(
+'Frame'
+,
+aM
+,
+{
+Size
+=
+UDim2
+.
+
+new(
+1
+,
+0
+,
+0.28
+,
+0
+)
+,
+Position
+=
+UDim2
+.
+
+fromScale(
+0
+,
+1
+)
+,
+AnchorPoint
+=
+Vector2
+.
+
+new(
+0
+,
+1
+)
+,
+BorderSizePixel
+=
+0
+,
+BackgroundColor3
+=
+E
+[
+'Color Hub 2'
+]
+}
+)
+
+G(
+'Corner'
+,
+aT
+,
+UDim
+.
+
+new(
+0
+,
+9
+)
+)
+if
+aS
+.
+Text
+and
+#
+aS
+.
+Text
+>
+0
+then
+aT
+.
+Size
+=
+UDim2
+.
+
+new(
+1
+,
+0
+,
+0.42
+,
+0
+)
+
+p(
+'UIGradient'
+,
+aT
+,
+{
+Rotation
+=
+-
+90
+,
+Transparency
+=
+NumberSequence
+.
+new
+{
+NumberSequenceKeypoint
+.
+
+new(
+0
+,
+0
+)
+,
+NumberSequenceKeypoint
+.
+
+new(
+0.6
+,
+0
+)
+,
+NumberSequenceKeypoint
+.
+
+new(
+1
+,
+1
+)
+}
+}
+)
+end
+local
+aU
+=
+
+p(
+'TextButton'
+,
+aT
+,
+{
+Size
+=
+UDim2
+.
+
+new(
+1
+,
+-
+18
+,
+0
+,
+18
+)
+,
+AnchorPoint
+=
+Vector2
+.
+
+new(
+0.5
+,
+1
+)
+,
+Position
+=
+UDim2
+.
+
+new(
+0.5
+,
+0
+,
+1
+,
+-
+9
+)
+,
+Text
+=
+'Go to Server'
+,
+Font
+=
+Enum
+.
+Font
+.
+BuilderSansBold
+,
+TextSize
+=
+8
+,
+TextColor3
+=
+Color3
+.
+
+fromRGB(
+255
+,
+255
+,
+255
+)
+,
+BackgroundColor3
+=
+Color3
+.
+
+fromRGB(
+37
+,
+128
+,
+69
+)
+,
+RichText
+=
+false
+}
+)
+
+G(
+'Corner'
+,
+aU
+,
+UDim
+.
+
+new(
+0.5
+,
+0
+)
+)
+local
+aV
+=
+false
+aU
+.
+Activated
+:
+
+Connect(
+function
+(
+)
+if
+setclipboard
+then
+
+pcall(
+setclipboard
+,
+aE
+)
+end
+if
+aV
+then
+return
+end
+aV
+=
+true
+
+m(
+aU
+,
+{
+Text
+=
+'Copied to Clipboard'
+,
+BackgroundColor3
+=
+Color3
+.
+
+fromRGB(
+100
+,
+100
+,
+100
+)
+,
+TextColor3
+=
+Color3
+.
+
+fromRGB(
+150
+,
+150
+,
+150
+)
+}
+)
+task
+.
+
+wait(
+5
+)
+
+m(
+aU
+,
+{
+Text
+=
+'Go to Server'
+,
+BackgroundColor3
+=
+Color3
+.
+
+fromRGB(
+37
+,
+128
+,
+69
+)
+,
+TextColor3
+=
+Color3
+.
+
+fromRGB(
+255
+,
+255
+,
+255
+)
+}
+)
+aV
+=
+false
+end
+)
+local
+aW
+=
+{
+}
+function
+aW
+:
+Destroy
+(
+)
+aJ
+:
+
+Destroy(
+)
+end
+function
+aW
+:
+Visible
+(
+...
+)
+q
+:
+
+ToggleVisible(
+aJ
+,
+...
+)
+end
+return
+aW
+end
+return
+az
+end
+ah
+.
+Activated
+:
+
+Connect(
+am
+.
+CloseBtn
+)
+ai
+.
+Activated
+:
+
+Connect(
+am
+.
+MinimizeBtn
+)
+return
+am
+end
+return
+h
