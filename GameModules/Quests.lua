@@ -328,9 +328,9 @@ return {
     },
     {
       LevelReq = 55,
-      Name = "Bobby",
+      Name = "Chef",
       Task = {
-        Bobby = 1
+        Chef = 1
       }
     }
   },
